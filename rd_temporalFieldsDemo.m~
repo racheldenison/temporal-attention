@@ -7,6 +7,8 @@ p.keyCodes = KbName(p.keyNames);
 p.backgroundColor = 0.5;
 p.imageDur = 1/60;
 p.cueTargetSOA = 0.5;
+p.refRate = 1/60;
+slack = p.
 
 % SOA conditions
 p.soas = [-20 -10 10 20]*(1/60);
@@ -28,22 +30,17 @@ devNum = devNums.Keypad;
 % Sound for starting trials
 v = 1:1000;
 envelope = [0:.05:1 ones(1,1000-42) 1:-.05:0];
-
-% Response error sound
-% errorsound = 0.25 * sin(40*pi*v/30);
-errorsound = (.8 * sin(3*pi*v/30) + sin(5*pi*v/30)).*envelope;
-
-% Response correct sound
-correctsound = (0.7 * sin(6*pi*v/30)).*envelope;
+startSound = (0.25 * sin(3*pi*v/30)).*envelope;
 
 % Calculate stimulus dimensions (px) and position
 % imPos = round(ang2pix(p.imPos, p.screenSize(1), p.screenRes(1), p.viewDist, 'radial')); % from screen center
 % imSize = round(ang2pix(p.imSize, p.screenSize(1), p.screenRes(1), p.viewDist, 'central'));
 % fixSize = round(ang2pix(p.fixSize, p.screenSize(1), p.screenRes(1), p.viewDist, 'central'));
-% pixelsPerDegree = round(ang2pix(1, p.screenSize(1), p.screenRes(1), p.viewDist, 'central'));
-% imPos = [1 -1]*50;
+% pixelsPerDegree = round(ang2pix(1, p.screenSize(1), p.screenRes(1),
+% p.viewDist, 'central'));
 fixSize = 5;
-imPos = [0 0];
+imPos = [1 -1]*20;
+% imPos = [0 0];
 targetSize = 20;
 surroundSize = 20;
 
@@ -129,25 +126,24 @@ for iTrial = 1:nTrials
     end
     
     % Present cue
-    %%% no cue for now
-%     Screen('FillRect', window ,[255 0 0] ,fixRect);
-    timeCue = GetSecs;
+    Screen('FillRect', window ,[255 255 255] ,fixRect);
+    timeCue = Screen('Flip', win);
     sound(startSound);
     
     % Present images
     Screen('DrawTexture', win, tex1, [], imRect);
-    timeIm1 = Screen('Flip', win, timeCue + cueIm1SOA);
+    timeIm1 = Screen('Flip', win, timeCue + cueIm1SOA - slack);
     
     if abs(soa)>p.imageDur
         Screen('FillRect', win, white*p.backgroundColor);
-        timeBlank1 = Screen('Flip', win, timeIm1 + p.imageDur);
+        timeBlank1 = Screen('Flip', win, timeIm1 + p.imageDur - slack);
     end
     
     Screen('DrawTexture', win, tex2, [], imRect);
-    timeIm2 = Screen('Flip', win, timeCue + cueIm2SOA);
+    timeIm2 = Screen('Flip', win, timeCue + cueIm2SOA - slack);
     
     Screen('FillRect', win, white*p.backgroundColor);
-    timeBlank2 = Screen('Flip', win, timeIm2 + p.imageDur);
+    timeBlank2 = Screen('Flip', win, timeIm2 + p.imageDur - slack);
     
     % Find the actual times the target and surround were presented
     if soa < 0
