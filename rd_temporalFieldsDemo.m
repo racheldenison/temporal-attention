@@ -1,7 +1,8 @@
 % rd_temporalFieldsDemo.m
 
 % p = temporalFieldsParams;
-p.testingLocation = 'laptop';
+% p.testingLocation = 'laptop';
+p.testingLocation = 'CarrascoL1';
 p.keyNames = {'1!','2@'};
 p.keyCodes = KbName(p.keyNames);
 p.backgroundColor = 0.5;
@@ -13,7 +14,7 @@ p.targOnlyCode = 0.5;
 slack = p.refRate/2;
 
 % SOA conditions
-p.soas = [-20 -10 10 20]*p.refRate;
+p.soas = [-20 -10:2:-2 2:2:10 20]*p.refRate;
 p.soas = [p.soas p.targOnlyCode]; % p.targOnlyCode means include surround absent condition
 % p.soas = [p.targOnlyCode p.targOnlyCode]; 
 
@@ -22,14 +23,13 @@ p.targetPresAbs = [1 0]; % 1=present, 0=absent
 
 pixelsPerDegree = 99;
 
-nReps = 3;
+nReps = 5;
 
 % Find keyboard device number
-devNums = findKeyboardDevNumsAtLocation(p.testingLocation);
-if isempty(devNums.Keypad)
-%     error('Could not find Keypad!')
+devNum = findKeyboardDevNumsAtLocationNYU(p.testingLocation);
+if isempty(devNum)
+    error('Could not find Keypad!')
 end
-devNum = devNums.Keypad;
 
 % Sound for starting trials
 v = 1:1000;
@@ -46,7 +46,7 @@ fixSize = 5;
 imPos = [1 -1]*50;
 % imPos = [0 0];
 targetSize = 20;
-surroundSize = 20;
+surroundSize = 30;
 
 % Set up window and textures
 screenNumber = max(Screen('Screens'));
@@ -60,7 +60,7 @@ fixRect = CenterRectOnPoint([0 0 fixSize fixSize], cx, cy);
 imSizeDeg = [4 4];
 spatialFrequency = 3;
 orientation = 0;
-targetContrast = 0.02;
+targetContrast = 0.05;% 0.045ish
 surroundContrast = 0.1;
 blurRadius = 0.1;
 
@@ -105,6 +105,7 @@ vbl = Screen('Flip', win);
 KbWait(devNum);
 
 % Trials
+tic
 for iTrial = 1:nTrials
     % get conditions for this trial
     trialIdx = trialOrder(iTrial);
@@ -197,6 +198,7 @@ for iTrial = 1:nTrials
     trials(trialIdx,8) = correct;
     trials(trialIdx,9) = jitter;
 end
+toc
 
 % Show end of block feedback
 % acc = mean(trials(:,6));
@@ -225,9 +227,9 @@ accSte = totals.stes(:,8);
 
 % Plot figs
 figure
-errorbar(p.soas, accMean, accSte, 'k')
+errorbar(p.soas, accMean, accSte, '.-k')
 
-figure
-scatter(trials(:,3), trials(:,4))
+% figure
+% scatter(trials(:,3), trials(:,4))
 
 
