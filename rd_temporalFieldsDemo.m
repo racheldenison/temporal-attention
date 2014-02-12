@@ -21,7 +21,7 @@ nReps = 3;
 % Find keyboard device number
 devNums = findKeyboardDevNumsAtLocation(p.testingLocation);
 if isempty(devNums.Keypad)
-    error('Could not find Keypad!')
+%     error('Could not find Keypad!')
 end
 devNum = devNums.Keypad;
 
@@ -43,8 +43,8 @@ surroundSize = 20;
 
 % Set up window and textures
 screenNumber = max(Screen('Screens'));
-% [win rect] = Screen('OpenWindow', screenNumber);
-[win rect] = Screen('OpenWindow', screenNumber, [], [0 0 800 600]);
+[win rect] = Screen('OpenWindow', screenNumber);
+% [win rect] = Screen('OpenWindow', screenNumber, [], [0 0 800 600]);
 white = WhiteIndex(win);  % Retrieves the CLUT color code for white.
 [cx cy] = RectCenter(rect);
 fixRect = CenterRectOnPoint([0 0 fixSize fixSize], cx, cy);
