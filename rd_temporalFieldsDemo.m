@@ -7,9 +7,15 @@ p.keyCodes = KbName(p.keyNames);
 p.backgroundColor = 0.5;
 p.imageDur = 1/60;
 p.cueTargetSOA = 0.5;
+p.postStimCushion = 0.2;
+p.refRate = 1/60;
+p.targOnlyCode = 0.5;
+slack = p.refRate/2;
 
 % SOA conditions
-p.soas = [-20 -10 10 20]*(1/60);
+p.soas = [-20 -10 10 20]*p.refRate;
+p.soas = [p.soas p.targOnlyCode]; % p.targOnlyCode means include surround absent condition
+% p.soas = [p.targOnlyCode p.targOnlyCode]; 
 
 % Target present / absent conditions
 p.targetPresAbs = [1 0]; % 1=present, 0=absent
@@ -34,10 +40,11 @@ startSound = (0.25 * sin(3*pi*v/30)).*envelope;
 % imPos = round(ang2pix(p.imPos, p.screenSize(1), p.screenRes(1), p.viewDist, 'radial')); % from screen center
 % imSize = round(ang2pix(p.imSize, p.screenSize(1), p.screenRes(1), p.viewDist, 'central'));
 % fixSize = round(ang2pix(p.fixSize, p.screenSize(1), p.screenRes(1), p.viewDist, 'central'));
-% pixelsPerDegree = round(ang2pix(1, p.screenSize(1), p.screenRes(1), p.viewDist, 'central'));
-% imPos = [1 -1]*50;
+% pixelsPerDegree = round(ang2pix(1, p.screenSize(1), p.screenRes(1),
+% p.viewDist, 'central'));
 fixSize = 5;
-imPos = [0 0];
+imPos = [1 -1]*50;
+% imPos = [0 0];
 targetSize = 20;
 surroundSize = 20;
 
@@ -79,7 +86,7 @@ imSize = size(target,1);
 imRect = CenterRectOnPoint([0 0 imSize imSize], cx+imPos(1), cy+imPos(2));
 
 % Construct trials matrix
-trials_headers = {'soaCond','targetPresAbsCond','soa','actualSOA','rt','responseKey','response','correct'};
+trials_headers = {'soaCond','targetPresAbsCond','soa','actualSOA','rt','responseKey','response','correct','jitter'};
 
 trials = fullfact([numel(p.soas) numel(p.targetPresAbs)]);
 trials = repmat(trials, nReps, 1);
@@ -91,9 +98,11 @@ nTrials = size(trials,1);
 % Choose order of trial presentation
 trialOrder = randperm(nTrials);
 
-% Show background screen
+% Show fixation and wait for a button press
 Screen('FillRect', win, white*p.backgroundColor);
+Screen('FillRect', win, [0 0 0], fixRect);
 vbl = Screen('Flip', win);
+KbWait(devNum);
 
 % Trials
 for iTrial = 1:nTrials
@@ -117,30 +126,45 @@ for iTrial = 1:nTrials
         else
             tex1 = blankTex;
         end
-        tex2 = surroundTex;
+        if soa==p.targOnlyCode % target only
+            tex2 = blankTex;
+            soa = 3*p.refRate; % set soa to a reasonable number
+        else
+            tex2 = surroundTex;
+        end
         cueIm1SOA = p.cueTargetSOA; % target
         cueIm2SOA = p.cueTargetSOA + soa; % surround
     end
     
+    % Select random jitter for stim 1 onset
+    % ** consider using a flat hazard function instead **
+    jitter = 0.2*rand; % uniform random delay between 0-200 ms
+    
     % Present cue
-%     Screen('FillRect', window ,[255 0 0] ,fixRect);
-    timeCue = GetSecs;
-    sound(startSound);
+    Screen('FillRect', win, [255 255 255], fixRect);
+    timeCue = Screen('Flip', win);
     
     % Present images
     Screen('DrawTexture', win, tex1, [], imRect);
-    timeIm1 = Screen('Flip', win, timeCue + cueIm1SOA);
+    Screen('FillRect', win, [255 255 255], fixRect);
+    timeIm1 = Screen('Flip', win, timeCue + jitter + cueIm1SOA - slack);
     
     if abs(soa)>p.imageDur
         Screen('FillRect', win, white*p.backgroundColor);
-        timeBlank1 = Screen('Flip', win, timeIm1 + p.imageDur);
+        Screen('FillRect', win ,[255 255 255], fixRect);
+        timeBlank1 = Screen('Flip', win, timeIm1 + p.imageDur - slack);
     end
     
     Screen('DrawTexture', win, tex2, [], imRect);
-    timeIm2 = Screen('Flip', win, timeCue + cueIm2SOA);
+    Screen('FillRect', win, [255 255 255], fixRect);
+    timeIm2 = Screen('Flip', win, timeCue + jitter + cueIm2SOA - slack);
     
     Screen('FillRect', win, white*p.backgroundColor);
-    timeBlank2 = Screen('Flip', win, timeIm2 + p.imageDur);
+    Screen('FillRect', win ,[255 255 255] ,fixRect);
+    timeBlank2 = Screen('Flip', win, timeIm2 + p.imageDur - slack);
+    
+    Screen('FillRect', win, [0 0 255], fixRect);
+    timeRespCue = Screen('Flip', win, timeBlank2 + p.postStimCushion - slack);
     
     % Find the actual times the target and surround were presented
     if soa < 0
@@ -171,6 +195,7 @@ for iTrial = 1:nTrials
     trials(trialIdx,6) = responseKey;
     trials(trialIdx,7) = response;
     trials(trialIdx,8) = correct;
+    trials(trialIdx,9) = jitter;
 end
 
 % Show end of block feedback
