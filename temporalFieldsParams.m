@@ -34,13 +34,13 @@ p.cueTargetSOA = 0.5;
 p.postStimCushion = 0.2;
 
 p.imPos = [2 -2];
-p.imSize = [4 4]; % this is the size of the image container that holds the stim
+p.imSize = [6 6]; % this is the size of the image container that holds the stim
 p.fixSize = 0.1;
-p.targetSize = 2;
-p.surroundSize = 3;
-p.spatialFrequency = 3;
+p.targetSize = 0.5; % sigma of gaussian
+p.surroundSize = 1; % sigma of gaussian
+p.spatialFrequency = 1;
 p.orientation = 0;
-p.targetContrast = 0.05;
+p.targetContrast = 0.3;
 p.surroundContrast = 0.1;
 
 
