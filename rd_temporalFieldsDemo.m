@@ -1,29 +1,8 @@
 % rd_temporalFieldsDemo.m
 
-% p = temporalFieldsParams;
-% p.testingLocation = 'laptop';
-p.testingLocation = 'CarrascoL1';
-p.keyNames = {'1!','2@'};
-p.keyCodes = KbName(p.keyNames);
-p.backgroundColor = 0.5;
-p.imageDur = 1/60;
-p.cueTargetSOA = 0.5;
-p.postStimCushion = 0.2;
-p.refRate = 1/60;
-p.targOnlyCode = 0.5;
+p = temporalFieldsParams;
+
 slack = p.refRate/2;
-
-% SOA conditions
-p.soas = [-20 -10:2:-2 2:2:10 20]*p.refRate;
-p.soas = [p.soas p.targOnlyCode]; % p.targOnlyCode means include surround absent condition
-% p.soas = [p.targOnlyCode p.targOnlyCode]; 
-
-% Target present / absent conditions
-p.targetPresAbs = [1 0]; % 1=present, 0=absent
-
-pixelsPerDegree = 99;
-
-nReps = 5;
 
 % Find keyboard device number
 devNum = findKeyboardDevNumsAtLocationNYU(p.testingLocation);
@@ -36,41 +15,49 @@ v = 1:1000;
 envelope = [0:.05:1 ones(1,1000-42) 1:-.05:0];
 startSound = (0.25 * sin(3*pi*v/30)).*envelope;
 
-% Calculate stimulus dimensions (px) and position
-% imPos = round(ang2pix(p.imPos, p.screenSize(1), p.screenRes(1), p.viewDist, 'radial')); % from screen center
-% imSize = round(ang2pix(p.imSize, p.screenSize(1), p.screenRes(1), p.viewDist, 'central'));
-% fixSize = round(ang2pix(p.fixSize, p.screenSize(1), p.screenRes(1), p.viewDist, 'central'));
-% pixelsPerDegree = round(ang2pix(1, p.screenSize(1), p.screenRes(1),
-% p.viewDist, 'central'));
-fixSize = 5;
-imPos = [1 -1]*50;
-% imPos = [0 0];
-targetSize = 20;
-surroundSize = 30;
-
 % Set up window and textures
 screenNumber = max(Screen('Screens'));
 [win rect] = Screen('OpenWindow', screenNumber);
 % [win rect] = Screen('OpenWindow', screenNumber, [], [0 0 800 600]);
 white = WhiteIndex(win);  % Retrieves the CLUT color code for white.
 [cx cy] = RectCenter(rect);
-fixRect = CenterRectOnPoint([0 0 fixSize fixSize], cx, cy);
+
+% Check screen size
+[sw, sh] = Screen('WindowSize', win); % height and width of screen (px)
+if ~all([sw sh] == p.screenRes)
+    error('Screen resolution is different from requested!')
+end
+
+% Check refresh rate
+flipInterval = Screen('GetFlipInterval', win); % frame duration (s)
+if abs(flipInterval - p.refRate) > 0.001
+    error('Refresh rate is different from requested!')
+end
+
+% Load calibration file
+switch p.testingLocation
+    case 'CarrascoL1'
+        load('../Displays/0001_james_TrinitonG520_1280x960_57cm_Input1_140129.mat');
+        Screen('LoadNormalizedGammaTable', win, repmat(calib.table,1,3));
+    otherwise
+        fprintf('\nNot loading gamma table ...\n')
+end
+
+% Calculate stimulus dimensions (px) and position
+imPos = round(ang2pix(p.imPos, p.screenSize(1), p.screenRes(1), p.viewDist, 'radial')); % from screen center
+targetSize = round(ang2pix(p.targetSize, p.screenSize(1), p.screenRes(1), p.viewDist, 'central'));
+surroundSize = round(ang2pix(p.surroundSize, p.screenSize(1), p.screenRes(1), p.viewDist, 'central'));
+fixSize = round(ang2pix(p.fixSize, p.screenSize(1), p.screenRes(1), p.viewDist, 'central'));
+pixelsPerDegree = round(ang2pix(1, p.screenSize(1), p.screenRes(1), p.viewDist, 'central'));
 
 % Make target and surround gratings
-imSizeDeg = [4 4];
-spatialFrequency = 3;
-orientation = 0;
-targetContrast = 0.05;% 0.045ish
-surroundContrast = 0.1;
-blurRadius = 0.1;
-
-% make big gratings that will later be masked
-t = buildColorGrating(pixelsPerDegree, imSizeDeg, ...
-    spatialFrequency, orientation, 0, targetContrast, 0, 'bw');
-s = buildColorGrating(pixelsPerDegree, imSizeDeg, ...
-    spatialFrequency, orientation, 0, surroundContrast, 0, 'bw');
-blank = buildColorGrating(pixelsPerDegree, imSizeDeg, ...
-    spatialFrequency, orientation, 0, 0, 0, 'bw');
+% Make big gratings that will later be masked
+t = buildColorGrating(pixelsPerDegree, p.imSize, ...
+    p.spatialFrequency, p.orientation, 0, p.targetContrast, 0, 'bw');
+s = buildColorGrating(pixelsPerDegree, p.imSize, ...
+    p.spatialFrequency, p.orientation, 0, p.surroundContrast, 0, 'bw');
+blank = buildColorGrating(pixelsPerDegree, p.imSize, ...
+    p.spatialFrequency, p.orientation, 0, 0, 0, 'bw');
 
 % Mask with annulus
 target = maskWithGaussian(t, size(t,1), targetSize);
@@ -81,15 +68,16 @@ targetTex = Screen('MakeTexture', win, target*white);
 surroundTex = Screen('MakeTexture', win, surround*white);
 blankTex = Screen('MakeTexture', win, blank*white);
 
-% Make the rect for placing the images
+% Make the rects for placing the images
 imSize = size(target,1);
 imRect = CenterRectOnPoint([0 0 imSize imSize], cx+imPos(1), cy+imPos(2));
+fixRect = CenterRectOnPoint([0 0 fixSize fixSize], cx, cy);
 
 % Construct trials matrix
 trials_headers = {'soaCond','targetPresAbsCond','soa','actualSOA','rt','responseKey','response','correct','jitter'};
 
 trials = fullfact([numel(p.soas) numel(p.targetPresAbs)]);
-trials = repmat(trials, nReps, 1);
+trials = repmat(trials, p.nReps, 1);
 nTrials = size(trials,1);
 
 %%% for debugging, just show all the stimuli
