@@ -1,4 +1,10 @@
-% rd_temporalFieldsDemo.m
+function rd_temporalFieldsDemo(subjectID)
+
+if nargin==0
+    subjectID = 'test';
+end
+
+saveData = 1;
 
 p = temporalFieldsParams;
 
@@ -192,10 +198,10 @@ toc
 % acc = mean(trials(:,6));
 
 % Store expt info
+expt.p = p;
 expt.trialOrder = trialOrder;
-
-results.trials_headers = trials_headers;
-results.trials = trials;
+expt.trials_headers = trials_headers;
+expt.trials = trials;
 
 % Clean up
 Screen('CloseAll')
@@ -219,5 +225,17 @@ errorbar(p.soas, accMean, accSte, '.-k')
 
 % figure
 % scatter(trials(:,3), trials(:,4))
+
+% Store data
+results.totals = totals;
+results.accMean = accMean;
+results.accSte = accSte;
+results.whenSaved = datestr(now);
+
+% Save data
+if saveData
+    fileName = sprintf('data/%s_%s.mat', subjectID, datestr(now, 'yyyymmdd'));
+    save(fileName, 'expt', 'results')
+end
 
 

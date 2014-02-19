@@ -40,7 +40,7 @@ p.targetSize = 0.5; % sigma of gaussian
 p.surroundSize = 1; % sigma of gaussian
 p.spatialFrequency = 1;
 p.orientation = 0;
-p.targetContrast = 0.3;
+p.targetContrast = 0.05;
 p.surroundContrast = 0.1;
 
 
