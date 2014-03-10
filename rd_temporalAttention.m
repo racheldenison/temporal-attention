@@ -130,18 +130,29 @@ for iTrial = 1:nTrials
     cuedInterval = p.cuedInterval(trials(trialIdx,cuedIntervalIdx));
     cueValidity = p.cuedInterval(trials(trialIdx,cueValidityIdx));
     
-    if cuedInterval==1
-        cuedTargetOrientation = p.targetOrientations(to1Cond);
-    elseif cuedInterval==2
-        cuedTargetOrientation = p.targetOrientations(to2Cond);
+    % Determine response interval and target orientation
+    if cueValidity==1 % valid cue
+        respInterval = cuedInterval;
     else
-        error('cuedInterval not recognized')
+        respInterval = 3-cuedInterval; % 2 if 1, and 1 if 2
     end
+
+    if respInterval==1
+        respTargetOrientation = p.targetOrientations(to1Cond);
+    else
+        respTargetOrientation = p.targetOrientations(to2Cond);
+    end
+    
+    % Select tones and textures
+    cueTone = p.cueTones(cuedInterval,:);
+    respTone = p.cueTones(respInterval,:);
     
     tex1 = targetTex(tcCond,to1Cond);
     tex2 = targetTex(tcCond,to2Cond);
     
     % Present cue
+    %%% insert tone cue here %%%
+    soundsc(cueTone)
     Screen('FillRect', win, [255 255 255], fixRect);
     timeCue = Screen('Flip', win);
     
@@ -162,6 +173,8 @@ for iTrial = 1:nTrials
     Screen('FillRect', win, [255 255 255], fixRect);
     timeBlank2 = Screen('Flip', win, timeIm2 + p.targetDur - slack);
     
+    %%% insert tone respone cue here %%%
+    soundsc(respTone)
     Screen('FillRect', win, [0 0 255], fixRect);
     timeRespCue = Screen('Flip', win, timeCue + p.respCueSOA - slack);
     
@@ -172,17 +185,26 @@ for iTrial = 1:nTrials
     % Feedback
     responseKey = find(p.keyCodes==find(keyCode));
     response = p.targetOrientations(responseKey);
-    if response==cuedTargetOrientation;
+    if response==respTargetOrientation;
         correct = 1;
+        feedbackText = '+';
+        feedbackColor = [0 1 0]*white;
     else
         correct = 0;
+        feedbackText = '-';
+        feedbackColor = [1 0 0]*white;
     end
     
+    DrawFormattedText(win, feedbackText, cx, cy, feedbackColor)
+    timeFeedback = Screen('Flip', win);
+   
     % Store trial info
-    trials(trialIdx,6) = rt;
-    trials(trialIdx,7) = responseKey;
-    trials(trialIdx,8) = response;
-    trials(trialIdx,9) = correct;
+    trials(trialIdx,6) = respInterval;
+    trials(trialIdx,7) = respTargetOrientation;
+    trials(trialIdx,8) = rt;
+    trials(trialIdx,9) = responseKey;
+    trials(trialIdx,10) = response;
+    trials(trialIdx,11) = correct;
     
     % Store timing
     timing.timeCue(iTrial,1) = timeCue;
@@ -191,6 +213,7 @@ for iTrial = 1:nTrials
     timing.timeIm2(iTrial,1) = timeIm2;
     timing.timeBlank2(iTrial,1) = timeBlank2;
     timing.timeRespCue(iTrial,1) = timeRespCue;
+    timing.timeFeedback(iTrial,1) = timeFeedback;
     
     save('data/TEMP') % saves the workspace on each trial
 end
