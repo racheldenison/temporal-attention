@@ -20,29 +20,36 @@ end
 
 % Set up window and textures
 screenNumber = max(Screen('Screens'));
-% [win rect] = Screen('OpenWindow', screenNumber);
-[win rect] = Screen('OpenWindow', screenNumber, [], [0 0 800 600]);
-white = WhiteIndex(win);  % Retrieves the CLUT color code for white.
+% [window rect] = Screen('OpenWindow', screenNumber);
+[window rect] = Screen('OpenWindow', screenNumber, [], [0 0 800 600]);
+white = WhiteIndex(window);  % Retrieves the CLUT color code for white.
 [cx cy] = RectCenter(rect);
-Screen('TextSize', win, 24);
+Screen('TextSize', window, 24);
+Screen('TextColor', window, [1 1 1]*white);
+Screen('TextFont', window, p.font);
 
 % Check screen size
-[sw, sh] = Screen('WindowSize', win); % height and width of screen (px)
+[sw, sh] = Screen('WindowSize', window); % height and width of screen (px)
 if ~all([sw sh] == p.screenRes) && ~strcmp(subjectID,'test')
     error('Screen resolution is different from requested!')
 end
 
 % Check refresh rate
-flipInterval = Screen('GetFlipInterval', win); % frame duration (s)
+flipInterval = Screen('GetFlipInterval', window); % frame duration (s)
 if abs(flipInterval - p.refRate) > 0.001
     error('Refresh rate is different from requested!')
+end
+
+% Check font
+if ~strcmp(p.font, Screen('TextFont', window))
+    error('Font was not set to requested: %s', p.font)
 end
 
 % Load calibration file
 switch p.testingLocation
     case 'CarrascoL1'
         load('../Displays/0001_james_TrinitonG520_1280x960_57cm_Input1_140129.mat');
-        Screen('LoadNormalizedGammaTable', win, repmat(calib.table,1,3));
+        Screen('LoadNormalizedGammaTable', window, repmat(calib.table,1,3));
     otherwise
         fprintf('\nNot loading gamma table ...\n')
 end
@@ -72,7 +79,7 @@ end
 % Make textures
 for iC = 1:numel(p.targetContrasts)
     for iTO = 1:numel(p.targetOrientations)
-        targetTex(iC,iTO) = Screen('MakeTexture', win, target{iC,iTO}*white);
+        targetTex(iC,iTO) = Screen('MakeTexture', window, target{iC,iTO}*white);
     end
 end
 
@@ -83,26 +90,26 @@ fixRect = CenterRectOnPoint([0 0 fixSize fixSize], cx, cy);
 
 %% Generate trials
 % Construct trials matrix
-trials_headers = {'targetContrast','cuedInterval','cueValidity',...
-    'target1Orient','target2Orient','respInterval','respTargetOrient',...
+trials_headers = {'targetContrast','respInterval','cueValidity',...
+    'target1Orient','target2Orient','cuedInterval','respTargetOrient',...
     'rt','responseKey','response','correct'};
 
 % make sure column indices match trials headers
-targetContrastIdx = find(strcmp(trials_headers,'targetContrast'));
-cuedIntervalIdx = find(strcmp(trials_headers,'cuedInterval'));
-cueValidityIdx = find(strcmp(trials_headers,'cueValidity'));
-target1OrientIdx = find(strcmp(trials_headers,'target1Orient'));
-target2OrientIdx = find(strcmp(trials_headers,'target2Orient'));
-respIntervalIdx = find(strcmp(trials_headers,'respInterval'));
-respTargetOrientIdx = find(strcmp(trials_headers,'respTargetOrient'));
-rtIdx = find(strcmp(trials_headers,'rt'));
-responseKeyIdx = find(strcmp(trials_headers,'responseKey'));
-responseIdx = find(strcmp(trials_headers,'response'));
-correctIdx = find(strcmp(trials_headers,'correct'));
+targetContrastIdx = strcmp(trials_headers,'targetContrast');
+respIntervalIdx = strcmp(trials_headers,'respInterval');
+cueValidityIdx = strcmp(trials_headers,'cueValidity');
+target1OrientIdx = strcmp(trials_headers,'target1Orient');
+target2OrientIdx = strcmp(trials_headers,'target2Orient');
+cuedIntervalIdx = strcmp(trials_headers,'cuedInterval');
+respTargetOrientIdx = strcmp(trials_headers,'respTargetOrient');
+rtIdx = strcmp(trials_headers,'rt');
+responseKeyIdx = strcmp(trials_headers,'responseKey');
+responseIdx = strcmp(trials_headers,'response');
+correctIdx = strcmp(trials_headers,'correct');
 
 % full factorial design
 trials = fullfact([numel(p.targetContrasts) ...
-    numel(p.cuedInterval) ...
+    numel(p.respInterval) ...
     numel(p.cueValidityFactor) ...
     numel(p.targetOrientations) ...
     numel(p.targetOrientations)]);
@@ -121,9 +128,10 @@ trialOrder = randperm(nTrials);
 
 %% Present trials
 % Show fixation and wait for a button press
-Screen('FillRect', win, white*p.backgroundColor);
-Screen('FillRect', win, [0 0 0], fixRect);
-Screen('Flip', win);
+Screen('FillRect', window, white*p.backgroundColor);
+% Screen('FillRect', window, [0 0 0], fixRect);
+DrawFormattedText(window, 'x', 'center', 'center');
+Screen('Flip', window);
 KbWait(devNum);
 
 % Trials
@@ -138,55 +146,70 @@ for iTrial = 1:nTrials
     tcCond = trials(trialIdx,targetContrastIdx);
     to1Cond = trials(trialIdx,target1OrientIdx);
     to2Cond = trials(trialIdx,target2OrientIdx);
-    cuedInterval = p.cuedInterval(trials(trialIdx,cuedIntervalIdx));
-    cueValidity = p.cuedInterval(trials(trialIdx,cueValidityIdx));
+    respInterval = p.respInterval(trials(trialIdx,respIntervalIdx));
+    cueValidity = p.cueValidity(trials(trialIdx,cueValidityIdx));
     
-    % Determine response interval and target orientation
-    if cueValidity==1 % valid cue
-        respInterval = cuedInterval;
-    else
-        respInterval = 3-cuedInterval; % 2 if 1, and 1 if 2
+    % Determine cued interval and target orientation
+    switch cueValidity
+        case 1 % valid cue
+            cuedInterval = respInterval;
+        case -1
+            cuedInterval = 3-respInterval; % 2 if 1, and 1 if 2
+        case 0
+            cuedInterval = 0;
     end
 
-    if respInterval==1
-        respTargetOrientation = p.targetOrientations(to1Cond);
-    else
-        respTargetOrientation = p.targetOrientations(to2Cond);
+    switch respInterval
+        case 1
+            respTargetOrientation = p.targetOrientations(to1Cond);
+        case 2
+            respTargetOrientation = p.targetOrientations(to2Cond);
     end
     
     % Select tones and textures
-    cueTone = p.cueTones(cuedInterval,:);
+    if cuedInterval==0
+        cueTone = sum(p.cueTones,1); % play both tones
+    else
+        cueTone = p.cueTones(cuedInterval,:);
+    end
     respTone = p.cueTones(respInterval,:);
     
     tex1 = targetTex(tcCond,to1Cond);
     tex2 = targetTex(tcCond,to2Cond);
     
     % Present cue
-    %%% insert tone cue here %%%
+    %%% insert timed tone cue here %%%
+%     Screen('FillRect', window, [255 255 255], fixRect);
+    DrawFormattedText(window, 'x', 'center', 'center', [1 1 1]*white);
+    timeCue = Screen('Flip', window);
     sound(cueTone, p.Fs)
-    Screen('FillRect', win, [255 255 255], fixRect);
-    timeCue = Screen('Flip', win);
     
     % Present images
-    Screen('DrawTexture', win, tex1, [], imRect);
-    Screen('FillRect', win, [255 255 255], fixRect);
-    timeIm1 = Screen('Flip', win, timeCue + p.soas(1) - slack);
+    Screen('DrawTexture', window, tex1, [], imRect);
+    DrawFormattedText(window, 'x', 'center', 'center');
+%     Screen('FillRect', window, [255 255 255], fixRect);
+    timeIm1 = Screen('Flip', window, timeCue + p.soas(1) - slack);
     
-    Screen('FillRect', win, white*p.backgroundColor);
-    Screen('FillRect', win, [255 255 255], fixRect);
-    timeBlank1 = Screen('Flip', win, timeIm1 + p.targetDur - slack);
+    Screen('FillRect', window, white*p.backgroundColor);
+    DrawFormattedText(window, 'x', 'center', 'center');
+%     Screen('FillRect', window, [255 255 255], fixRect);
+    timeBlank1 = Screen('Flip', window, timeIm1 + p.targetDur - slack);
     
-    Screen('DrawTexture', win, tex2, [], imRect);
-    Screen('FillRect', win, [255 255 255], fixRect);
-    timeIm2 = Screen('Flip', win, timeCue + p.soas(2) - slack);
+    Screen('DrawTexture', window, tex2, [], imRect);
+    DrawFormattedText(window, 'x', 'center', 'center');
+%     Screen('FillRect', window, [255 255 255], fixRect);
+    timeIm2 = Screen('Flip', window, timeCue + p.soas(2) - slack);
     
-    Screen('FillRect', win, white*p.backgroundColor);
-    Screen('FillRect', win, [255 255 255], fixRect);
-    timeBlank2 = Screen('Flip', win, timeIm2 + p.targetDur - slack);
+    Screen('FillRect', window, white*p.backgroundColor);
+    DrawFormattedText(window, 'x', 'center', 'center');
+%     Screen('FillRect', window, [255 255 255], fixRect);
+    timeBlank2 = Screen('Flip', window, timeIm2 + p.targetDur - slack);
     
-    %%% insert tone respone cue here %%%
-    Screen('FillRect', win, [0 0 255], fixRect);
-    timeRespCue = Screen('Flip', win, timeCue + p.respCueSOA - slack);
+    % Present response cue
+    %%% insert timed tone respone cue here %%%
+    DrawFormattedText(window, 'x', 'center', 'center');
+%     Screen('FillRect', window, [0 0 255], fixRect);
+    timeRespCue = Screen('Flip', window, timeCue + p.respCueSOA - slack);
     sound(respTone, p.Fs)
     
     % Collect response
@@ -209,11 +232,11 @@ for iTrial = 1:nTrials
         feedbackColor = [1 0 0]*white;
     end
     
-    DrawFormattedText(win, feedbackText, 'center', 'center', feedbackColor);
-    timeFeedback = Screen('Flip', win);
+    DrawFormattedText(window, feedbackText, 'center', 'center', feedbackColor);
+    timeFeedback = Screen('Flip', window);
    
     % Store trial info
-    trials(trialIdx,respIntervalIdx) = respInterval;
+    trials(trialIdx,cuedIntervalIdx) = cuedInterval;
     trials(trialIdx,respTargetOrientIdx) = respTargetOrientation;
     trials(trialIdx,rtIdx) = rt;
     trials(trialIdx,responseKeyIdx) = responseKey;
@@ -234,7 +257,7 @@ end
 timing.endTime = GetSecs;
 
 % Show end of block feedback
-% acc = mean(trials(:,6));
+% acc = mean(trials(:,correctIdx));
 
 % Store expt info
 expt.p = p;
@@ -247,24 +270,31 @@ expt.trials = trials;
 Screen('CloseAll')
 
 % Analyze data
-for iSOA = 1:numel(p.soas)
-    w = trials(:,1)==iSOA;
-    totals.all(:,:,iSOA) = trials(w,:);
+for iCV = 1:numel(p.cueValidity)
+    w = trials(:,cueValidityIdx)==iCV;
+    totals.all{iCV} = trials(w,:);
+    
+    totals.means(iCV,:) = mean(totals.all{iCV},1);
+    totals.stds(iCV,:) = std(totals.all{iCV},0,1);
+    totals.stes(iCV,:) = totals.stds(iCV,:)./sqrt(size(totals.all{iCV},1));
 end
 
-totals.means = squeeze(mean(totals.all,1))';
-totals.stds = squeeze(std(totals.all,0,1))';
-totals.stes = totals.stds./sqrt(size(totals.all,1));
+accMean = totals.means(:,correctIdx);
+accSte = totals.stes(:,correctIdx);
 
-accMean = totals.means(:,8);
-accSte = totals.stes(:,8);
+rtMean = totals.means(:,rtIdx);
+rtSte = totals.stes(:,rtIdx);
 
 % Plot figs
 figure
-errorbar(p.soas, accMean, accSte, '.-k')
+errorbar(p.cueValidity, accMean, accSte, '.-k')
+xlabel('cue validity')
+ylabel('acc')
 
-% figure
-% scatter(trials(:,3), trials(:,4))
+figure
+errorbar(p.cueValidity, rtMean, rtSte, '.-k')
+xlabel('cue validity')
+ylabel('rt')
 
 % Store data
 results.totals = totals;

@@ -22,10 +22,11 @@ end
 p.keyCodes = KbName(p.keyNames);
 p.backgroundColor = 0.5;
 p.nReps = 1;
+p.font = 'Verdana';
 
 % Conditions
 p.targetContrasts = [0.16 0.32];
-p.cuedInterval = [1 2]; % [1=early 2=late]
+p.respInterval = [1 2]; % [1=early 2=late]
 p.cueValidity = [1 -1]; % [1=valid -1=invalid]
 p.propValid = 0.75;
 p.cueValidityFactor = generatePropFactor(p.propValid);
