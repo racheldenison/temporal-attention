@@ -179,7 +179,7 @@ for iTrial = 1:nTrials
     DrawFormattedText(window, 'x', 'center', 'center', [1 1 1]*white);
     timeFix = Screen('Flip', window);
     
-    timeCue = WaitSecs('UntilTime', timeFix + p.fixCueSOA);
+    timeCue = WaitSecs('UntilTime', timeFix + p.preCueDur);
     soundsc(cueTone, p.Fs)
     
     % Present images
