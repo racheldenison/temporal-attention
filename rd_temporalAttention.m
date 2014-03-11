@@ -58,7 +58,6 @@ end
 % Calculate stimulus dimensions (px) and position
 imPos = round(ang2pix(p.imPos, p.screenSize(1), p.screenRes(1), p.viewDist, 'radial')); % from screen center
 targetSize = round(ang2pix(p.targetSize, p.screenSize(1), p.screenRes(1), p.viewDist, 'central'));
-fixSize = round(ang2pix(p.fixSize, p.screenSize(1), p.screenRes(1), p.viewDist, 'central'));
 pixelsPerDegree = round(ang2pix(1, p.screenSize(1), p.screenRes(1), p.viewDist, 'central'));
 
 % Make target gratings
@@ -178,8 +177,10 @@ for iTrial = 1:nTrials
     % Present cue
     %%% insert timed tone cue here %%%
     DrawFormattedText(window, 'x', 'center', 'center', [1 1 1]*white);
-    timeCue = Screen('Flip', window);
-    sound(cueTone, p.Fs)
+    timeFix = Screen('Flip', window);
+    
+    timeCue = WaitSecs('UntilTime', timeFix + p.fixCueSOA);
+    soundsc(cueTone, p.Fs)
     
     % Present images
     Screen('DrawTexture', window, tex1, [], imRect);
@@ -202,7 +203,7 @@ for iTrial = 1:nTrials
     %%% insert timed tone respone cue here %%%
     DrawFormattedText(window, 'x', 'center', 'center');
     timeRespCue = Screen('Flip', window, timeCue + p.respCueSOA - slack);
-    sound(respTone, p.Fs)
+    soundsc(respTone, p.Fs)
     
     % Collect response
     responseKey = [];
@@ -236,6 +237,7 @@ for iTrial = 1:nTrials
     trials(trialIdx,correctIdx) = correct;
     
     % Store timing
+    timing.timeFix(iTrial,1) = timeFix;
     timing.timeCue(iTrial,1) = timeCue;
     timing.timeIm1(iTrial,1) = timeIm1;
     timing.timeBlank1(iTrial,1) = timeBlank1;
@@ -279,12 +281,12 @@ rtSte = totals.stes(:,rtIdx);
 
 % Plot figs
 figure
-errorbar(p.cueValidity, accMean, accSte, '.-k')
+errorbar(p.cueValidity, accMean, accSte, '.k')
 xlabel('cue validity')
 ylabel('acc')
 
 figure
-errorbar(p.cueValidity, rtMean, rtSte, '.-k')
+errorbar(p.cueValidity, rtMean, rtSte, '.k')
 xlabel('cue validity')
 ylabel('rt')
 
