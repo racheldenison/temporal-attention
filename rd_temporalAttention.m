@@ -24,6 +24,7 @@ screenNumber = max(Screen('Screens'));
 [win rect] = Screen('OpenWindow', screenNumber, [], [0 0 800 600]);
 white = WhiteIndex(win);  % Retrieves the CLUT color code for white.
 [cx cy] = RectCenter(rect);
+Screen('TextSize', win, 24);
 
 % Check screen size
 [sw, sh] = Screen('WindowSize', win); % height and width of screen (px)
@@ -82,13 +83,22 @@ fixRect = CenterRectOnPoint([0 0 fixSize fixSize], cx, cy);
 
 %% Generate trials
 % Construct trials matrix
-trials_headers = {'targetContrast','cuedInterval','cueValidity','target1Orient','target2Orient','rt','responseKey','response','correct'};
+trials_headers = {'targetContrast','cuedInterval','cueValidity',...
+    'target1Orient','target2Orient','respInterval','respTargetOrient',...
+    'rt','responseKey','response','correct'};
 
+% make sure column indices match trials headers
 targetContrastIdx = find(strcmp(trials_headers,'targetContrast'));
 cuedIntervalIdx = find(strcmp(trials_headers,'cuedInterval'));
 cueValidityIdx = find(strcmp(trials_headers,'cueValidity'));
 target1OrientIdx = find(strcmp(trials_headers,'target1Orient'));
 target2OrientIdx = find(strcmp(trials_headers,'target2Orient'));
+respIntervalIdx = find(strcmp(trials_headers,'respInterval'));
+respTargetOrientIdx = find(strcmp(trials_headers,'respTargetOrient'));
+rtIdx = find(strcmp(trials_headers,'rt'));
+responseKeyIdx = find(strcmp(trials_headers,'responseKey'));
+responseIdx = find(strcmp(trials_headers,'response'));
+correctIdx = find(strcmp(trials_headers,'correct'));
 
 % full factorial design
 trials = fullfact([numel(p.targetContrasts) ...
@@ -113,12 +123,14 @@ trialOrder = randperm(nTrials);
 % Show fixation and wait for a button press
 Screen('FillRect', win, white*p.backgroundColor);
 Screen('FillRect', win, [0 0 0], fixRect);
-vbl = Screen('Flip', win);
+Screen('Flip', win);
 KbWait(devNum);
 
 % Trials
 timing.startTime = GetSecs;
 for iTrial = 1:nTrials
+    WaitSecs(p.iti);
+    
     % Current trial number
     trialIdx = trialOrder(iTrial);
     
@@ -126,7 +138,6 @@ for iTrial = 1:nTrials
     tcCond = trials(trialIdx,targetContrastIdx);
     to1Cond = trials(trialIdx,target1OrientIdx);
     to2Cond = trials(trialIdx,target2OrientIdx);
-    targetContrast = p.targetContrasts(tcCond);
     cuedInterval = p.cuedInterval(trials(trialIdx,cuedIntervalIdx));
     cueValidity = p.cuedInterval(trials(trialIdx,cueValidityIdx));
     
@@ -152,7 +163,7 @@ for iTrial = 1:nTrials
     
     % Present cue
     %%% insert tone cue here %%%
-    soundsc(cueTone)
+    sound(cueTone, p.Fs)
     Screen('FillRect', win, [255 255 255], fixRect);
     timeCue = Screen('Flip', win);
     
@@ -174,17 +185,20 @@ for iTrial = 1:nTrials
     timeBlank2 = Screen('Flip', win, timeIm2 + p.targetDur - slack);
     
     %%% insert tone respone cue here %%%
-    soundsc(respTone)
     Screen('FillRect', win, [0 0 255], fixRect);
     timeRespCue = Screen('Flip', win, timeCue + p.respCueSOA - slack);
+    sound(respTone, p.Fs)
     
     % Collect response
-    [secs, keyCode] = KbWait(devNum);
-    rt = secs - timeRespCue;
+    responseKey = [];
+    while isempty(responseKey) % record wrong key as missed trial
+        [secs, keyCode] = KbWait(devNum);
+        rt = secs - timeRespCue;
+        responseKey = find(p.keyCodes==find(keyCode));
+    end
+    response = p.targetOrientations(responseKey);
     
     % Feedback
-    responseKey = find(p.keyCodes==find(keyCode));
-    response = p.targetOrientations(responseKey);
     if response==respTargetOrientation;
         correct = 1;
         feedbackText = '+';
@@ -195,16 +209,16 @@ for iTrial = 1:nTrials
         feedbackColor = [1 0 0]*white;
     end
     
-    DrawFormattedText(win, feedbackText, cx, cy, feedbackColor)
+    DrawFormattedText(win, feedbackText, 'center', 'center', feedbackColor);
     timeFeedback = Screen('Flip', win);
    
     % Store trial info
-    trials(trialIdx,6) = respInterval;
-    trials(trialIdx,7) = respTargetOrientation;
-    trials(trialIdx,8) = rt;
-    trials(trialIdx,9) = responseKey;
-    trials(trialIdx,10) = response;
-    trials(trialIdx,11) = correct;
+    trials(trialIdx,respIntervalIdx) = respInterval;
+    trials(trialIdx,respTargetOrientIdx) = respTargetOrientation;
+    trials(trialIdx,rtIdx) = rt;
+    trials(trialIdx,responseKeyIdx) = responseKey;
+    trials(trialIdx,responseIdx) = response;
+    trials(trialIdx,correctIdx) = correct;
     
     % Store timing
     timing.timeCue(iTrial,1) = timeCue;

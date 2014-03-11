@@ -31,10 +31,11 @@ p.propValid = 0.75;
 p.cueValidityFactor = generatePropFactor(p.propValid);
 
 % Timing
-p.soas = [300 550]/1000; % [short long]
+p.soas = [1000 1433]/1000; % [short long]
 p.cueDur = 0.2;
 p.targetDur = 2/60; % 33 ms
-p.respCueSOA = p.soas(2) + 0.3;
+p.respCueSOA = p.soas(2) + 0.5;
+p.iti = 1; % inter-trial interval
 
 % Images
 p.fixSize = 0.1;
