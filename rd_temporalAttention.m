@@ -86,7 +86,6 @@ end
 % Make the rects for placing the images
 imSize = size(target{1,1},1);
 imRect = CenterRectOnPoint([0 0 imSize imSize], cx+imPos(1), cy+imPos(2));
-fixRect = CenterRectOnPoint([0 0 fixSize fixSize], cx, cy);
 
 %% Generate trials
 % Construct trials matrix
@@ -129,7 +128,6 @@ trialOrder = randperm(nTrials);
 %% Present trials
 % Show fixation and wait for a button press
 Screen('FillRect', window, white*p.backgroundColor);
-% Screen('FillRect', window, [0 0 0], fixRect);
 DrawFormattedText(window, 'x', 'center', 'center');
 Screen('Flip', window);
 KbWait(devNum);
@@ -179,7 +177,6 @@ for iTrial = 1:nTrials
     
     % Present cue
     %%% insert timed tone cue here %%%
-%     Screen('FillRect', window, [255 255 255], fixRect);
     DrawFormattedText(window, 'x', 'center', 'center', [1 1 1]*white);
     timeCue = Screen('Flip', window);
     sound(cueTone, p.Fs)
@@ -187,28 +184,23 @@ for iTrial = 1:nTrials
     % Present images
     Screen('DrawTexture', window, tex1, [], imRect);
     DrawFormattedText(window, 'x', 'center', 'center');
-%     Screen('FillRect', window, [255 255 255], fixRect);
     timeIm1 = Screen('Flip', window, timeCue + p.soas(1) - slack);
     
     Screen('FillRect', window, white*p.backgroundColor);
     DrawFormattedText(window, 'x', 'center', 'center');
-%     Screen('FillRect', window, [255 255 255], fixRect);
     timeBlank1 = Screen('Flip', window, timeIm1 + p.targetDur - slack);
     
     Screen('DrawTexture', window, tex2, [], imRect);
     DrawFormattedText(window, 'x', 'center', 'center');
-%     Screen('FillRect', window, [255 255 255], fixRect);
     timeIm2 = Screen('Flip', window, timeCue + p.soas(2) - slack);
     
     Screen('FillRect', window, white*p.backgroundColor);
     DrawFormattedText(window, 'x', 'center', 'center');
-%     Screen('FillRect', window, [255 255 255], fixRect);
     timeBlank2 = Screen('Flip', window, timeIm2 + p.targetDur - slack);
     
     % Present response cue
     %%% insert timed tone respone cue here %%%
     DrawFormattedText(window, 'x', 'center', 'center');
-%     Screen('FillRect', window, [0 0 255], fixRect);
     timeRespCue = Screen('Flip', window, timeCue + p.respCueSOA - slack);
     sound(respTone, p.Fs)
     
