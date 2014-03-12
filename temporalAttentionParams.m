@@ -53,7 +53,8 @@ p.targetOrientations = [-15 15];
 p.Fs = 44100;
 p.cueFreqs = [784 523]; % [higher G = target 1, lower C = target 2]
 for iTone = 1:numel(p.cueFreqs)
-    p.cueTones(iTone,:) = applyEnvelope(note(p.cueFreqs(iTone), p.Fs, p.cueDur));
+    p.cueTones(iTone,:) = applyEnvelope(MakeBeep(p.cueFreqs(iTone), p.cueDur, p.Fs));
+%     p.cueTones(iTone,:) = applyEnvelope(note(p.cueFreqs(iTone), p.Fs, p.cueDur));
 end
 % 10^0.5 for every 10dB
 

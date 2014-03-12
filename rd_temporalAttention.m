@@ -11,13 +11,25 @@ p = temporalAttentionParams;
 
 slack = p.refRate/2;
 
-%% Keyboard and screen
+% Running on PTB-3? Abort otherwise.
+AssertOpenGL;
+
+%% Keyboard
 % Find keyboard device number
 devNum = findKeyboardDevNumsAtLocationNYU(p.testingLocation);
 if isempty(devNum)
     error('Could not find Keypad!')
 end
 
+%% Sound
+% Perform basic initialization of the sound driver
+InitializePsychSound;
+
+% Open audio device for low-latency output
+reqlatencyclass = 2; %Level 2 means: Take full control over the audio device, even if this causes other sound applications to fail or shutdown.
+pahandle = PsychPortAudio('Open', [], [], reqlatencyclass, p.Fs, 1);
+
+%% Screen
 % Set up window and textures
 screenNumber = max(Screen('Screens'));
 % [window rect] = Screen('OpenWindow', screenNumber);
@@ -174,13 +186,16 @@ for iTrial = 1:nTrials
     tex1 = targetTex(tcCond,to1Cond);
     tex2 = targetTex(tcCond,to2Cond);
     
-    % Present cue
-    %%% insert timed tone cue here %%%
+    % Present fixation
     DrawFormattedText(window, 'x', 'center', 'center', [1 1 1]*white);
     timeFix = Screen('Flip', window);
     
-    timeCue = WaitSecs('UntilTime', timeFix + p.preCueDur);
-    soundsc(cueTone, p.Fs)
+    % Present cue
+    PsychPortAudio('FillBuffer', pahandle, cueTone);
+    % waitForStart = 1 in order to return a timestamp of playback
+    timeCue = PsychPortAudio('Start', pahandle, [], timeFix + p.preCueDur, 1);
+%     timeCue = WaitSecs('UntilTime', timeFix + p.preCueDur);
+%     soundsc(cueTone, p.Fs)
     
     % Present images
     Screen('DrawTexture', window, tex1, [], imRect);
@@ -200,10 +215,10 @@ for iTrial = 1:nTrials
     timeBlank2 = Screen('Flip', window, timeIm2 + p.targetDur - slack);
     
     % Present response cue
-    %%% insert timed tone respone cue here %%%
-    DrawFormattedText(window, 'x', 'center', 'center');
-    timeRespCue = Screen('Flip', window, timeCue + p.respCueSOA - slack);
-    soundsc(respTone, p.Fs)
+    PsychPortAudio('FillBuffer', pahandle, respTone);
+    timeRespCue = PsychPortAudio('Start', pahandle, [], timeCue + p.respCueSOA, 1);
+%     timeCue = WaitSecs('UntilTime', timeCue + p.respCueSOA);
+%     soundsc(respTone, p.Fs)
     
     % Collect response
     responseKey = [];
@@ -261,6 +276,8 @@ expt.trials_headers = trials_headers;
 expt.trials = trials;
 
 % Clean up
+PsychPortAudio('Stop', pahandle);
+PsychPortAudio('Close', pahandle);
 Screen('CloseAll')
 
 % Analyze data
