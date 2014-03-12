@@ -26,8 +26,8 @@ end
 InitializePsychSound;
 
 % Open audio device for low-latency output
-reqlatencyclass = 2; %Level 2 means: Take full control over the audio device, even if this causes other sound applications to fail or shutdown.
-pahandle = PsychPortAudio('Open', [], [], reqlatencyclass, p.Fs, 1);
+reqlatencyclass = 2; % Level 2 means: Take full control over the audio device, even if this causes other sound applications to fail or shutdown.
+pahandle = PsychPortAudio('Open', [], [], reqlatencyclass, p.Fs, 1); % 1 = single-channel
 
 %% Screen
 % Set up window and textures
@@ -192,8 +192,9 @@ for iTrial = 1:nTrials
     
     % Present cue
     PsychPortAudio('FillBuffer', pahandle, cueTone);
-    % waitForStart = 1 in order to return a timestamp of playback
     timeCue = PsychPortAudio('Start', pahandle, [], timeFix + p.preCueDur, 1);
+    % Note: waitForStart = 1 in order to return a timestamp of playback
+%     status = PsychPortAudio('GetStatus', pahandle);
 %     timeCue = WaitSecs('UntilTime', timeFix + p.preCueDur);
 %     soundsc(cueTone, p.Fs)
     
@@ -217,8 +218,6 @@ for iTrial = 1:nTrials
     % Present response cue
     PsychPortAudio('FillBuffer', pahandle, respTone);
     timeRespCue = PsychPortAudio('Start', pahandle, [], timeCue + p.respCueSOA, 1);
-%     timeCue = WaitSecs('UntilTime', timeCue + p.respCueSOA);
-%     soundsc(respTone, p.Fs)
     
     % Collect response
     responseKey = [];
