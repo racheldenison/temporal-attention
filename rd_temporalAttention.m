@@ -23,7 +23,7 @@ end
 
 %% Sound
 % Perform basic initialization of the sound driver
-InitializePsychSound;
+InitializePsychSound(1); % 1 for precise timing
 
 % Open audio device for low-latency output
 reqlatencyclass = 2; % Level 2 means: Take full control over the audio device, even if this causes other sound applications to fail or shutdown.
@@ -124,12 +124,13 @@ trials = fullfact([numel(p.targetContrasts) ...
     numel(p.targetOrientations) ...
     numel(p.targetOrientations)]);
 
-% set cue validity to be just 1 or 2 (in potentially unequal proportions)
+% set cue validity condition according to the cueValidityFactor (potentially unequal proportion of trials in each condition)
 cueValidityTrials = trials(:,cueValidityIdx);
 for i = 1:numel(p.cueValidityFactor)   
     trials(cueValidityTrials==i,cueValidityIdx) = p.cueValidityFactor(i);
 end
 
+% repeat trials matrix according to nReps of all conditions
 trials = repmat(trials, p.nReps, 1);
 nTrials = size(trials,1);
 
@@ -158,7 +159,7 @@ for iTrial = 1:nTrials
     respInterval = p.respInterval(trials(trialIdx,respIntervalIdx));
     cueValidity = p.cueValidity(trials(trialIdx,cueValidityIdx));
     
-    % Determine cued interval and target orientation
+    % Determine cued interval
     switch cueValidity
         case 1 % valid cue
             cuedInterval = respInterval;
@@ -168,6 +169,7 @@ for iTrial = 1:nTrials
             cuedInterval = 0;
     end
 
+    % Determine target orientation
     switch respInterval
         case 1
             respTargetOrientation = p.targetOrientations(to1Cond);
@@ -194,9 +196,9 @@ for iTrial = 1:nTrials
     PsychPortAudio('FillBuffer', pahandle, cueTone);
     timeCue = PsychPortAudio('Start', pahandle, [], timeFix + p.preCueDur, 1);
     % Note: waitForStart = 1 in order to return a timestamp of playback
-%     status = PsychPortAudio('GetStatus', pahandle);
-%     timeCue = WaitSecs('UntilTime', timeFix + p.preCueDur);
-%     soundsc(cueTone, p.Fs)
+    % More useful sound commands:
+	% status = PsychPortAudio('GetStatus', pahandle);
+    % soundsc(cueTone, p.Fs)
     
     % Present images
     Screen('DrawTexture', window, tex1, [], imRect);
@@ -207,7 +209,7 @@ for iTrial = 1:nTrials
     DrawFormattedText(window, 'x', 'center', 'center');
     timeBlank1 = Screen('Flip', window, timeIm1 + p.targetDur - slack);
     
-    Screen('DrawTexture', window, tex2, [], imRect);
+    Screen('DrawTexture', window, tex2, [], imRect, 90);
     DrawFormattedText(window, 'x', 'center', 'center');
     timeIm2 = Screen('Flip', window, timeCue + p.soas(2) - slack);
     

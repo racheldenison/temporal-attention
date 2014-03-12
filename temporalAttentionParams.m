@@ -47,13 +47,14 @@ p.imPos = [4 4];
 p.imSize = [6 6]; % this is the size of the image container that holds the stim
 p.targetSize = 0.5; % sigma of gaussian
 p.spatialFrequency = 4;
-p.targetOrientations = [-15 15];
+p.targetOrientations = [-10 10];
 
 % Sounds
 p.Fs = 44100;
 p.cueFreqs = [784 523]; % [higher G = target 1, lower C = target 2]
 for iTone = 1:numel(p.cueFreqs)
-    p.cueTones(iTone,:) = applyEnvelope(MakeBeep(p.cueFreqs(iTone), p.cueDur, p.Fs));
+    tone = MakeBeep(p.cueFreqs(iTone), p.cueDur, p.Fs);
+    p.cueTones(iTone,:) = applyEnvelope(tone, p.Fs);
 %     p.cueTones(iTone,:) = applyEnvelope(note(p.cueFreqs(iTone), p.Fs, p.cueDur));
 end
 % 10^0.5 for every 10dB
