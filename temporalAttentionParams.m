@@ -25,7 +25,7 @@ p.nReps = 1;
 p.font = 'Verdana';
 
 % Conditions
-p.targetContrasts = [.32];
+p.targetContrasts = [.16 .32];
 p.respInterval = [1 2]; % [1=early 2=late]
 p.cueValidity = [1 -1 0]; % [1=valid -1=invalid 0=neutral]
 % p.propValid = 0.67;

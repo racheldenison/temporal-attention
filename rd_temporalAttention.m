@@ -161,6 +161,7 @@ end
 % repeat trials matrix according to nReps of all conditions
 trials = repmat(trials, p.nReps, 1);
 nTrials = size(trials,1);
+nTrialsPerBlock = nTrials/p.nReps; % 1 rep per block
 
 % Choose order of trial presentation
 trialOrder = randperm(nTrials);
@@ -327,6 +328,12 @@ for iTrial = 1:nTrials
     timing.timeFeedback(iTrial,1) = timeFeedback;
     
     save('data/TEMP') % saves the workspace on each trial
+    
+    if mod(iTrial,nTrialsPerBlock)==0 && iTrial<nTrials
+        DrawFormattedText(window, 'Break time!\n\nPress any key to go on.', 'center', 'center');
+        Screen('Flip', window);
+        KbWait(devNum);
+    end
 end
 timing.endTime = GetSecs;
 
@@ -346,41 +353,33 @@ PsychPortAudio('Close', pahandle);
 Screen('CloseAll')
 
 % Analyze data
-for iCV = 1:numel(p.cueValidity)
-    for iRI = 1:numel(p.respInterval)
-        w = trials(:,cueValidityIdx)==iCV & trials(:,respIntervalIdx)==iRI;
-        totals.all{iCV}(:,:,iRI) = trials(w,:);
+for iRI = 1:numel(p.respInterval)
+    for iCV = 1:numel(p.cueValidity)
+        for iTC = 1:numel(p.targetContrasts)
+            w = trials(:,respIntervalIdx)==iRI & trials(:,cueValidityIdx)==iCV & trials(:,targetContrastIdx)==iTC;
+            totals.all{iCV,iRI}(:,:,iTC) = trials(w,:);
+            
+            totals.means{iRI}(iCV,:,iTC) = mean(totals.all{iCV,iRI}(:,:,iTC),1);
+            totals.stds{iRI}(iCV,:,iTC) = std(totals.all{iCV,iRI}(:,:,iTC),0,1);
+            totals.stes{iRI}(iCV,:,iTC) = totals.stds{iRI}(iCV,:,iTC)./sqrt(size(totals.all{iCV,iRI}(:,:,iTC),1));
+        end
     end
-        totals.means(iCV,:,:) = mean(totals.all{iCV},1);
-        totals.stds(iCV,:,:) = std(totals.all{iCV},0,1);
-        totals.stes(iCV,:,:) = totals.stds(iCV,:,:)./sqrt(size(totals.all{iCV},1));
 end
 
-accMean = squeeze(totals.means(:,correctIdx,:));
-accSte = squeeze(totals.stes(:,correctIdx,:));
-
-rtMean = squeeze(totals.means(:,rtIdx,:));
-rtSte = squeeze(totals.stes(:,rtIdx,:));
-
-% Plot figs
-figure
-errorbar(repmat(p.cueValidity',1,numel(p.respInterval)),...
-    accMean, accSte, '.')
-xlabel('cue validity')
-ylabel('acc')
-legend(num2str(p.respInterval'),'location','best')
-
-figure
-errorbar(repmat(p.cueValidity',1,numel(p.respInterval)),...
-    rtMean, rtSte, '.')
-xlabel('cue validity')
-ylabel('rt')
-legend(num2str(p.respInterval'),'location','best')
+for iRI = 1:numel(p.respInterval)
+    accMean{iRI} = squeeze(totals.means{iRI}(:,correctIdx,:)); % [validity x contrast]
+    accSte{iRI} = squeeze(totals.stes{iRI}(:,correctIdx,:));
+    
+    rtMean{iRI} = squeeze(totals.means{iRI}(:,rtIdx,:));
+    rtSte{iRI} = squeeze(totals.stes{iRI}(:,rtIdx,:));
+end
 
 % Store data
 results.totals = totals;
 results.accMean = accMean;
 results.accSte = accSte;
+results.rtMean = rtMean;
+results.rtSte = rtSte;
 results.whenSaved = datestr(now);
 
 % Save data
@@ -389,4 +388,27 @@ if saveData
     save(fileName, 'expt', 'results')
 end
 
+% Plot figs
+intervalNames = {'early','late'};
+figure
+for iRI = 1:numel(p.respInterval)
+    subplot(1,numel(p.respInterval),iRI)
+    errorbar(repmat(p.targetContrasts',1,numel(p.cueValidity)),...
+        accMean{iRI}', accSte{iRI}', '.')
+    xlabel('contrast')
+    ylabel('acc')
+    legend(num2str(p.cueValidity'),'location','best')
+    title(intervalNames{iRI})
+end
+
+figure
+for iRI = 1:numel(p.respInterval)
+    subplot(1,numel(p.respInterval),iRI)
+    errorbar(repmat(p.targetContrasts',1,numel(p.cueValidity)),...
+        rtMean{iRI}', rtSte{iRI}', '.')
+    xlabel('contrast')
+    ylabel('rt')
+    legend(num2str(p.cueValidity'),'location','best')
+    title(intervalNames{iRI})
+end
 
