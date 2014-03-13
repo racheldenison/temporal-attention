@@ -30,7 +30,7 @@ p.respInterval = [1 2]; % [1=early 2=late]
 p.cueValidity = [1 -1 0]; % [1=valid -1=invalid 0=neutral]
 % p.propValid = 0.67;
 % p.cueValidityFactor = generatePropFactor(p.propValid);
-p.cueValidityFactor = [1 1 2 3]; % 50% valid, 25% invalid, 25% neutral
+p.cueValidityFactor = [1 1 1 2]; % 50% valid, 25% invalid, 25% neutral
 p.propValid = nnz(p.cueValidityFactor==1)./nnz(p.cueValidityFactor<3);
 p.propNeutral = nnz(p.cueValidityFactor==3)./numel(p.cueValidityFactor);
 
@@ -39,7 +39,7 @@ p.soas = [1000 1250]/1000; % [short long]
 p.preCueDur = 0.5; % time between fixation onset and cue
 p.cueDur = 0.2;
 p.targetDur = 2/60; % 33 ms
-p.maskSOA = 2/60; % time between target onset and mask onset
+p.maskSOA = 4/60; % time between target onset and mask onset
 p.maskDur = 2/60;
 p.respCueSOA = p.soas(2) + 0.5;
 p.iti = 0.5; % inter-trial interval
@@ -60,7 +60,6 @@ p.cueFreqs = [784 523]; % [higher G = target 1, lower C = target 2]
 for iTone = 1:numel(p.cueFreqs)
     tone = MakeBeep(p.cueFreqs(iTone), p.cueDur, p.Fs);
     p.cueTones(iTone,:) = applyEnvelope(tone, p.Fs);
-%     p.cueTones(iTone,:) = applyEnvelope(note(p.cueFreqs(iTone), p.Fs, p.cueDur));
 end
 % 10^0.5 for every 10dB
 

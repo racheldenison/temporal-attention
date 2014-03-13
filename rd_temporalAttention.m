@@ -235,9 +235,13 @@ for iTrial = 1:nTrials
     timeIm1 = Screen('Flip', window, timeCue + p.soas(1) - slack);
     
     % blank
-    Screen('FillRect', window, white*p.backgroundColor);
-    DrawFormattedText(window, 'x', 'center', 'center');
-    timeBlank1 = Screen('Flip', window, timeIm1 + p.targetDur - slack);
+    if p.maskSOA > p.targetDur
+        Screen('FillRect', window, white*p.backgroundColor);
+        DrawFormattedText(window, 'x', 'center', 'center');
+        timeBlank1 = Screen('Flip', window, timeIm1 + p.targetDur - slack);
+    else
+        timeBlank1 = NaN;
+    end
     
     % mask 1
     Screen('DrawTexture', window, maskTex, [], imRect);
@@ -255,9 +259,13 @@ for iTrial = 1:nTrials
     timeIm2 = Screen('Flip', window, timeCue + p.soas(2) - slack);
     
     % blank
-    Screen('FillRect', window, white*p.backgroundColor);
-    DrawFormattedText(window, 'x', 'center', 'center');
-    timeBlank2 = Screen('Flip', window, timeIm2 + p.targetDur - slack);
+    if p.maskSOA > p.targetDur
+        Screen('FillRect', window, white*p.backgroundColor);
+        DrawFormattedText(window, 'x', 'center', 'center');
+        timeBlank2 = Screen('Flip', window, timeIm2 + p.targetDur - slack);
+    else
+        timeBlank2 = NaN;
+    end
     
     % mask 2
     Screen('DrawTexture', window, maskTex, [], imRect);
@@ -309,8 +317,12 @@ for iTrial = 1:nTrials
     timing.timeCue(iTrial,1) = timeCue;
     timing.timeIm1(iTrial,1) = timeIm1;
     timing.timeBlank1(iTrial,1) = timeBlank1;
+    timing.timeMask1(iTrial,1) = timeMask1;
+    timing.timeMaskBlank1(iTrial,1) = timeMaskBlank1;
     timing.timeIm2(iTrial,1) = timeIm2;
     timing.timeBlank2(iTrial,1) = timeBlank2;
+    timing.timeMask2(iTrial,1) = timeMask2;
+    timing.timeMaskBlank2(iTrial,1) = timeMaskBlank2;
     timing.timeRespCue(iTrial,1) = timeRespCue;
     timing.timeFeedback(iTrial,1) = timeFeedback;
     
