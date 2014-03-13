@@ -25,7 +25,7 @@ p.nReps = 1;
 p.font = 'Verdana';
 
 % Conditions
-p.targetContrasts = [0.08];
+p.targetContrasts = [.32];
 p.respInterval = [1 2]; % [1=early 2=late]
 p.cueValidity = [1 -1 0]; % [1=valid -1=invalid 0=neutral]
 % p.propValid = 0.67;
@@ -35,19 +35,24 @@ p.propValid = nnz(p.cueValidityFactor==1)./nnz(p.cueValidityFactor<3);
 p.propNeutral = nnz(p.cueValidityFactor==3)./numel(p.cueValidityFactor);
 
 % Timing
-p.soas = [1000 1433]/1000; % [short long]
+p.soas = [1000 1250]/1000; % [short long]
 p.preCueDur = 0.5; % time between fixation onset and cue
 p.cueDur = 0.2;
 p.targetDur = 2/60; % 33 ms
+p.maskSOA = 2/60; % time between target onset and mask onset
+p.maskDur = 2/60;
 p.respCueSOA = p.soas(2) + 0.5;
 p.iti = 0.5; % inter-trial interval
 
 % Images
 p.imPos = [4 4];
-p.imSize = [6 6]; % this is the size of the image container that holds the stim
+p.imSize = [4 4]; % this is the size of the image container that holds the stim
 p.targetSize = 0.5; % sigma of gaussian
 p.spatialFrequency = 4;
 p.targetOrientations = [-10 10];
+
+p.maskType = 'filterednoise';
+p.maskContrast = 1;
 
 % Sounds
 p.Fs = 44100;

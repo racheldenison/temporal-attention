@@ -87,12 +87,40 @@ for iC = 1:numel(p.targetContrasts)
     end
 end
 
+% Make mask
+switch p.maskType
+    case 'whitenoise'
+        mask = (rand(size(t))-0.5)*p.maskContrast + 0.5;
+    case 'verticalgrating'
+        m = buildColorGrating(pixelsPerDegree, p.imSize, ...
+            p.spatialFrequency, 0, 0, p.maskContrast, 0, 'bw');
+        mask = maskWithGaussian(m, size(m,1), targetSize);
+    case 'crossedgratings'
+        for i=1:numel(p.targetOrientations)
+            m(:,:,i) = buildColorGrating(pixelsPerDegree, p.imSize, ...
+                p.spatialFrequency, p.targetOrientations(i), 0, p.maskContrast, 0, 'bw');
+        end
+        m = sum(m,3)./numel(p.targetOrientations);
+        mask = maskWithGaussian(m, size(m,1), targetSize);
+    case 'filterednoise'
+        m = rand(size(t));
+        f = lowpassfilter(size(m), 0.15, 5);
+        m = imifft(imfft(m).*f);
+%         m = (m-min(m(:))) ./ (max(m(:)-min(m(:)))); % rescale
+        m = histeq(m); % basically increases the contrast
+        mask = (m-0.5)*p.maskContrast + 0.5;
+    otherwise
+        error('maskType not recognized')
+end
+
 % Make textures
 for iC = 1:numel(p.targetContrasts)
     for iTO = 1:numel(p.targetOrientations)
         targetTex(iC,iTO) = Screen('MakeTexture', window, target{iC,iTO}*white);
     end
 end
+
+maskTex = Screen('MakeTexture', window, mask*white);
 
 % Make the rects for placing the images
 imSize = size(target{1,1},1);
@@ -201,21 +229,45 @@ for iTrial = 1:nTrials
     % soundsc(cueTone, p.Fs)
     
     % Present images
+    % target 1
     Screen('DrawTexture', window, tex1, [], imRect);
     DrawFormattedText(window, 'x', 'center', 'center');
     timeIm1 = Screen('Flip', window, timeCue + p.soas(1) - slack);
     
+    % blank
     Screen('FillRect', window, white*p.backgroundColor);
     DrawFormattedText(window, 'x', 'center', 'center');
     timeBlank1 = Screen('Flip', window, timeIm1 + p.targetDur - slack);
     
-    Screen('DrawTexture', window, tex2, [], imRect, 90);
+    % mask 1
+    Screen('DrawTexture', window, maskTex, [], imRect);
+    DrawFormattedText(window, 'x', 'center', 'center');
+    timeMask1 = Screen('Flip', window, timeIm1 + p.maskSOA - slack);
+
+    % blank
+    Screen('FillRect', window, white*p.backgroundColor);
+    DrawFormattedText(window, 'x', 'center', 'center');
+    timeMaskBlank1 = Screen('Flip', window, timeMask1 + p.maskDur - slack);
+    
+    % target 2
+    Screen('DrawTexture', window, tex2, [], imRect, 0);
     DrawFormattedText(window, 'x', 'center', 'center');
     timeIm2 = Screen('Flip', window, timeCue + p.soas(2) - slack);
     
+    % blank
     Screen('FillRect', window, white*p.backgroundColor);
     DrawFormattedText(window, 'x', 'center', 'center');
     timeBlank2 = Screen('Flip', window, timeIm2 + p.targetDur - slack);
+    
+    % mask 2
+    Screen('DrawTexture', window, maskTex, [], imRect);
+    DrawFormattedText(window, 'x', 'center', 'center');
+    timeMask2 = Screen('Flip', window, timeIm2 + p.maskSOA - slack);
+
+    % blank
+    Screen('FillRect', window, white*p.backgroundColor);
+    DrawFormattedText(window, 'x', 'center', 'center');
+    timeMaskBlank2 = Screen('Flip', window, timeMask2 + p.maskDur - slack);
     
     % Present response cue
     PsychPortAudio('FillBuffer', pahandle, respTone);
