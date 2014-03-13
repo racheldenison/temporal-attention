@@ -347,30 +347,35 @@ Screen('CloseAll')
 
 % Analyze data
 for iCV = 1:numel(p.cueValidity)
-    w = trials(:,cueValidityIdx)==iCV;
-    totals.all{iCV} = trials(w,:);
-    
-    totals.means(iCV,:) = mean(totals.all{iCV},1);
-    totals.stds(iCV,:) = std(totals.all{iCV},0,1);
-    totals.stes(iCV,:) = totals.stds(iCV,:)./sqrt(size(totals.all{iCV},1));
+    for iRI = 1:numel(p.respInterval)
+        w = trials(:,cueValidityIdx)==iCV & trials(:,respIntervalIdx)==iRI;
+        totals.all{iCV}(:,:,iRI) = trials(w,:);
+    end
+        totals.means(iCV,:,:) = mean(totals.all{iCV},1);
+        totals.stds(iCV,:,:) = std(totals.all{iCV},0,1);
+        totals.stes(iCV,:,:) = totals.stds(iCV,:,:)./sqrt(size(totals.all{iCV},1));
 end
 
-accMean = totals.means(:,correctIdx);
-accSte = totals.stes(:,correctIdx);
+accMean = squeeze(totals.means(:,correctIdx,:));
+accSte = squeeze(totals.stes(:,correctIdx,:));
 
-rtMean = totals.means(:,rtIdx);
-rtSte = totals.stes(:,rtIdx);
+rtMean = squeeze(totals.means(:,rtIdx,:));
+rtSte = squeeze(totals.stes(:,rtIdx,:));
 
 % Plot figs
 figure
-errorbar(p.cueValidity, accMean, accSte, '.k')
+errorbar(repmat(p.cueValidity',1,numel(p.respInterval)),...
+    accMean, accSte, '.')
 xlabel('cue validity')
 ylabel('acc')
+legend(num2str(p.respInterval'),'location','best')
 
 figure
-errorbar(p.cueValidity, rtMean, rtSte, '.k')
+errorbar(repmat(p.cueValidity',1,numel(p.respInterval)),...
+    rtMean, rtSte, '.')
 xlabel('cue validity')
 ylabel('rt')
+legend(num2str(p.respInterval'),'location','best')
 
 % Store data
 results.totals = totals;
