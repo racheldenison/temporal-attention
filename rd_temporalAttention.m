@@ -6,6 +6,7 @@ if nargin==0
 end
 
 saveData = 1;
+saveFigs = 1;
 
 p = temporalAttentionParams;
 
@@ -341,6 +342,7 @@ timing.endTime = GetSecs;
 % acc = mean(trials(:,correctIdx));
 
 % Store expt info
+expt.subjectID = subjectID;
 expt.p = p;
 expt.timing = timing;
 expt.trialOrder = trialOrder;
@@ -390,7 +392,7 @@ end
 
 % Plot figs
 intervalNames = {'early','late'};
-figure
+f(1) = figure;
 for iRI = 1:numel(p.respInterval)
     subplot(1,numel(p.respInterval),iRI)
     errorbar(repmat(p.targetContrasts',1,numel(p.cueValidity)),...
@@ -401,7 +403,7 @@ for iRI = 1:numel(p.respInterval)
     title(intervalNames{iRI})
 end
 
-figure
+f(2) = figure;
 for iRI = 1:numel(p.respInterval)
     subplot(1,numel(p.respInterval),iRI)
     errorbar(repmat(p.targetContrasts',1,numel(p.cueValidity)),...
@@ -410,5 +412,14 @@ for iRI = 1:numel(p.respInterval)
     ylabel('rt')
     legend(num2str(p.cueValidity'),'location','best')
     title(intervalNames{iRI})
+end
+
+% Save figs
+if saveFigs
+    figNames = {'acc','rt'};
+    for iF = 1:numel(f)
+        figFile = sprintf('figures/%s_TemporalAttention_%s', subjectID, figNames{iF});
+        print(f(iF), '-dpng', figFile)
+    end
 end
 
