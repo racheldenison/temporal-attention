@@ -32,8 +32,8 @@ pahandle = PsychPortAudio('Open', [], [], reqlatencyclass, p.Fs, 1); % 1 = singl
 %% Screen
 % Set up window and textures
 screenNumber = max(Screen('Screens'));
-% [window rect] = Screen('OpenWindow', screenNumber);
-[window rect] = Screen('OpenWindow', screenNumber, [], [0 0 800 600]);
+[window rect] = Screen('OpenWindow', screenNumber);
+% [window rect] = Screen('OpenWindow', screenNumber, [], [0 0 800 600]);
 white = WhiteIndex(window);  % Retrieves the CLUT color code for white.
 [cx cy] = RectCenter(rect);
 Screen('TextSize', window, 24);
@@ -330,7 +330,7 @@ for iTrial = 1:nTrials
     save('data/TEMP') % saves the workspace on each trial
     
     if mod(iTrial,nTrialsPerBlock)==0 && iTrial<nTrials
-        DrawFormattedText(window, 'Break time!\n\nPress any key to go on.', 'center', 'center');
+        DrawFormattedText(window, 'Break time!\n\nPress any key to go on.', 'center', 'center', [1 1 1]*white);
         Screen('Flip', window);
         KbWait(devNum);
     end
@@ -384,7 +384,7 @@ results.whenSaved = datestr(now);
 
 % Save data
 if saveData
-    fileName = sprintf('data/%s_temporalAttention_%s.mat', subjectID, datestr(now, 'yyyymmdd'));
+    fileName = sprintf('data/%s_TemporalAttention_%s.mat', subjectID, datestr(now, 'yyyymmdd'));
     save(fileName, 'expt', 'results')
 end
 
