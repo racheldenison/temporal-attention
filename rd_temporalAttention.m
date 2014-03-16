@@ -392,31 +392,42 @@ end
 
 % Plot figs
 intervalNames = {'early','late'};
-f(1) = figure;
+accLims = [0.2 1];
+rtLims = [0.5 1.6];
+contrastLims = [p.targetContrasts(1)-0.05 p.targetContrasts(end)+0.05];
+
+fig(1) = figure;
 for iRI = 1:numel(p.respInterval)
     subplot(1,numel(p.respInterval),iRI)
-    errorbar(repmat(p.targetContrasts',1,numel(p.cueValidity)),...
-        accMean{iRI}', accSte{iRI}', '.')
+    hold on
+    plot(contrastLims, [0.5 0.5], '--k');
+    p1 = errorbar(repmat(p.targetContrasts',1,numel(p.cueValidity)),...
+        accMean{iRI}', accSte{iRI}', '.', 'MarkerSize', 20);
     xlabel('contrast')
     ylabel('acc')
-    legend(num2str(p.cueValidity'),'location','best')
+    legend(p1, num2str(p.cueValidity'),'location','best')
     title(intervalNames{iRI})
+    xlim(contrastLims)
+    ylim(accLims)
 end
 
-f(2) = figure;
+fig(2) = figure;
 for iRI = 1:numel(p.respInterval)
     subplot(1,numel(p.respInterval),iRI)
     errorbar(repmat(p.targetContrasts',1,numel(p.cueValidity)),...
-        rtMean{iRI}', rtSte{iRI}', '.')
+        rtMean{iRI}', rtSte{iRI}', '.', 'MarkerSize', 20)
     xlabel('contrast')
     ylabel('rt')
     legend(num2str(p.cueValidity'),'location','best')
     title(intervalNames{iRI})
+    xlim(contrastLims)
+    ylim(rtLims)
+    box off
 end
 
 % Save figs
 if saveFigs
     figNames = {'acc','rt'};
-    rd_saveAllFigs(f, figNames, 'TemporalAttention')
+    rd_saveAllFigs(fig, figNames, [subjectID '_TemporalAttention'])
 end
 
