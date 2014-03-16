@@ -1,4 +1,4 @@
-function rd_saveAllFigs(h, figNames, figNamePrefix, figDir, fileType)
+function rd_saveAllFigs(f, figNames, figNamePrefix, figDir, fileType)
 %
 % function rd_saveAllFigs(h, figNames, [figNamePrefix], [figDir], [fileType])
 %
@@ -22,7 +22,7 @@ if nargin < 5 || isempty(fileType)
     fileType = '-dpng';
 end
 
-for iF = 1:numel(h)
-    figFile = sprintf('%/%s_%s', figDir, figNamePrefix, figNames{iF});
-    print(h(iF), fileType, figFile)
+for iF = 1:numel(f)
+    figFile = sprintf('%s/%s_%s', figDir, figNamePrefix, figNames{iF});
+    print(f(iF), fileType, figFile)
 end

@@ -417,9 +417,6 @@ end
 % Save figs
 if saveFigs
     figNames = {'acc','rt'};
-    for iF = 1:numel(f)
-        figFile = sprintf('figures/%s_TemporalAttention_%s', subjectID, figNames{iF});
-        print(f(iF), '-dpng', figFile)
-    end
+    rd_saveAllFigs(f, figNames, 'TemporalAttention')
 end
 
