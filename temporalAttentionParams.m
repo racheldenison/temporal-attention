@@ -35,7 +35,7 @@ p.propValid = nnz(p.cueValidityFactor==1)./nnz(p.cueValidityFactor<3);
 p.propNeutral = nnz(p.cueValidityFactor==3)./numel(p.cueValidityFactor);
 
 % Timing
-p.soas = [1000 1433]/1000; % [short long]
+p.soas = [300 733]/1000; % [short long]
 p.preCueDur = 0.5; % time between fixation onset and cue
 p.cueDur = 0.2;
 p.targetDur = 2/60; % 33 ms

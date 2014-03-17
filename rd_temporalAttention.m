@@ -393,7 +393,7 @@ end
 % Plot figs
 intervalNames = {'early','late'};
 accLims = [0.2 1];
-rtLims = [0.5 1.6];
+rtLims = [0.3 1.6];
 contrastLims = [p.targetContrasts(1)-0.05 p.targetContrasts(end)+0.05];
 
 fig(1) = figure;
