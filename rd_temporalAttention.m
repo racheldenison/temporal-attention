@@ -38,7 +38,7 @@ screenNumber = max(Screen('Screens'));
 white = WhiteIndex(window);  % Retrieves the CLUT color code for white.
 [cx cy] = RectCenter(rect);
 Screen('TextSize', window, 24);
-Screen('TextColor', window, [1 1 1]*white);
+Screen('TextColor', window, white);
 Screen('TextFont', window, p.font);
 
 % Check screen size
@@ -90,6 +90,8 @@ end
 
 % Make mask
 switch p.maskType
+    case 'none'
+        mask = ones(size(t))*p.backgroundColor;
     case 'whitenoise'
         mask = (rand(size(t))-0.5)*p.maskContrast + 0.5;
     case 'verticalgrating'
@@ -114,7 +116,7 @@ switch p.maskType
         error('maskType not recognized')
 end
 
-% Make textures
+%% Make textures
 for iC = 1:numel(p.targetContrasts)
     for iTO = 1:numel(p.targetOrientations)
         targetTex(iC,iTO) = Screen('MakeTexture', window, target{iC,iTO}*white);
@@ -126,6 +128,7 @@ maskTex = Screen('MakeTexture', window, mask*white);
 % Make the rects for placing the images
 imSize = size(target{1,1},1);
 imRect = CenterRectOnPoint([0 0 imSize imSize], cx+imPos(1), cy+imPos(2));
+phRect = imRect + [-1 -1 1 1]*p.phLineWidth;
 
 %% Generate trials
 % Construct trials matrix
@@ -219,7 +222,8 @@ for iTrial = 1:nTrials
     tex2 = targetTex(tcCond,to2Cond);
     
     % Present fixation
-    DrawFormattedText(window, 'x', 'center', 'center', [1 1 1]*white);
+    DrawFormattedText(window, 'x', 'center', 'center', white);
+    drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
     timeFix = Screen('Flip', window);
     
     % Present cue
@@ -232,51 +236,59 @@ for iTrial = 1:nTrials
     
     % Present images
     % target 1
-    Screen('DrawTexture', window, tex1, [], imRect);
     DrawFormattedText(window, 'x', 'center', 'center');
+    drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
+    Screen('DrawTexture', window, tex1, [], imRect);
     timeIm1 = Screen('Flip', window, timeCue + p.soas(1) - slack);
     
     % blank
     if p.maskSOA > p.targetDur
         Screen('FillRect', window, white*p.backgroundColor);
         DrawFormattedText(window, 'x', 'center', 'center');
+        drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
         timeBlank1 = Screen('Flip', window, timeIm1 + p.targetDur - slack);
     else
         timeBlank1 = NaN;
     end
     
     % mask 1
-    Screen('DrawTexture', window, maskTex, [], imRect);
     DrawFormattedText(window, 'x', 'center', 'center');
+    drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
+    Screen('DrawTexture', window, maskTex, [], imRect);
     timeMask1 = Screen('Flip', window, timeIm1 + p.maskSOA - slack);
 
     % blank
     Screen('FillRect', window, white*p.backgroundColor);
     DrawFormattedText(window, 'x', 'center', 'center');
+    drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
     timeMaskBlank1 = Screen('Flip', window, timeMask1 + p.maskDur - slack);
     
     % target 2
-    Screen('DrawTexture', window, tex2, [], imRect, 0);
     DrawFormattedText(window, 'x', 'center', 'center');
+    drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
+    Screen('DrawTexture', window, tex2, [], imRect, 0);
     timeIm2 = Screen('Flip', window, timeCue + p.soas(2) - slack);
     
     % blank
     if p.maskSOA > p.targetDur
         Screen('FillRect', window, white*p.backgroundColor);
         DrawFormattedText(window, 'x', 'center', 'center');
+        drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
         timeBlank2 = Screen('Flip', window, timeIm2 + p.targetDur - slack);
     else
         timeBlank2 = NaN;
     end
     
     % mask 2
-    Screen('DrawTexture', window, maskTex, [], imRect);
     DrawFormattedText(window, 'x', 'center', 'center');
+    drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
+    Screen('DrawTexture', window, maskTex, [], imRect);
     timeMask2 = Screen('Flip', window, timeIm2 + p.maskSOA - slack);
 
     % blank
     Screen('FillRect', window, white*p.backgroundColor);
     DrawFormattedText(window, 'x', 'center', 'center');
+    drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
     timeMaskBlank2 = Screen('Flip', window, timeMask2 + p.maskDur - slack);
     
     % Present response cue
@@ -304,6 +316,7 @@ for iTrial = 1:nTrials
     end
     
     DrawFormattedText(window, feedbackText, 'center', 'center', feedbackColor);
+    drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
     timeFeedback = Screen('Flip', window);
    
     % Store trial info

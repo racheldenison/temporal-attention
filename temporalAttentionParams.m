@@ -23,6 +23,8 @@ p.keyCodes = KbName(p.keyNames);
 p.backgroundColor = 0.5;
 p.nReps = 3;
 p.font = 'Verdana';
+p.showPlaceholders = 1;
+p.phLineWidth = 2; % (pixels)
 
 % Conditions
 p.targetContrasts = [.16 .32];
@@ -51,7 +53,7 @@ p.targetSize = 0.5; % sigma of gaussian
 p.spatialFrequency = 4;
 p.targetOrientations = [-10 10];
 
-p.maskType = 'filterednoise'; % whitenoise, verticalgrating, crossedgratings, filterednoise
+p.maskType = 'none'; % none, whitenoise, verticalgrating, crossedgratings, filterednoise
 p.maskContrast = 1;
 
 % Sounds
