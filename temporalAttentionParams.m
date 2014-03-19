@@ -1,9 +1,9 @@
 function p = temporalAttentionParams
 
-p.testingLocation = 'CarrascoL1'; % 'CarrascoL1','laptop'
+p.testingLocation = 'desk'; % 'CarrascoL1','laptop','desk'
 
 switch p.testingLocation
-    case 'laptop'
+    case {'laptop','desk'}
         p.keyNames = {'1!','2@'};
         p.refRate = 1/60;
         p.screenSize = [9 13]; % (in)

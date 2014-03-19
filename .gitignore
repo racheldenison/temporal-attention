@@ -1,5 +1,6 @@
 # .gitignore
 
 *~
+._*
 data/
 figures/
