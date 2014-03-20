@@ -1,6 +1,6 @@
 function p = temporalAttentionParams
 
-p.testingLocation = 'desk'; % 'CarrascoL1','laptop','desk'
+p.testingLocation = 'CarrascoL1'; % 'CarrascoL1','laptop','desk'
 
 switch p.testingLocation
     case {'laptop','desk'}
@@ -42,7 +42,7 @@ p.preCueDur = 0.5; % time between fixation onset and cue
 p.cueDur = 0.2;
 p.targetDur = 2/60; % 33 ms
 p.maskSOA = 4/60; % time between target onset and mask onset
-p.maskDur = 1/60;
+p.maskDur = 3/60; % 1/60
 p.respCueSOA = p.soas(2) + 0.5;
 p.iti = 0.5; % inter-trial interval
 
@@ -53,7 +53,7 @@ p.targetSize = 1.5; % 0.5 sigma of gaussian / 1.5 side length of T/L
 p.spatialFrequency = 4; % 4
 p.targetOrientation = [-10 10]; % [-10 10]
 p.TL = [0 0.5]; % [offset-for-T(=0) offset-for-L]
-p.TLLineWidth = 5;
+p.TLLineWidth = 5; % (pixels)
 
 % Task
 p.task = 'TL'; % 'targetOrientation','spatialFrequency','TL'
@@ -72,7 +72,7 @@ end
 %%% NB. currently, rotated targets can obscure placeholders 
 
 % Masks
-p.maskType = 'none'; % none, whitenoise, verticalgrating, crossedgratings, filterednoise
+p.maskType = 'filterednoise'; % none, whitenoise, verticalgrating, crossedgratings, filterednoise
 p.maskContrast = 1;
 
 % Sounds

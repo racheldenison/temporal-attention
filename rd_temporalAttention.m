@@ -33,8 +33,8 @@ pahandle = PsychPortAudio('Open', [], [], reqlatencyclass, p.Fs, 1); % 1 = singl
 %% Screen
 % Set up window and textures
 screenNumber = max(Screen('Screens'));
-% [window rect] = Screen('OpenWindow', screenNumber);
-[window rect] = Screen('OpenWindow', screenNumber, [], [0 0 800 600]);
+[window rect] = Screen('OpenWindow', screenNumber);
+% [window rect] = Screen('OpenWindow', screenNumber, [], [0 0 800 600]);
 white = WhiteIndex(window);  % Retrieves the CLUT color code for white.
 [cx cy] = RectCenter(rect);
 Screen('TextSize', window, 24);
