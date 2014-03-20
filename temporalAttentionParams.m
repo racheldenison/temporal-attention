@@ -27,7 +27,7 @@ p.showPlaceholders = 1;
 p.phLineWidth = 2; % (pixels)
 
 % Conditions
-p.targetContrasts = [.04 .08];
+p.targetContrasts = [.16 .32];
 p.respInterval = [1 2]; % [1=early 2=late]
 p.cueValidity = [1 -1 0]; % [1=valid -1=invalid 0=neutral]
 % p.propValid = 0.67;
@@ -49,12 +49,14 @@ p.iti = 0.5; % inter-trial interval
 % Images
 p.imPos = [4 4];
 p.imSize = [4 4]; % this is the size of the image container that holds the stim
-p.targetSize = 0.5; % sigma of gaussian
-p.spatialFrequency = [3 5]; % 4
-p.targetOrientation = 0; % [-10 10]
+p.targetSize = 1.5; % 0.5 sigma of gaussian / 1.5 side length of T/L
+p.spatialFrequency = 4; % 4
+p.targetOrientation = [-10 10]; % [-10 10]
+p.TL = [0 0.5]; % [offset-for-T(=0) offset-for-L]
+p.TLLineWidth = 5;
 
 % Task
-p.task = 'spatialFrequency';
+p.task = 'TL'; % 'targetOrientation','spatialFrequency','TL'
 p.targetStates = p.(p.task);
 % check states
 if numel(p.targetStates)~=2
@@ -64,7 +66,7 @@ end
 switch p.task
     case 'targetOrientation'
         p.rotateTarget = 0;
-    case 'spatialFrequency'
+    case {'spatialFrequency','TL'}
         p.rotateTarget = 1;
 end
 %%% NB. currently, rotated targets can obscure placeholders 

@@ -80,20 +80,26 @@ for iC = 1:numel(p.targetContrasts)
         targetState = p.targetStates(iT);
         
         switch p.task
-            case 'targetOrientation'
-                targetOrientation = targetState;
-                spatialFrequency = p.spatialFrequency;
-            case 'spatialFrequency'
-                spatialFrequency = targetState;
-                targetOrientation = p.targetOrientation;
+            case 'TL'
+                targetColor = targetContrast*(1-p.backgroundColor) + p.backgroundColor;
+                t = makeTLImage(targetSize, p.TLLineWidth, targetState, targetColor, p.backgroundColor);
             otherwise
-                error('p.task not recognized')
+                switch p.task
+                    case 'targetOrientation'
+                        targetOrientation = targetState;
+                        spatialFrequency = p.spatialFrequency;
+                    case 'spatialFrequency'
+                        spatialFrequency = targetState;
+                        targetOrientation = p.targetOrientation;
+                    otherwise
+                        error('p.task not recognized')
+                end
+                
+                % make big grating
+                t = buildColorGrating(pixelsPerDegree, p.imSize, ...
+                    spatialFrequency, targetOrientation, 0, targetContrast, 0, 'bw');
         end
-        
-        % make big grating
-        t = buildColorGrating(pixelsPerDegree, p.imSize, ...
-            spatialFrequency, targetOrientation, 0, targetContrast, 0, 'bw');
-        
+
         % mask with annulus
         target{iC,iT} = maskWithGaussian(t, size(t,1), targetSize);
     end
