@@ -234,6 +234,12 @@ for iTrial = 1:nTrials
     tex1 = targetTex(tcCond,ts1Cond);
     tex2 = targetTex(tcCond,ts2Cond);
     
+    if p.rotateTarget
+        rot = 360*rand(1,2);
+    else
+        rot = [0 0];
+    end
+    
     % Present fixation
     DrawFormattedText(window, 'x', 'center', 'center', white);
     drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
@@ -251,7 +257,7 @@ for iTrial = 1:nTrials
     % target 1
     DrawFormattedText(window, 'x', 'center', 'center');
     drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
-    Screen('DrawTexture', window, tex1, [], imRect);
+    Screen('DrawTexture', window, tex1, [], imRect, rot(1));
     timeIm1 = Screen('Flip', window, timeCue + p.soas(1) - slack);
     
     % blank
@@ -279,7 +285,7 @@ for iTrial = 1:nTrials
     % target 2
     DrawFormattedText(window, 'x', 'center', 'center');
     drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
-    Screen('DrawTexture', window, tex2, [], imRect, 0);
+    Screen('DrawTexture', window, tex2, [], imRect, rot(2));
     timeIm2 = Screen('Flip', window, timeCue + p.soas(2) - slack);
     
     % blank
@@ -340,6 +346,8 @@ for iTrial = 1:nTrials
     trials(trialIdx,responseIdx) = response;
     trials(trialIdx,correctIdx) = correct;
     
+    targetRotations(trialIdx,:) = rot;
+    
     % Store timing
     timing.timeFix(iTrial,1) = timeFix;
     timing.timeCue(iTrial,1) = timeCue;
@@ -374,6 +382,7 @@ expt.timing = timing;
 expt.trialOrder = trialOrder;
 expt.trials_headers = trials_headers;
 expt.trials = trials;
+expt.targetRotations = targetRotations;
 
 % Clean up
 PsychPortAudio('Stop', pahandle);
