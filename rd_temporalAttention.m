@@ -76,15 +76,26 @@ pixelsPerDegree = round(ang2pix(1, p.screenSize(1), p.screenRes(1), p.viewDist, 
 % Make target gratings
 for iC = 1:numel(p.targetContrasts)
     targetContrast = p.targetContrasts(iC);
-    for iTO = 1:numel(p.targetOrientations)
-        targetOrientation = p.targetOrientations(iTO);
+    for iT = 1:numel(p.targetStates)
+        targetState = p.targetStates(iT);
+        
+        switch p.task
+            case 'targetOrientation'
+                targetOrientation = targetState;
+                spatialFrequency = p.spatialFrequency;
+            case 'spatialFrequency'
+                spatialFrequency = targetState;
+                targetOrientation = p.targetOrientation;
+            otherwise
+                error('p.task not recognized')
+        end
         
         % make big grating
         t = buildColorGrating(pixelsPerDegree, p.imSize, ...
-            p.spatialFrequency, targetOrientation, 0, targetContrast, 0, 'bw');
+            spatialFrequency, targetOrientation, 0, targetContrast, 0, 'bw');
         
         % mask with annulus
-        target{iC,iTO} = maskWithGaussian(t, size(t,1), targetSize);
+        target{iC,iT} = maskWithGaussian(t, size(t,1), targetSize);
     end
 end
 
@@ -118,8 +129,8 @@ end
 
 %% Make textures
 for iC = 1:numel(p.targetContrasts)
-    for iTO = 1:numel(p.targetOrientations)
-        targetTex(iC,iTO) = Screen('MakeTexture', window, target{iC,iTO}*white);
+    for iT = 1:numel(p.targetStates)
+        targetTex(iC,iT) = Screen('MakeTexture', window, target{iC,iT}*white);
     end
 end
 
@@ -132,18 +143,20 @@ phRect = imRect + [-1 -1 1 1]*p.phLineWidth;
 
 %% Generate trials
 % Construct trials matrix
+% a "state" is one of two states the target can take, eg left vs. right
+% orientation, or low vs. high SF
 trials_headers = {'targetContrast','respInterval','cueValidity',...
-    'target1Orient','target2Orient','cuedInterval','respTargetOrient',...
+    'target1State','target2State','cuedInterval','respTargetState',...
     'rt','responseKey','response','correct'};
 
 % make sure column indices match trials headers
 targetContrastIdx = strcmp(trials_headers,'targetContrast');
 respIntervalIdx = strcmp(trials_headers,'respInterval');
 cueValidityIdx = strcmp(trials_headers,'cueValidity');
-target1OrientIdx = strcmp(trials_headers,'target1Orient');
-target2OrientIdx = strcmp(trials_headers,'target2Orient');
+target1StateIdx = strcmp(trials_headers,'target1State');
+target2StateIdx = strcmp(trials_headers,'target2State');
 cuedIntervalIdx = strcmp(trials_headers,'cuedInterval');
-respTargetOrientIdx = strcmp(trials_headers,'respTargetOrient');
+respTargetOrientIdx = strcmp(trials_headers,'respTargetState');
 rtIdx = strcmp(trials_headers,'rt');
 responseKeyIdx = strcmp(trials_headers,'responseKey');
 responseIdx = strcmp(trials_headers,'response');
@@ -153,8 +166,8 @@ correctIdx = strcmp(trials_headers,'correct');
 trials = fullfact([numel(p.targetContrasts) ...
     numel(p.respInterval) ...
     numel(p.cueValidityFactor) ...
-    numel(p.targetOrientations) ...
-    numel(p.targetOrientations)]);
+    numel(p.targetStates) ...
+    numel(p.targetStates)]);
 
 % set cue validity condition according to the cueValidityFactor (potentially unequal proportion of trials in each condition)
 cueValidityTrials = trials(:,cueValidityIdx);
@@ -187,8 +200,8 @@ for iTrial = 1:nTrials
     
     % Get conditions for this trial
     tcCond = trials(trialIdx,targetContrastIdx);
-    to1Cond = trials(trialIdx,target1OrientIdx);
-    to2Cond = trials(trialIdx,target2OrientIdx);
+    ts1Cond = trials(trialIdx,target1StateIdx);
+    ts2Cond = trials(trialIdx,target2StateIdx);
     respInterval = p.respInterval(trials(trialIdx,respIntervalIdx));
     cueValidity = p.cueValidity(trials(trialIdx,cueValidityIdx));
     
@@ -202,12 +215,12 @@ for iTrial = 1:nTrials
             cuedInterval = 0;
     end
 
-    % Determine target orientation
+    % Determine target state (eg. orientation)
     switch respInterval
         case 1
-            respTargetOrientation = p.targetOrientations(to1Cond);
+            respTargetState = p.targetStates(ts1Cond);
         case 2
-            respTargetOrientation = p.targetOrientations(to2Cond);
+            respTargetState = p.targetStates(ts2Cond);
     end
     
     % Select tones and textures
@@ -218,8 +231,8 @@ for iTrial = 1:nTrials
     end
     respTone = p.cueTones(respInterval,:);
     
-    tex1 = targetTex(tcCond,to1Cond);
-    tex2 = targetTex(tcCond,to2Cond);
+    tex1 = targetTex(tcCond,ts1Cond);
+    tex2 = targetTex(tcCond,ts2Cond);
     
     % Present fixation
     DrawFormattedText(window, 'x', 'center', 'center', white);
@@ -302,10 +315,10 @@ for iTrial = 1:nTrials
         rt = secs - timeRespCue;
         responseKey = find(p.keyCodes==find(keyCode));
     end
-    response = p.targetOrientations(responseKey);
+    response = p.targetStates(responseKey);
     
     % Feedback
-    if response==respTargetOrientation;
+    if response==respTargetState;
         correct = 1;
         feedbackText = '+';
         feedbackColor = [0 1 0]*white;
@@ -321,7 +334,7 @@ for iTrial = 1:nTrials
    
     % Store trial info
     trials(trialIdx,cuedIntervalIdx) = cuedInterval;
-    trials(trialIdx,respTargetOrientIdx) = respTargetOrientation;
+    trials(trialIdx,respTargetOrientIdx) = respTargetState;
     trials(trialIdx,rtIdx) = rt;
     trials(trialIdx,responseKeyIdx) = responseKey;
     trials(trialIdx,responseIdx) = response;

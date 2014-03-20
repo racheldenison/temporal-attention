@@ -21,7 +21,7 @@ end
 
 p.keyCodes = KbName(p.keyNames);
 p.backgroundColor = 0.5;
-p.nReps = 3;
+p.nReps = 1;
 p.font = 'Verdana';
 p.showPlaceholders = 1;
 p.phLineWidth = 2; % (pixels)
@@ -50,9 +50,18 @@ p.iti = 0.5; % inter-trial interval
 p.imPos = [4 4];
 p.imSize = [4 4]; % this is the size of the image container that holds the stim
 p.targetSize = 0.5; % sigma of gaussian
-p.spatialFrequency = 4;
-p.targetOrientations = [-10 10];
+p.spatialFrequency = 4; % 4
+p.targetOrientation = [-10 10]; % [-10 10]
 
+% Task
+p.task = 'targetOrientation';
+p.targetStates = p.(p.task);
+% check states
+if numel(p.targetStates)~=2
+    error('p.targetStates should have exactly 2 elements. Check task settings.')
+end
+
+% Masks
 p.maskType = 'none'; % none, whitenoise, verticalgrating, crossedgratings, filterednoise
 p.maskContrast = 1;
 
