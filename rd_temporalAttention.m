@@ -41,6 +41,11 @@ Screen('TextSize', window, 24);
 Screen('TextColor', window, white);
 Screen('TextFont', window, p.font);
 
+% Set resolution and refresh rate
+if strcmp(p.testingLocation, 'CarrascoL1')
+    SetResolution(screenNumber, p.screenRes(1), p.screenRes(2), round(1/p.refRate));
+end
+
 % Check screen size
 [sw, sh] = Screen('WindowSize', window); % height and width of screen (px)
 if ~all([sw sh] == p.screenRes) && ~strcmp(subjectID,'test')
@@ -183,6 +188,8 @@ switch p.rotateTarget
         targetRotations = zeros(nTrials0,2);
     case 'random'
         targetRotations = 360*rand(nTrials0,2);
+    case 'rotT2'
+        targetRotations = [zeros(nTrials0,1) 90*ones(nTrials0,1)];
     case 'cb'
         % if we want to counterbalance rotations across trials, we need to
         % have 4x the original number of trials

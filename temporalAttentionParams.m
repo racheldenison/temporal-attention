@@ -1,6 +1,6 @@
 function p = temporalAttentionParams
 
-p.testingLocation = 'desk'; % 'CarrascoL1','laptop','desk'
+p.testingLocation = 'CarrascoL1'; % 'CarrascoL1','laptop','desk'
 
 switch p.testingLocation
     case {'laptop','desk'}
@@ -28,7 +28,7 @@ p.showPlaceholders = 1;
 p.phLineWidth = 2; % (pixels)
 
 % Conditions
-p.targetContrasts = [.16 .32];
+p.targetContrasts = [.64 1];
 p.respInterval = [1 2]; % [1=early 2=late]
 p.cueValidity = [1 -1 0]; % [1=valid -1=invalid 0=neutral]
 % p.propValid = 0.67;
@@ -38,7 +38,7 @@ p.propValid = nnz(p.cueValidityFactor==1)./nnz(p.cueValidityFactor<3);
 p.propNeutral = nnz(p.cueValidityFactor==3)./numel(p.cueValidityFactor);
 
 % Timing
-p.soas = [1000 1433]/1000; % [short long]
+p.soas = [1000 1250]/1000; % [short long]
 p.preCueDur = 0.5; % time between fixation onset and cue
 p.cueDur = 0.2;
 p.targetDur = 2/60; % 33 ms
@@ -66,7 +66,7 @@ end
 % target rotation
 switch p.task
     case 'targetOrientation'
-        p.rotateTarget = 'cb'; % 'none','cb'= counterbalanced
+        p.rotateTarget = 'rotT2'; % 'none','rotT2'= rotate T2 90 deg,'cb'= counterbalanced
     case {'spatialFrequency','TL'}
         p.rotateTarget = 'random'; % random rotations
 end
