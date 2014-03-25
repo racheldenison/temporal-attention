@@ -175,6 +175,24 @@ trials = fullfact([numel(p.targetContrasts) ...
     numel(p.targetStates) ...
     numel(p.targetStates)]);
 
+% generate target rotations
+% these are applied over and above any initial orientation
+nTrials0 = size(trials,1);
+switch p.rotateTarget
+    case 'none'
+        targetRotations = zeros(nTrials0,2);
+    case 'random'
+        targetRotations = 360*rand(nTrials0,2);
+    case 'cb'
+        % if we want to counterbalance rotations across trials, we need to
+        % have 4x the original number of trials
+        targetRotations(:,1) = repmat([zeros(nTrials0,1); 90*ones(nTrials0,1)],2,1);
+        targetRotations(:,2) = [zeros(nTrials0*2,1); 90*ones(nTrials0*2,1)];
+        trials = repmat(trials,4,1);
+    otherwise
+        error('p.rotateTarget not recognized')
+end
+        
 % set cue validity condition according to the cueValidityFactor (potentially unequal proportion of trials in each condition)
 cueValidityTrials = trials(:,cueValidityIdx);
 for i = 1:numel(p.cueValidityFactor)   
@@ -184,7 +202,10 @@ end
 % repeat trials matrix according to nReps of all conditions
 trials = repmat(trials, p.nReps, 1);
 nTrials = size(trials,1);
-nTrialsPerBlock = nTrials/p.nReps; % 1 rep per block
+
+% determine blocks
+nBlocks = nTrials/p.nTrialsPerBlock;
+fprintf('\n%1.2f blocks\n\n', nBlocks)
 
 % Choose order of trial presentation
 trialOrder = randperm(nTrials);
@@ -239,12 +260,9 @@ for iTrial = 1:nTrials
     
     tex1 = targetTex(tcCond,ts1Cond);
     tex2 = targetTex(tcCond,ts2Cond);
-    
-    if p.rotateTarget
-        rot = 360*rand(1,2);
-    else
-        rot = [0 0];
-    end
+
+    % Get rotations
+    rot = targetRotations(trialIdx,:);
     
     % Present fixation
     DrawFormattedText(window, 'x', 'center', 'center', white);
@@ -351,9 +369,7 @@ for iTrial = 1:nTrials
     trials(trialIdx,responseKeyIdx) = responseKey;
     trials(trialIdx,responseIdx) = response;
     trials(trialIdx,correctIdx) = correct;
-    
-    targetRotations(trialIdx,:) = rot;
-    
+        
     % Store timing
     timing.timeFix(iTrial,1) = timeFix;
     timing.timeCue(iTrial,1) = timeCue;
@@ -370,9 +386,10 @@ for iTrial = 1:nTrials
     
     save('data/TEMP') % saves the workspace on each trial
     
-    if mod(iTrial,nTrialsPerBlock)==0 && iTrial<nTrials
+    if mod(iTrial,p.nTrialsPerBlock)==0 && iTrial<nTrials
         DrawFormattedText(window, 'Break time!\n\nPress any key to go on.', 'center', 'center', [1 1 1]*white);
         Screen('Flip', window);
+        WaitSecs(1);
         KbWait(devNum);
     end
 end

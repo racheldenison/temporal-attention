@@ -1,6 +1,6 @@
 function p = temporalAttentionParams
 
-p.testingLocation = 'CarrascoL1'; % 'CarrascoL1','laptop','desk'
+p.testingLocation = 'desk'; % 'CarrascoL1','laptop','desk'
 
 switch p.testingLocation
     case {'laptop','desk'}
@@ -22,6 +22,7 @@ end
 p.keyCodes = KbName(p.keyNames);
 p.backgroundColor = 0.5;
 p.nReps = 1;
+p.nTrialsPerBlock = 64;
 p.font = 'Verdana';
 p.showPlaceholders = 1;
 p.phLineWidth = 2; % (pixels)
@@ -49,30 +50,30 @@ p.iti = 0.5; % inter-trial interval
 % Images
 p.imPos = [4 4];
 p.imSize = [4 4]; % this is the size of the image container that holds the stim
-p.targetSize = 1.5; % 0.5 sigma of gaussian / 1.5 side length of T/L
+p.targetSize = 0.5; % 0.5 sigma of gaussian / 1.5 side length of T/L
 p.spatialFrequency = 4; % 4
-p.targetOrientation = [-10 10]; % [-10 10]
+p.targetOrientation = [-5 5]; % [-10 10]
 p.TL = [0 0.5]; % [offset-for-T(=0) offset-for-L]
 p.TLLineWidth = 5; % (pixels)
 
 % Task
-p.task = 'TL'; % 'targetOrientation','spatialFrequency','TL'
+p.task = 'targetOrientation'; % 'targetOrientation','spatialFrequency','TL'
 p.targetStates = p.(p.task);
 % check states
 if numel(p.targetStates)~=2
     error('p.targetStates should have exactly 2 elements. Check task settings.')
 end
-% random target rotation?
+% target rotation
 switch p.task
     case 'targetOrientation'
-        p.rotateTarget = 0;
+        p.rotateTarget = 'cb'; % 'none','cb'= counterbalanced
     case {'spatialFrequency','TL'}
-        p.rotateTarget = 1;
+        p.rotateTarget = 'random'; % random rotations
 end
 %%% NB. currently, rotated targets can obscure placeholders 
 
 % Masks
-p.maskType = 'filterednoise'; % none, whitenoise, verticalgrating, crossedgratings, filterednoise
+p.maskType = 'none'; % none, whitenoise, verticalgrating, crossedgratings, filterednoise
 p.maskContrast = 1;
 
 % Sounds
