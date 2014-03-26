@@ -215,7 +215,7 @@ nTrials = size(trials,1);
 
 % determine blocks
 nBlocks = nTrials/p.nTrialsPerBlock;
-fprintf('\n%1.2f blocks\n\n', nBlocks)
+fprintf('\n%d trials, %1.2f blocks\n\n', nTrials, nBlocks)
 
 % Choose order of trial presentation
 trialOrder = randperm(nTrials);
@@ -224,6 +224,7 @@ trialOrder = randperm(nTrials);
 % Show fixation and wait for a button press
 Screen('FillRect', window, white*p.backgroundColor);
 DrawFormattedText(window, 'x', 'center', 'center');
+drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
 Screen('Flip', window);
 KbWait(devNum);
 
