@@ -10,6 +10,7 @@ rdP1
 settled on some parameters:
 tilt=2 (for me)
 orientation task with target rotation=rotT2
+no mask
 first target is at 1000 ms
 3 valid : 1 invalid : 1 neutral
 will test different contrasts, starting with [.64 1]
