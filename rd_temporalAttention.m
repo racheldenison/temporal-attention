@@ -262,7 +262,7 @@ for iTrial = 1:nTrials
     
     % Select tones and textures
     if cuedInterval==0
-        cueTone = sum(p.cueTones,1); % play both tones
+        cueTone = sum(p.cueTones,1)./2; % play both tones
     else
         cueTone = p.cueTones(cuedInterval,:);
     end
