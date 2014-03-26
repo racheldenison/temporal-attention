@@ -53,7 +53,7 @@ p.imPos = [4 4];
 p.imSize = [4 4]; % this is the size of the image container that holds the stim
 p.targetSize = 0.5; % 0.5 sigma of gaussian / 1.5 side length of T/L
 p.spatialFrequency = 4; % 4
-p.targetOrientation = [-2 2]; % eg. [-10 10]
+p.targetOrientation = [-1.5 1.5]; % eg. [-10 10]
 p.TL = [0 0.5]; % [offset-for-T(=0) offset-for-L]
 p.TLLineWidth = 5; % (pixels)
 

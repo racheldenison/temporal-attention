@@ -477,6 +477,8 @@ for iRI = 1:numel(p.respInterval)
     title(intervalNames{iRI})
     xlim(contrastLims)
     ylim(accLims)
+    rd_supertitle(subjectID);
+    rd_raiseAxis(gca);
 end
 
 fig(2) = figure;
@@ -491,6 +493,8 @@ for iRI = 1:numel(p.respInterval)
     xlim(contrastLims)
     ylim(rtLims)
     box off
+    rd_supertitle(subjectID);
+    rd_raiseAxis(gca);
 end
 
 % Save figs
