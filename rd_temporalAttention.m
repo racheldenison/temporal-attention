@@ -31,8 +31,15 @@ reqlatencyclass = 2; % Level 2 means: Take full control over the audio device, e
 pahandle = PsychPortAudio('Open', [], [], reqlatencyclass, p.Fs, 1); % 1 = single-channel
 
 %% Screen
-% Set up window and textures
+% Set up screen
 screenNumber = max(Screen('Screens'));
+
+% Set resolution and refresh rate
+if strcmp(p.testingLocation, 'CarrascoL1')
+    Screen('Resolution',screenNumber, p.screenRes(1), p.screenRes(2), round(1/p.refRate));
+end
+
+% Set up window
 [window rect] = Screen('OpenWindow', screenNumber);
 % [window rect] = Screen('OpenWindow', screenNumber, [], [0 0 800 600]);
 white = WhiteIndex(window);  % Retrieves the CLUT color code for white.
@@ -40,11 +47,6 @@ white = WhiteIndex(window);  % Retrieves the CLUT color code for white.
 Screen('TextSize', window, 24);
 Screen('TextColor', window, white);
 Screen('TextFont', window, p.font);
-
-% Set resolution and refresh rate
-if strcmp(p.testingLocation, 'CarrascoL1')
-    SetResolution(screenNumber, p.screenRes(1), p.screenRes(2), round(1/p.refRate));
-end
 
 % Check screen size
 [sw, sh] = Screen('WindowSize', window); % height and width of screen (px)
