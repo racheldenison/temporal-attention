@@ -210,6 +210,7 @@ end
 
 % repeat trials matrix according to nReps of all conditions
 trials = repmat(trials, p.nReps, 1);
+targetRotations = repmat(targetRotations, p.nReps, 1);
 nTrials = size(trials,1);
 
 % determine blocks
