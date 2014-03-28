@@ -398,7 +398,9 @@ for iTrial = 1:nTrials
     save('data/TEMP') % saves the workspace on each trial
     
     if mod(iTrial,p.nTrialsPerBlock)==0 && iTrial<nTrials
-        DrawFormattedText(window, 'Break time!\n\nPress any key to go on.', 'center', 'center', [1 1 1]*white);
+        blockMessage = sprintf('%s You''ve completed %d of %d blocks.', highpraise, iTrial/p.nTrialsPerBlock, ceil(nBlocks));
+        breakMessage = sprintf('Break time\n%s\n\nPress any key to go on.', blockMessage);
+        DrawFormattedText(window, breakMessage, 'center', 'center', [1 1 1]*white);
         Screen('Flip', window);
         WaitSecs(1);
         KbWait(devNum);
