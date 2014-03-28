@@ -21,7 +21,7 @@ end
 
 p.keyCodes = KbName(p.keyNames);
 p.backgroundColor = 0.5;
-p.nReps = 4;
+p.nReps = 1;
 p.nTrialsPerBlock = 64;
 p.font = 'Verdana';
 p.showPlaceholders = 1;
@@ -67,7 +67,7 @@ end
 % target rotation
 switch p.task
     case 'targetOrientation'
-        p.rotateTarget = 'rotT2'; % 'none','rotT2'= rotate T2 90 deg,'cb'= counterbalanced
+        p.rotateTarget = 'rotT2'; % 'none','rotT2'= rotate T2 90 deg, 'rotT1' = rotate T1 90 deg, 'cb'= counterbalanced
     case {'spatialFrequency','TL'}
         p.rotateTarget = 'random'; % random rotations
 end

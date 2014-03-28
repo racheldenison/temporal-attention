@@ -190,8 +190,15 @@ switch p.rotateTarget
         targetRotations = zeros(nTrials0,2);
     case 'random'
         targetRotations = 360*rand(nTrials0,2);
+    case 'rotT1'
+        targetRotations = [90*ones(nTrials0,1) zeros(nTrials0,1)];
     case 'rotT2'
         targetRotations = [zeros(nTrials0,1) 90*ones(nTrials0,1)];
+        % test code for interleaving target rotations
+%         r = randperm(length(targetRotations));
+%         r = logical(mod(r,2));
+%         targetRotations(r,1) = 90; 
+%         targetRotations(r,2) = 0;
     case 'cb'
         % if we want to counterbalance rotations across trials, we need to
         % have 4x the original number of trials
