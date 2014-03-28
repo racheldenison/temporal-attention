@@ -408,6 +408,10 @@ for iTrial = 1:nTrials
 end
 timing.endTime = GetSecs;
 
+DrawFormattedText(window, 'All done! Thanks for your effort!', 'center', 'center', [1 1 1]*white);
+Screen('Flip', window);
+WaitSecs(2);
+
 % Show end of block feedback
 % acc = mean(trials(:,correctIdx));
 
