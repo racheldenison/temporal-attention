@@ -43,7 +43,7 @@ if nargin < 7
     squareWave = 0;
 end
 if nargin < 8
-    colorOption = 'rg'; 
+    colorOption = 'bw'; 
 end
 if nargin < 9
     redWeight = 1;
