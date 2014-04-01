@@ -121,14 +121,11 @@ switch command
         
         % Displays a title at the bottom of the eye tracker display
         Eyelink('command', 'record_status_message ''Starting trial %d''', trialNum);
-        
-        fixation = 0; % fixation ok?
-        record = 0; % are we recording?
-        recalibrate = 0; % do we need to recalibrate?
-        
+
         % Start the trial only when 1) eyetracker is recording, 2) subject
         % is fixating
-        while ~record && ~fixation
+        record = 0; % are we recording?
+        while ~record
             % Start recording and check that it really worked
             while ~record
                 Eyelink('StartRecording');	% start recording
@@ -152,17 +149,12 @@ switch command
             % Verify that the subject is holding fixation for some set
             % time before allowing the trial to start. A
             % timeout period is built into this function.
-            % (woah, recursion)
             fixation = rd_eyeLink(window, 'fixholdcheck', {cx, cy, rad});
             
-            %%% what are the conditions for recalibration?? %%%
-            % Recalibrate if needed
-            if recalibrate
-                cal = EyelinkDoTrackerSetup(el);
-                if cal==el.TERMINATE_KEY
-                    exitFlag = 1;
-                    return
-                end
+            % Drift correct if fixation timed out
+            if ~fixation
+                Eyelink('StopRecording');
+                rd_eyeLink(window, 'driftcorrection', {el, cx, cy});
                 record = 0; % start over
             end
         end
@@ -251,6 +243,7 @@ switch command
         cx = in{2};
         cy = in{3};
         
+        Eyelink('message', 'DRIFT_CORRECTION');
         driftCorrection = EyelinkDoDriftCorrect(el, cx, cy, 1, 1);
         
         out = driftCorrection;

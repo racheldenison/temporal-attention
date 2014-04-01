@@ -78,15 +78,6 @@ switch p.testingLocation
         fprintf('\nNot loading gamma table ...\n')
 end
 
-%% Eyetracker
-if p.eyeTracking
-    eyeFile = sprintf('%s_%s', subjectID, datestr(now, 'yyyymmdd'));
-    [el exitFlag] = rd_eyeLink(window, 'start', eyeFile);
-    if exitFlag
-        return
-    end
-end
-
 %% Make stimuli
 % Calculate stimulus dimensions (px) and position
 imPos = round(ang2pix(p.imPos, p.screenSize(1), p.screenRes(1), p.viewDist, 'radial')); % from screen center
@@ -239,6 +230,23 @@ fprintf('\n%d trials, %1.2f blocks\n\n', nTrials, nBlocks)
 
 % Choose order of trial presentation
 trialOrder = randperm(nTrials);
+
+%% Eyetracker
+if p.eyeTracking
+    eyeFile = sprintf('%s_%s', subjectID, datestr(now, 'yyyymmdd'));
+    
+    % initialize eye tracker
+    [el exitFlag] = rd_eyeLink(window, 'eyestart', eyeFile);
+    if exitFlag
+        return
+    end
+    
+    % calibrate eye tracker
+    [cal exitFlag] = rd_eyeLink(window, 'calibrate', el);
+    if exitFlag
+        return
+    end
+end
 
 %% Present trials
 % Show fixation and wait for a button press
