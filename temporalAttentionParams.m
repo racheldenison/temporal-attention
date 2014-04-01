@@ -9,12 +9,14 @@ switch p.testingLocation
         p.screenSize = [9 13]; % (in)
         p.screenRes = [900 1440];
         p.viewDist = 21; % (in)
+        p.eyeTracking = 0;
     case 'CarrascoL1'
         p.keyNames = {'1!','2@'};
         p.refRate = 1/60;
         p.screenSize = [40 30];
         p.screenRes = [1600 1200];
         p.viewDist = 57;
+        p.eyeTracking = 1;
     otherwise
         error('Testing location not found in temporalAttentionParams.')
 end     

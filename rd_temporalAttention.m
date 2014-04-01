@@ -10,6 +10,10 @@ saveFigs = 1;
 
 p = temporalAttentionParams;
 
+if strcmp(subjectID,'test')
+    p.eyeTracking = 0;
+end
+
 slack = p.refRate/2;
 
 % Running on PTB-3? Abort otherwise.
@@ -72,6 +76,15 @@ switch p.testingLocation
         Screen('LoadNormalizedGammaTable', window, repmat(calib.table,1,3));
     otherwise
         fprintf('\nNot loading gamma table ...\n')
+end
+
+%% Eyetracker
+if p.eyeTracking
+    eyeFile = sprintf('%s_%s', subjectID, datestr(now, 'yyyymmdd'));
+    [el exitFlag] = rd_eyeLink(window, 'start', eyeFile);
+    if exitFlag
+        return
+    end
 end
 
 %% Make stimuli
