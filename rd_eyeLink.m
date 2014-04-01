@@ -1,36 +1,58 @@
 function [out, exitFlag] = rd_eyeLink(window, command, in)
 
-% If command is 'start':
+% Possible commands and their ins & outs:
+% 'eyestart'
 %   in = eyeFile
 %   out = el
 %
-% If command is 'calibrate':
+% 'calibrate'
 %   in = el
 %   out = cal
 %
-% If command is 'trialstart':
-%   in = {el, trialNum, cushion, cx, cy, rad};
-%   out =
+% 'trialstart'
+%   in = {el, trialNum, cx, cy, rad}
+%   out = []
 %
-% If command is 'fixholdcheck':
-%   in =
-%   out =
+% 'fixholdcheck'
+%   in = {cx, cy, rad}
+%   out = fixation
+%
+% 'fixcheck'
+%   in = {cx, cy, rad}
+%   out = fixation
+%
+% 'driftcorrection'
+%   in = {el, cx, cy}
+%   out = driftCorrection
+%
+% 'trialstop'
+%   in = []
+%   out = []
+%
+% 'eyestop'
+%   in = {eyeFile, eyeDataDir}
+%   out = []
 
-        el = in{1};
-        trialNum = in{2};
-        cushion = in{3};
-        cx = in{4};
-        cy = in{5};
-        rad = in{6};
+%% Initializations
+% assume no output unless some is given
+out = [];
 
 % assume everything goes ok (exitFlag=0) until proven otherwise        
 exitFlag = 0;
         
+%% Do command
 switch command
-    case 'start'
+    case 'eyestart'
         %% start eyetracker
         eyeFile = in;
         
+        % First check if we can get a connection
+        if EyelinkInit()~= 1
+            fprintf('Couldn''t initialize connection with eyetracker! Exiting ...\n');
+            return
+        end
+        
+        % Set up the eyetracker
         el = EyelinkInitDefaults(window);
         el.backgroundcolour = [128 128 128]; %%% needed?
         
@@ -39,6 +61,7 @@ switch command
         [v vs] = Eyelink('GetTrackerVersion');
         fprintf('\nRunning experiment on a ''%s'' tracker.', vs );
         
+        % Start the eye file
         edfFile = sprintf('%s.edf', eyeFile);
         edfFileStatus = Eyelink('Openfile', edfFile);
         if edfFileStatus==0
@@ -78,7 +101,12 @@ switch command
             return
         end
         Screen('Flip', window, 0, 1);
+        
         cal = EyelinkDoTrackerSetup(el);
+        if cal==el.TERMINATE_KEY
+            exitFlag = 1;
+            return
+        end
         
         out = cal;
         
@@ -87,15 +115,13 @@ switch command
         % start recording and wait until the subject is fixating
         el = in{1};
         trialNum = in{2};
-        cushion = in{3};
-        cx = in{4};
-        cy = in{5};
-        rad = in{6};
+        cx = in{3};
+        cy = in{4};
+        rad = in{5};
         
         % Displays a title at the bottom of the eye tracker display
         Eyelink('command', 'record_status_message ''Starting trial %d''', trialNum);
         
-        ncheck = 0; % how many times have we checked fixation?
         fixation = 0; % fixation ok?
         record = 0; % are we recording?
         recalibrate = 0; % do we need to recalibrate?
@@ -107,7 +133,7 @@ switch command
             while ~record
                 Eyelink('StartRecording');	% start recording
                 % start recording 100 msec before just to be safe
-                WaitSecs(cushion);
+                WaitSecs(0.1);
                 key=1;
                 while key~=0
                     key = EyelinkGetKey(el); % dump any pending local keys
@@ -126,7 +152,7 @@ switch command
             % Verify that the subject is holding fixation for some set
             % time before allowing the trial to start. A
             % timeout period is built into this function.
-            % woah, recursion
+            % (woah, recursion)
             fixation = rd_eyeLink(window, 'fixholdcheck', {cx, cy, rad});
             
             %%% what are the conditions for recalibration?? %%%
@@ -143,8 +169,6 @@ switch command
         
         Eyelink('Message', 'TRIAL_START %d', trialNum);
         Eyelink('Message', 'SYNCTIME');		% zero-plot time for EDFVIEW
-        
-        out = [];
         
     case 'fixholdcheck'
         %% check that fixation is held for some amount of time
@@ -216,10 +240,35 @@ switch command
             fixation = 1;
         else
             fixation = 0;
+            Eyelink('Message', sprintf('BROKE FIXATION'));
         end
         
         out = fixation;
         
+    case 'driftcorrection'
+        %% do a drift correction
+        el = in{1};
+        cx = in{2};
+        cy = in{3};
+        
+        driftCorrection = EyelinkDoDriftCorrect(el, cx, cy, 1, 1);
+        
+        out = driftCorrection;
+        
+    case 'trialstop'
+        %% stop recording
+        Eyelink('StopRecording');
+        Eyelink('Message','EVENT_trialEnd');
+        
+    case 'eyestop'
+        %% get the eye file and close down the eye tracker
+        eyeFile = in{1};
+        eyeDataDir = in{2};
+        
+        Eyelink('ReceiveFile', eyeFile, eyeDataDir, 1); 
+        Eyelink('CloseFile'); 
+        Eyelink('Shutdown');
+        
     otherwise
-        error('[rd_eyeLink]: ''command'' argument not recognized')
+        error('[rd_eyeLink]: ''command'' argument not recognized. See help for available commands.')
 end
