@@ -16,7 +16,7 @@ switch p.testingLocation
         p.screenSize = [40 30];
         p.screenRes = [1600 1200];
         p.viewDist = 57;
-        p.eyeTracking = 1;
+        p.eyeTracking = 0;
     otherwise
         error('Testing location not found in temporalAttentionParams.')
 end     
