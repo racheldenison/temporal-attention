@@ -54,7 +54,6 @@ switch command
         
         % Set up the eyetracker
         el = EyelinkInitDefaults(window);
-        el.backgroundcolour = [128 128 128]; %%% needed?
         
         Eyelink('Command', 'file_sample_data = LEFT,RIGHT,GAZE,AREA');
         % Eyelink('Command', 'calibration_type = HV9');
@@ -63,7 +62,7 @@ switch command
         
         % Start the eye file
         edfFile = sprintf('%s.edf', eyeFile);
-        edfFileStatus = Eyelink('Openfile', edfFile);
+        edfFileStatus = Eyelink('OpenFile', edfFile);
         if edfFileStatus==0
             fprintf('\nEye file opened ok.\n\n')
         else
@@ -120,7 +119,7 @@ switch command
         rad = in{5};
         
         % Displays a title at the bottom of the eye tracker display
-        Eyelink('command', 'record_status_message ''Starting trial %d''', trialNum);
+        Eyelink('Command', 'record_status_message ''Starting trial %d''', trialNum);
 
         % Start the trial only when 1) eyetracker is recording, 2) subject
         % is fixating
@@ -139,10 +138,10 @@ switch command
                 err=Eyelink('CheckRecording'); 	% check recording status
                 if err==0
                     record = 1;
-                    Eyelink('message', 'RECORD_START');
+                    Eyelink('Message', 'RECORD_START');
                 else
                     record = 0;	% results in repetition of fixation check
-                    Eyelink('message', 'RECORD_FAILURE');
+                    Eyelink('Message', 'RECORD_FAILURE');
                 end
             end
             
@@ -243,7 +242,7 @@ switch command
         cx = in{2};
         cy = in{3};
         
-        Eyelink('message', 'DRIFT_CORRECTION');
+        Eyelink('Message', 'DRIFT_CORRECTION');
         driftCorrection = EyelinkDoDriftCorrect(el, cx, cy, 1, 1);
         
         out = driftCorrection;

@@ -4,8 +4,10 @@
 % test and/or illustrate the use of rd_eyeLink.m.
 
 subjectID = 'eyetest';
+eyeDataDir = 'eyedata';
 
-eyeFile = sprintf('%s_%s', subjectID, datestr(now, 'yyyymmdd'));
+% eyeFile = sprintf('%s_%s', subjectID, datestr(now, 'yyyymmdd'));
+eyeFile = 'eyetest';
 
 nTrials = 10;
 rad = 50; %%% pixels? % radius of allowable eye movement
@@ -16,7 +18,7 @@ screenNumber = max(Screen('Screens'));
 % [window rect] = Screen('OpenWindow', screenNumber, [], [0 0 800 600]); % for testing
 [cx cy] = RectCenter(rect);
 Screen('TextSize', window, 24);
-Screen('TextColor', window, white);
+Screen('TextColor', window, 255);
 Screen('TextFont', window, 'Verdana');
 
 %% Initialize eye tracker
@@ -67,6 +69,17 @@ for iTrial = 1:nTrials
         continue
     end
     
+    % stop eye recording for this trial
+    rd_eyeLink(window, 'trialstop');
+    
     % wait for a keypress, then go on to the next trial
     KbWait;
 end
+
+%% Save the eye data and shut down the eye tracker
+if ~exist(eyeDataDir,'dir')
+    mkdir(eyeDataDir)
+end
+rd_eyeLink(window, 'eyestop', {eyeFile, eyeDataDir});
+
+
