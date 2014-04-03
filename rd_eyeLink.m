@@ -1,4 +1,4 @@
-function [out, exitFlag] = rd_eyeLink(window, command, in)
+function [out, exitFlag] = rd_eyeLink(command, window, in)
 
 % Possible commands and their ins & outs:
 % 'eyestart'

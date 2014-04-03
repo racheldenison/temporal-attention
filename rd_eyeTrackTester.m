@@ -21,13 +21,13 @@ Screen('TextColor', window, 255);
 Screen('TextFont', window, 'Verdana');
 
 %% Initialize eye tracker
-[el exitFlag] = rd_eyeLink(window, 'eyestart', eyeFile);
+[el exitFlag] = rd_eyeLink('eyestart', window, eyeFile);
 if exitFlag
     return
 end
 
 %% Calibrate eye tracker
-[cal exitFlag] = rd_eyeLink(window, 'calibrate', el);
+[cal exitFlag] = rd_eyeLink('calibrate', window, el);
 if exitFlag
     return
 end
@@ -44,7 +44,7 @@ for iTrial = 1:nTrials
     
     % start eye recording for this trial
     % don't start the trial until the subject is holding fixation
-    rd_eyeLink(window, 'trialstart', {el, iTrial, cx, cy, rad});
+    rd_eyeLink('trialstart', window, {el, iTrial, cx, cy, rad});
     
     % present first stimulus
     DrawFormattedText(window, '+', 'center', 'center');
@@ -54,7 +54,7 @@ for iTrial = 1:nTrials
     stopThisTrial = 0;
     while GetSecs < timeStim1(iTrial) + 0.45 && ~stopThisTrial
         WaitSecs(.01);
-        fixation = rd_eyeLink(window, 'fixcheck', {cx, cy, rad});
+        fixation = rd_eyeLink('fixcheck', window, {cx, cy, rad});
         if ~fixation
             % do fixation break tasks:
             % this could include adding the broken trial to the end
@@ -76,7 +76,7 @@ for iTrial = 1:nTrials
     
     while GetSecs < timeStim2(iTrial) + 0.45 && ~stopThisTrial
         WaitSecs(.01);
-        fixation = rd_eyeLink(window, 'fixcheck', {cx, cy, rad});
+        fixation = rd_eyeLink('fixcheck', window, {cx, cy, rad});
         if ~fixation
             fprintf('\n\nBROKE FIXATION!\n')
             stopThisTrial = 1;
@@ -85,7 +85,7 @@ for iTrial = 1:nTrials
     fix2(iTrial) = fixation;
     
     % stop eye recording for this trial
-    rd_eyeLink(window, 'trialstop');
+    rd_eyeLink('trialstop', window);
 end
 
  %% Save the eye data and shut down the eye tracker
