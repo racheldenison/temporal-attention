@@ -36,6 +36,8 @@ end
 for iTrial = 1:nTrials
     % wait for a keypress, then go on to the next trial
     KbWait;
+    Screen('FillRect', window)
+    Screen('Flip', window);
     
     fprintf('\n\nTrial %d', iTrial)
     % present fixation
