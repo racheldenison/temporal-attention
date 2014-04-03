@@ -21,7 +21,7 @@ function [out, exitFlag] = rd_eyeLink(command, window, in)
 %   in = {cx, cy, rad}
 %   out = fixation
 %
-% 'driftcorrection'
+% 'driftcorrect'
 %   in = {el, cx, cy}
 %   out = driftCorrection
 %
@@ -110,7 +110,7 @@ switch command
         out = cal;
         
     case 'startrecording'
-        el = in{1};
+        el = in;
         
         record = 0;
         while ~record
@@ -151,7 +151,7 @@ switch command
             % Check that we are recording
             err=Eyelink('CheckRecording');
             if err~=0
-                rd_eyeLink('startrecording', window, el)
+                rd_eyeLink('startrecording', window, el);
             end
             
             % Verify that the subject is holding fixation for some set
@@ -161,7 +161,7 @@ switch command
             
             % Drift correct if fixation timed out
             if ~fixation
-                rd_eyeLink('driftcorrection', window, {el, cx, cy});
+                rd_eyeLink('driftcorrect', window, {el, cx, cy});
                 ready = 0;
             else
                 ready = 1;
@@ -246,7 +246,7 @@ switch command
         
         out = fixation;
         
-    case 'driftcorrection'
+    case 'driftcorrect'
         %% do a drift correction
         el = in{1};
         cx = in{2};
@@ -272,6 +272,8 @@ switch command
         if err==0
             rd_eyeLink('stoprecording');
         end
+        
+        fprintf('\n\nSaving file %s/%s ...\n', eyeDataDir, eyeFile)
         
         Eyelink('ReceiveFile', eyeFile, eyeDataDir, 1); 
         Eyelink('CloseFile'); 
