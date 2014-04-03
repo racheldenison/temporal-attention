@@ -194,21 +194,33 @@ switch p.rotateTarget
         targetRotations = [90*ones(nTrials0,1) zeros(nTrials0,1)];
     case 'rotT2'
         targetRotations = [zeros(nTrials0,1) 90*ones(nTrials0,1)];
-        % test code for interleaving target rotations
-%         r = randperm(length(targetRotations));
-%         r = logical(mod(r,2));
-%         targetRotations(r,1) = 90; 
-%         targetRotations(r,2) = 0;
     case 'cb'
-        % if we want to counterbalance rotations across trials, we need to
-        % have 4x the original number of trials
+        % if we want to counterbalance vertical and horizontal rotations 
+        % across trials, we need to have 4x the original number of trials
         targetRotations(:,1) = repmat([zeros(nTrials0,1); 90*ones(nTrials0,1)],2,1);
         targetRotations(:,2) = [zeros(nTrials0*2,1); 90*ones(nTrials0*2,1)];
         trials = repmat(trials,4,1);
+    case 'cardobl'
+        % if we wanted to counterbalance across all possible rotation pairs
+        % in the early and late trials, we would need to have 12x the
+        % original number of trials (length of rotpairs, below). This seems
+        % impractical.
+%         rotpairs = fullfact([4 4]);
+%         same = rotpairs(:,1)==rotpairs(:,2);
+%         rotpairs(same,:) = [];
+        % so let's just select rotations at random and hope for the best
+        targetRotations = [];
+        while size(targetRotations,1)<nTrials0
+            % select rotations at random
+            tr = randi(4, [1 2]);
+            if tr(1)~=tr(2)
+                targetRotations = [targetRotations; tr];
+            end
+        end
     otherwise
         error('p.rotateTarget not recognized')
 end
-        
+
 % set cue validity condition according to the cueValidityFactor (potentially unequal proportion of trials in each condition)
 cueValidityTrials = trials(:,cueValidityIdx);
 for i = 1:numel(p.cueValidityFactor)   
