@@ -109,9 +109,32 @@ switch command
         
         out = cal;
         
+    case 'startrecording'
+        el = in{1};
+        
+        record = 0;
+        while ~record
+            Eyelink('StartRecording');	% start recording
+            % start recording 100 msec before just to be safe
+            WaitSecs(0.1);
+            key=1;
+            while key~=0
+                key = EyelinkGetKey(el); % dump any pending local keys
+            end
+            
+            err=Eyelink('CheckRecording'); 	% check recording status
+            if err==0
+                record = 1;
+                Eyelink('Message', 'RECORD_START');
+            else
+                record = 0;	% results in repetition of fixation check
+                Eyelink('Message', 'RECORD_FAILURE');
+            end
+        end
+        
     case 'trialstart'
         %% trial start
-        % start recording and wait until the subject is fixating
+        % start only when we are recording and the subject is fixating
         el = in{1};
         trialNum = in{2};
         cx = in{3};
@@ -123,26 +146,12 @@ switch command
 
         % Start the trial only when 1) eyetracker is recording, 2) subject
         % is fixating
-        record = 0; % are we recording?
-        while ~record
-            % Start recording and check that it really worked
-            while ~record
-                Eyelink('StartRecording');	% start recording
-                % start recording 100 msec before just to be safe
-                WaitSecs(0.1);
-                key=1;
-                while key~=0
-                    key = EyelinkGetKey(el); % dump any pending local keys
-                end
-                
-                err=Eyelink('CheckRecording'); 	% check recording status
-                if err==0
-                    record = 1;
-                    Eyelink('Message', 'RECORD_START');
-                else
-                    record = 0;	% results in repetition of fixation check
-                    Eyelink('Message', 'RECORD_FAILURE');
-                end
+        ready = 0; 
+        while ~ready
+            % Check that we are recording
+            err=Eyelink('CheckRecording');
+            if err~=0
+                rd_eyeLink('startrecording', window, el)
             end
             
             % Verify that the subject is holding fixation for some set
@@ -152,9 +161,10 @@ switch command
             
             % Drift correct if fixation timed out
             if ~fixation
-                Eyelink('StopRecording');
                 rd_eyeLink('driftcorrection', window, {el, cx, cy});
-                record = 0; % start over
+                ready = 0;
+            else
+                ready = 1;
             end
         end
         
@@ -247,7 +257,7 @@ switch command
         
         out = driftCorrection;
         
-    case 'trialstop'
+    case 'stoprecording'
         %% stop recording
         Eyelink('StopRecording');
         Eyelink('Message','RECORD_STOP');
@@ -256,6 +266,12 @@ switch command
         %% get the eye file and close down the eye tracker
         eyeFile = in{1};
         eyeDataDir = in{2};
+        
+        % if still recording, stop recording
+        err = Eyelink('CheckRecording');
+        if err==0
+            rd_eyeLink('stoprecording');
+        end
         
         Eyelink('ReceiveFile', eyeFile, eyeDataDir, 1); 
         Eyelink('CloseFile'); 
