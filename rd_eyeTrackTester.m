@@ -1,16 +1,15 @@
 % rd_eyeTrackTester.m
 %
 % This is designed to be a very simple "experiment" that can be used to
-% test and/or illustrate the use of rd_eyeLink.m.
+% test and/or demonstrate the use of rd_eyeLink.m.
 
-subjectID = 'eyetest';
+subjectID = 'test';
 eyeDataDir = 'eyedata';
 
-% eyeFile = sprintf('%s_%s', subjectID, datestr(now, 'yyyymmdd'));
-eyeFile = 'eyetest';
+eyeFile = sprintf('%s%s', subjectID, datestr(now, 'mmdd'));
 
 nTrials = 10;
-rad = 50; %%% pixels? % radius of allowable eye movement
+rad = 40; %%% pixels? % radius of allowable eye movement
 
 %% Screen
 screenNumber = max(Screen('Screens'));
@@ -35,6 +34,10 @@ end
 
 %% Present trials
 for iTrial = 1:nTrials
+    % wait for a keypress, then go on to the next trial
+    KbWait;
+    
+    fprintf('\n\nTrial %d', iTrial)
     % present fixation
     DrawFormattedText(window, '+', 'center', 'center');
     timeFix = Screen('Flip', window);
@@ -44,42 +47,53 @@ for iTrial = 1:nTrials
     rd_eyeLink(window, 'trialstart', {el, iTrial, cx, cy, rad});
     
     % present first stimulus
+    DrawFormattedText(window, '+', 'center', 'center');
     DrawFormattedText(window, 'STIM 1', cx-200, 'center');
-    timeStim1 = Screen('Flip', window);
+    timeStim1(iTrial) = Screen('Flip', window);
     
-    % check fixation right after stimulus presentation
-    fixation = rd_eyeLink(window, 'fixcheck', {cx, cy, rad});
-    if ~fixation
-        % do fixation break tasks:
-        % this could include adding the broken trial to the end
-        % of the trial list, but here we will just add an extra trial
-        nTrials = nTrials+1;
-        continue % stop this trial and go on to the next one
+    stopThisTrial = 0;
+    while GetSecs < timeStim1(iTrial) + 0.45 && ~stopThisTrial
+        WaitSecs(.01);
+        fixation = rd_eyeLink(window, 'fixcheck', {cx, cy, rad});
+        if ~fixation
+            % do fixation break tasks:
+            % this could include adding the broken trial to the end
+            fprintf('\nBROKE FIXATION!\n')
+            stopThisTrial = 1;
+        end
     end
+    fix1(iTrial) = fixation;
     % alt: fixationBreakTasks(fixation)
     
-    % present second stimulus
-    DrawFormattedText(window, 'STIM 2', cx+200, 'center');
-    timeStim2 = Screen('Flip', window, timeStim1 + 0.25);
-    
-    % check fixation right after stimulus presentation
-    fixation = rd_eyeLink(window, 'fixcheck', {cx, cy, rad});
-    if ~fixation
-        nTrials = nTrials+1;
+    if stopThisTrial
         continue
     end
     
+    % present second stimulus
+    DrawFormattedText(window, '+', 'center', 'center');
+    DrawFormattedText(window, 'STIM 2', cx+200, 'center');
+    timeStim2(iTrial) = Screen('Flip', window, timeStim1(iTrial) + 0.5);
+    
+    while GetSecs < timeStim2(iTrial) + 0.45 && ~stopThisTrial
+        WaitSecs(.01);
+        fixation = rd_eyeLink(window, 'fixcheck', {cx, cy, rad});
+        if ~fixation
+            fprintf('\n\nBROKE FIXATION!\n')
+            stopThisTrial = 1;
+        end
+    end
+    fix2(iTrial) = fixation;
+    
     % stop eye recording for this trial
     rd_eyeLink(window, 'trialstop');
-    
-    % wait for a keypress, then go on to the next trial
-    KbWait;
 end
 
-%% Save the eye data and shut down the eye tracker
+ %% Save the eye data and shut down the eye tracker
 if ~exist(eyeDataDir,'dir')
     mkdir(eyeDataDir)
 end
 rd_eyeLink(window, 'eyestop', {eyeFile, eyeDataDir});
 
+%% Close screen
+Screen('CloseAll')
 

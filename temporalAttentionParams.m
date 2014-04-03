@@ -48,7 +48,7 @@ p.targetDur = 2/60; % 33 ms
 p.maskSOA = 3/60; % 4/60 time between target onset and mask onset
 p.maskDur = 1/60; % 1/60, 3/60
 p.respCueSOA = p.soas(2) + 0.5;
-p.iti = 0.5; % inter-trial interval
+p.iti = 1; % inter-trial interval
 
 % Images
 p.imPos = [4 4];

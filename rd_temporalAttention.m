@@ -48,7 +48,7 @@ end
 % [window rect] = Screen('OpenWindow', screenNumber, [], [0 0 800 600]);
 white = WhiteIndex(window);  % Retrieves the CLUT color code for white.
 [cx cy] = RectCenter(rect);
-Screen('TextSize', window, 24);
+Screen('TextSize', window, 36);
 Screen('TextColor', window, white);
 Screen('TextFont', window, p.font);
 

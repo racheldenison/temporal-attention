@@ -80,7 +80,7 @@ switch command
         
         calString = sprintf('Eye tracker calibration:\n\nPlease fixate the center of the dot!\n\nPress ''space'' to start or ''q'' to quit!');
         DrawFormattedText(window, calString, 'center', 'center', 1, []);
-        Screen('Flip', window, 0, 1);
+        Screen('Flip', window, 0, 1); 
         
         contKey = '';
         while isempty(find(strcmp(contKey,'space'), 1))
@@ -167,7 +167,7 @@ switch command
         cy = in{2}; % y coordinate of screen center
         rad = in{3}; % acceptable fixation radius %%% in px?
         
-        timeout = 1.00; % maximum fixation check time
+        timeout = 2.00; % maximum fixation check time
         tFixMin = 0.20; % minimum correct fixation time
         
         % determine recorded eye
@@ -250,7 +250,7 @@ switch command
     case 'trialstop'
         %% stop recording
         Eyelink('StopRecording');
-        Eyelink('Message','EVENT_trialEnd');
+        Eyelink('Message','RECORD_STOP');
         
     case 'eyestop'
         %% get the eye file and close down the eye tracker
