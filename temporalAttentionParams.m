@@ -46,7 +46,7 @@ p.targetDur = 2/60; % 33 ms
 p.maskSOA = 3/60; % 4/60 time between target onset and mask onset
 p.maskDur = 1/60; % 1/60, 3/60
 p.respCueSOA = p.soas(2) + 0.5;
-p.iti = 0.5; % inter-trial interval
+p.iti = 1; % inter-trial interval
 
 % Images
 p.imPos = [4 4];
@@ -67,7 +67,7 @@ end
 % target rotation
 switch p.task
     case 'targetOrientation'
-        p.rotateTarget = 'rotT2'; % 'none','rotT2'= rotate T2 90 deg, 'rotT1' = rotate T1 90 deg, 'cb'= counterbalanced
+        p.rotateTarget = 'cardobl'; % 'none','rotT2'= rotate T2 90 deg, 'rotT1' = rotate T1 90 deg, 'cb'= counterbalanced vert/horiz, 'cardobl'= cardinal + oblique orientations
     case {'spatialFrequency','TL'}
         p.rotateTarget = 'random'; % random rotations
 end
