@@ -205,18 +205,14 @@ switch p.rotateTarget
         % in the early and late trials, we would need to have 12x the
         % original number of trials (length of rotpairs, below). This seems
         % impractical.
-%         rotpairs = fullfact([4 4]);
-%         same = rotpairs(:,1)==rotpairs(:,2);
-%         rotpairs(same,:) = [];
-        % so let's just select rotations at random and hope for the best
-        targetRotations = [];
-        while size(targetRotations,1)<nTrials0
-            % select rotations at random
-            tr = randi(4, [1 2]);
-            if tr(1)~=tr(2)
-                targetRotations = [targetRotations; tr];
-            end
-        end
+        rotpairs = fullfact([4 4]);
+        same = rotpairs(:,1)==rotpairs(:,2);
+        rotpairs(same,:) = [];
+        % so let's just try to have roughly equal numbers of each rot pair
+        targetRotations0 = repmat(rotpairs,ceil(nTrials0/size(rotpairs,1)),1);
+        randRotOrder = randperm(size(targetRotations0,1));
+        targetRotations = targetRotations0(randRotOrder(1:nTrials0),:);
+        targetRotations = targetRotations.*45 - 45;
     otherwise
         error('p.rotateTarget not recognized')
 end
