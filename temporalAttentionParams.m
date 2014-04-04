@@ -1,6 +1,6 @@
 function p = temporalAttentionParams
 
-p.testingLocation = 'CarrascoL1'; % 'CarrascoL1','laptop','desk'
+p.testingLocation = 'desk'; % 'CarrascoL1','laptop','desk'
 
 switch p.testingLocation
     case {'laptop','desk'}
@@ -52,11 +52,13 @@ p.iti = 0.5; % inter-trial interval
 % Images
 p.imPos = [4 4];
 p.imSize = [4 4]; % this is the size of the image container that holds the stim
-p.targetSize = 0.5; % 0.5 sigma of gaussian / 1.5 side length of T/L
+p.targetSize = 1.5; % 0.5 sigma of gaussian / 1.5 side length of T/L / 1.5 width of triangle
 p.spatialFrequency = 4; % 4
-p.targetOrientation = [-2 2]; % eg. [-10 10]
+p.targetOrientation = [-6 6]; % eg. [-10 10]
 p.TL = [0 0.5]; % [offset-for-T(=0) offset-for-L]
 p.TLLineWidth = 5; % (pixels)
+p.triangleBlurProp = 0.3;
+p.triHWRatio = 1.5; % should be > 1 so that targetSize corresponds to triangle width
 
 % Task
 p.task = 'targetOrientation'; % 'targetOrientation','spatialFrequency','TL'
@@ -68,11 +70,16 @@ end
 % target rotation
 switch p.task
     case 'targetOrientation'
-        p.rotateTarget = 'rotT2'; % 'none','rotT2'= rotate T2 90 deg, 'rotT1' = rotate T1 90 deg, 'cb'= counterbalanced vert/horiz, 'cardobl'= cardinal + oblique orientations
+        p.rotateTarget = 'card4'; % 'none','rotT2'= rotate T2 90 deg, 'rotT1' = rotate T1 90 deg, 'cb'= counterbalanced vert/horiz, 'cardobl'= cardinal + oblique orientations
     case {'spatialFrequency','TL'}
         p.rotateTarget = 'random'; % random rotations
 end
-%%% NB. currently, rotated targets can obscure placeholders 
+%%% NB. currently, rotated targets can obscure placeholders
+if strcmp(p.rotateTarget, 'card4')
+    p.aperture = 'triangle'; % 'gaussian','triangle'
+else
+    p.aperture = 'gaussian';
+end
 
 % Masks
 p.maskType = 'none'; % none, whitenoise, verticalgrating, crossedgratings, filterednoise

@@ -107,8 +107,18 @@ for iC = 1:numel(p.targetContrasts)
                     spatialFrequency, targetOrientation, 0, targetContrast, 0, 'bw');
         end
 
-        % mask with annulus
-        target{iC,iT} = maskWithGaussian(t, size(t,1), targetSize);
+        % mask with an aperture (eg. 2d gaussian)
+        switch p.aperture
+            case 'gaussian'
+                target{iC,iT} = maskWithGaussian(t, size(t,1), targetSize);
+            case 'triangle'
+                blurSize = round(targetSize*p.triangleBlurProp);
+                target{iC,iT} = maskWithTriangle(t, ...
+                    round(size(t,2)/2), round(size(t,1)/2), ...
+                    targetSize, targetSize*p.triHWRatio, blurSize);
+            otherwise
+                error('p.aperture not recognized')
+        end
     end
 end
 
@@ -213,6 +223,16 @@ switch p.rotateTarget
         randRotOrder = randperm(size(targetRotations0,1));
         targetRotations = targetRotations0(randRotOrder(1:nTrials0),:);
         targetRotations = targetRotations.*45 - 45;
+    case 'card4'
+        % same strategy as in cardobl: dp not counterbalance, but try to
+        % have the same number of each cardinal direction pair
+        rotpairs = fullfact([4 4]);
+        same = rotpairs(:,1)==rotpairs(:,2);
+        rotpairs(same,:) = [];
+        targetRotations0 = repmat(rotpairs,ceil(nTrials0/size(rotpairs,1)),1);
+        randRotOrder = randperm(size(targetRotations0,1));
+        targetRotations = targetRotations0(randRotOrder(1:nTrials0),:);
+        targetRotations = targetRotations.*90 - 90;
     otherwise
         error('p.rotateTarget not recognized')
 end
