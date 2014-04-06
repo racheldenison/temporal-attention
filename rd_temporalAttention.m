@@ -223,6 +223,10 @@ switch p.rotateTarget
         randRotOrder = randperm(size(targetRotations0,1));
         targetRotations = targetRotations0(randRotOrder(1:nTrials0),:);
         targetRotations = targetRotations.*45 - 45;
+        % add extra tilt to oblique orientations
+        isobl = mod(targetRotations,90)~=0; % find the obliques
+        tilts = trials(:,target1StateIdx | target2StateIdx);
+        targetRotations = targetRotations + p.extraOblTilt(tilts).*isobl;
     case 'card4'
         % same strategy as in cardobl: dp not counterbalance, but try to
         % have the same number of each cardinal direction pair

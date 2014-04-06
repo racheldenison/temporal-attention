@@ -54,11 +54,12 @@ p.imPos = [4 4];
 p.imSize = [4 4]; % this is the size of the image container that holds the stim
 p.targetSize = 1.5; % 0.5 sigma of gaussian / 1.5 side length of T/L / 1.5 width of triangle
 p.spatialFrequency = 4; % 4
-p.targetOrientation = [-6 6]; % eg. [-10 10]
+p.targetOrientation = [-2 2]; % eg. [-10 10]
 p.TL = [0 0.5]; % [offset-for-T(=0) offset-for-L]
 p.TLLineWidth = 5; % (pixels)
 p.triangleBlurProp = 0.3;
 p.triHWRatio = 1.5; % should be > 1 so that targetSize corresponds to triangle width
+p.extraOblTilt = [-5 5];
 
 % Task
 p.task = 'targetOrientation'; % 'targetOrientation','spatialFrequency','TL'
