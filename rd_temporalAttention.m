@@ -102,6 +102,13 @@ for iC = 1:numel(p.targetContrasts)
                         error('p.task not recognized')
                 end
                 
+                % overwrite targetOrientation if we are also rotating the
+                % aperture. will take care of the target tilt via
+                % targetRotations.
+                if strcmp(p.rotateTarget, 'card4wap')
+                    targetOrientation = 0;
+                end
+                
                 % make big grating
                 t = buildColorGrating(pixelsPerDegree, p.imSize, ...
                     spatialFrequency, targetOrientation, 0, targetContrast, 0, 'bw');
@@ -163,6 +170,7 @@ maskTex = Screen('MakeTexture', window, mask*white);
 imSize = size(target{1,1},1);
 imRect = CenterRectOnPoint([0 0 imSize imSize], cx+imPos(1), cy+imPos(2));
 phRect = imRect + [-1 -1 1 1]*p.phLineWidth;
+phRect = phRect + [-1 -1 1 1]*3; % expand placeholders by this many pixels so that they are not obscured by image rotations
 
 %% Generate trials
 % Construct trials matrix
@@ -237,6 +245,19 @@ switch p.rotateTarget
         randRotOrder = randperm(size(targetRotations0,1));
         targetRotations = targetRotations0(randRotOrder(1:nTrials0),:);
         targetRotations = targetRotations.*90 - 90;
+    case 'card4wap'
+        % same strategy as card4. however, all gratings will be zero tilt
+        % originally, so add extra rotations as in cardobl.
+        rotpairs = fullfact([4 4]);
+        same = rotpairs(:,1)==rotpairs(:,2);
+        rotpairs(same,:) = [];
+        targetRotations0 = repmat(rotpairs,ceil(nTrials0/size(rotpairs,1)),1);
+        randRotOrder = randperm(size(targetRotations0,1));
+        targetRotations = targetRotations0(randRotOrder(1:nTrials0),:);
+        targetRotations = targetRotations.*90 - 90;
+        % add rotations to all targets
+        tilts = trials(:,target1StateIdx | target2StateIdx);
+        targetRotations = targetRotations + p.targetOrientation(tilts);
     otherwise
         error('p.rotateTarget not recognized')
 end

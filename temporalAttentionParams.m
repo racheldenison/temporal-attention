@@ -1,6 +1,6 @@
 function p = temporalAttentionParams
 
-p.testingLocation = 'CarrascoL1'; % 'CarrascoL1','laptop','desk'
+p.testingLocation = 'desk'; % 'CarrascoL1','laptop','desk'
 
 switch p.testingLocation
     case {'laptop','desk'}
@@ -71,7 +71,7 @@ end
 % target rotation
 switch p.task
     case 'targetOrientation'
-        p.rotateTarget = 'card4'; % 'none','rotT2'= rotate T2 90 deg, 'rotT1' = rotate T1 90 deg, 'cb'= counterbalanced vert/horiz, 'cardobl'= cardinal + oblique orientations, 'card4'= 4 cardinal directions (triangle)
+        p.rotateTarget = 'card4wap'; % 'none','rotT2'= rotate T2 90 deg, 'rotT1' = rotate T1 90 deg, 'cb'= counterbalanced vert/horiz, 'cardobl'= cardinal + oblique orientations, 'card4'= 4 cardinal directions (triangle), 'card4wap'= like card4 but rotate the entire aperture ("card4 w/ aperture")
     case 'spatialFrequency'
         p.rotateTarget = 'random'; % random rotations
     case 'TL'
@@ -79,11 +79,12 @@ switch p.task
         p.targetSize = 1.5;
 end
 %%% NB. currently, rotated targets can obscure placeholders
-if strcmp(p.rotateTarget, 'card4')
-    p.aperture = 'triangle'; % 'gaussian','triangle'
-    p.targetSize = 2;
-else
-    p.aperture = 'gaussian';
+switch p.rotateTarget
+    case {'card4','card4wap'};
+        p.aperture = 'triangle'; % 'gaussian','triangle'
+        p.targetSize = 2;
+    otherwise
+        p.aperture = 'gaussian';
 end
 
 % Masks
