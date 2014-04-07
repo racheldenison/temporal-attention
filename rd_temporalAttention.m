@@ -170,7 +170,7 @@ maskTex = Screen('MakeTexture', window, mask*white);
 imSize = size(target{1,1},1);
 imRect = CenterRectOnPoint([0 0 imSize imSize], cx+imPos(1), cy+imPos(2));
 phRect = imRect + [-1 -1 1 1]*p.phLineWidth;
-phRect = phRect + [-1 -1 1 1]*3; % expand placeholders by this many pixels so that they are not obscured by image rotations
+phRect = phRect + [-1 -1 1 1]*round(ang2pix(0.25, p.screenSize(1), p.screenRes(1), p.viewDist, 'central'));; % expand placeholders by this many pixels so that they are not obscured by image rotations
 
 %% Generate trials
 % Construct trials matrix
