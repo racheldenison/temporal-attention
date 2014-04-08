@@ -21,7 +21,7 @@ end
 
 p.keyCodes = KbName(p.keyNames);
 p.backgroundColor = 0.5;
-p.nReps = 4;
+p.nReps = 1;
 p.nTrialsPerBlock = 64;
 p.font = 'Verdana';
 p.fontSize = 24;
