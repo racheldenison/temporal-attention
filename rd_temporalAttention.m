@@ -218,6 +218,17 @@ switch p.rotateTarget
         targetRotations(:,1) = repmat([zeros(nTrials0,1); 90*ones(nTrials0,1)],2,1);
         targetRotations(:,2) = [zeros(nTrials0*2,1); 90*ones(nTrials0*2,1)];
         trials = repmat(trials,4,1);
+    case 'cbvar'
+        % same as cb, with the added twist that we will add a little bit of
+        % variability about the tilt
+        targetRotations(:,1) = repmat([zeros(nTrials0,1); 90*ones(nTrials0,1)],2,1);
+        targetRotations(:,2) = [zeros(nTrials0*2,1); 90*ones(nTrials0*2,1)];
+        trials = repmat(trials,4,1);
+        % now add the extra variability around the base tilt
+        baseTilt = min(abs(p.targetStates));
+        tiltJitterRange = [-0.75*baseTilt .75*baseTilt];
+        tiltJitters = tiltJitterRange(1) + diff(tiltJitterRange).*rand(size(targetRotations));
+        targetRotations = targetRotations + tiltJitters;
     case 'cardobl'
         % if we wanted to counterbalance across all possible rotation pairs
         % in the early and late trials, we would need to have 12x the
