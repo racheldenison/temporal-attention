@@ -2,16 +2,16 @@ function praise = highpraise(idx)
 %
 % function praise = highpraise([idx])
 
-% Note, weights are a little weird:
+% Note, weights are a little weird. This might be true sometimes:
 % .5 + .5*(weight/sum(weights)) = trueprop;
 
 if nargin==0
     idx = [];
 end
 
-% praises = {1, 0};
-praises = {'Great work!','Rock star!'};
-weights = [4 1];
+praises = {1, 2, 3};
+% praises = {'Great work!','Rock star!','Champ!'};
+weights = [4 1 1];
 
 if isempty(idx)
     x = rand(1,numel(praises)).*weights;
