@@ -1,6 +1,6 @@
 function rd_saveAllFigs(f, figNames, figNamePrefix, figDir, fileType)
 %
-% function rd_saveAllFigs(h, figNames, [figNamePrefix], [figDir], [fileType])
+% function rd_saveAllFigs(f, figNames, [figNamePrefix], [figDir], [fileType])
 %
 % f is a vector of figure handles. [] to save all open figures.
 % figNames is a cell array of figure names
@@ -13,7 +13,9 @@ function rd_saveAllFigs(f, figNames, figNamePrefix, figDir, fileType)
 % 2014 March 14 (pi day!)
 
 if nargin < 3 || isempty(figNamePrefix)
-    figNamePrefix = '';
+    prefix = '';
+else
+    prefix = sprintf('%s_', figNamePrefix);
 end
 if nargin < 4 || isempty(figDir)
     figDir = 'figures';
@@ -31,6 +33,6 @@ if numel(f)~=numel(figNames)
 end
 
 for iF = 1:numel(f)
-    figFile = sprintf('%s/%s_%s', figDir, figNamePrefix, figNames{iF});
-    print(f(iF), fileType, figFile)
+    figFile = sprintf('%s/%s%s', figDir, prefix, figNames{iF});
+    print(f(iF), fileType, '-r0', figFile)
 end
