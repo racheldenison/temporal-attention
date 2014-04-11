@@ -2,7 +2,7 @@ function rd_saveAllFigs(f, figNames, figNamePrefix, figDir, fileType)
 %
 % function rd_saveAllFigs(h, figNames, [figNamePrefix], [figDir], [fileType])
 %
-% h is a vector of figure handles
+% f is a vector of figure handles. [] to save all open figures.
 % figNames is a cell array of figure names
 % figNamePrefix is a string that will be the start of all figure names
 % (default is no prefix)
@@ -20,6 +20,14 @@ if nargin < 4 || isempty(figDir)
 end
 if nargin < 5 || isempty(fileType)
     fileType = '-dpng';
+end
+
+if isempty(f)
+    f = findobj('Type','figure');
+end
+if numel(f)~=numel(figNames)
+    fprintf('\nSorry, the number of open figures does not match the number of figure names. Not saving anything.\n\n')
+    return
 end
 
 for iF = 1:numel(f)
