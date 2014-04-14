@@ -15,6 +15,10 @@ if nargin < 3
     noPairEquality = 0;
 end
 
+if nLevels==1
+    noPairEquality = 0;
+end
+
 pairs = fullfact([nLevels nLevels]);
 if noPairEquality
     same = pairs(:,1)==pairs(:,2);

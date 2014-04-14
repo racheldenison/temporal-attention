@@ -276,9 +276,8 @@ switch p.rotateTarget
         error('p.rotateTarget not recognized')
 end
 
-% generate target phases
-targetPhases = generatePseudorandomPairs(4, size(trials,1), 1);
-targetPhases = targetPhases.*(pi/2) - pi/2;
+% generate target phases (indices for the target textures)
+targetPhases = generatePseudorandomPairs(numel(p.targetPhases), size(trials,1), 1);
 
 % set cue validity condition according to the cueValidityFactor (potentially unequal proportion of trials in each condition)
 cueValidityTrials = trials(:,cueValidityIdx);
@@ -289,6 +288,7 @@ end
 % repeat trials matrix according to nReps of all conditions
 trials = repmat(trials, p.nReps, 1);
 targetRotations = repmat(targetRotations, p.nReps, 1);
+targetPhases = repmat(targetPhases, p.nReps, 1);
 nTrials = size(trials,1);
 
 % determine blocks
@@ -339,7 +339,11 @@ for iTrial = 1:nTrials
             respTargetState = p.targetStates(ts2Cond);
     end
     
-    % Select tones and textures
+    % Get rotations and phases
+    rot = targetRotations(trialIdx,:);
+    ph = targetPhases(trialIdx,:);
+    
+    % Select tones
     if cuedInterval==0
         cueTone = sum(p.cueTones,1)./2; % play both tones
     else
@@ -347,11 +351,9 @@ for iTrial = 1:nTrials
     end
     respTone = p.cueTones(respInterval,:);
     
-    tex1 = targetTex(tcCond,ts1Cond);
-    tex2 = targetTex(tcCond,ts2Cond);
-
-    % Get rotations
-    rot = targetRotations(trialIdx,:);
+    % Select textures
+    tex1 = targetTex(tcCond,ts1Cond,ph(1));
+    tex2 = targetTex(tcCond,ts2Cond,ph(2));
     
     % Present fixation
     DrawFormattedText(window, 'x', 'center', 'center', white);
@@ -501,6 +503,7 @@ expt.trialOrder = trialOrder;
 expt.trials_headers = trials_headers;
 expt.trials = trials;
 expt.targetRotations = targetRotations;
+expt.targetPhases = targetPhases;
 
 % Clean up
 PsychPortAudio('Stop', pahandle);
