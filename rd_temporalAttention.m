@@ -242,12 +242,7 @@ switch p.rotateTarget
         % use the strategy from cardobl to get roughly equal numbers of
         % each tilt jitter pair. require that T1 and T2 never have
         % identical tilts
-        rotpairs = fullfact([3 3]);
-        same = rotpairs(:,1)==rotpairs(:,2);
-        rotpairs(same,:) = [];
-        tilts0 = repmat(rotpairs,ceil(size(targetRotations,1)/size(rotpairs,1)),1);
-        randRotOrder = randperm(size(tilts0,1));
-        tiltJitters0 = tilts0(randRotOrder(1:size(targetRotations,1)),:);
+        tiltJitters0 = generatePseudorandomPairs(3, size(targetRotations,1), 1);
         tiltJitters = zeros(size(tiltJitters0));
         tiltJitters(tiltJitters0==1) = -p.tiltJitter;
         tiltJitters(tiltJitters0==3) = p.tiltJitter;
@@ -256,14 +251,9 @@ switch p.rotateTarget
         % if we wanted to counterbalance across all possible rotation pairs
         % in the early and late trials, we would need to have 12x the
         % original number of trials (length of rotpairs, below). This seems
-        % impractical.
-        rotpairs = fullfact([4 4]);
-        same = rotpairs(:,1)==rotpairs(:,2);
-        rotpairs(same,:) = [];
-        % so let's just try to have roughly equal numbers of each rot pair
-        targetRotations0 = repmat(rotpairs,ceil(nTrials0/size(rotpairs,1)),1);
-        randRotOrder = randperm(size(targetRotations0,1));
-        targetRotations = targetRotations0(randRotOrder(1:nTrials0),:);
+        % impractical. so let's just try to have roughly equal numbers of 
+        % each rot pair
+        targetRotations = generatePseudorandomPairs(4, nTrials0, 1);
         targetRotations = targetRotations.*45 - 45;
         % add extra tilt to oblique orientations
         isobl = mod(targetRotations,90)~=0; % find the obliques
@@ -272,22 +262,11 @@ switch p.rotateTarget
     case 'card4'
         % same strategy as in cardobl: dp not counterbalance, but try to
         % have the same number of each cardinal direction pair
-        rotpairs = fullfact([4 4]);
-        same = rotpairs(:,1)==rotpairs(:,2);
-        rotpairs(same,:) = [];
-        targetRotations0 = repmat(rotpairs,ceil(nTrials0/size(rotpairs,1)),1);
-        randRotOrder = randperm(size(targetRotations0,1));
-        targetRotations = targetRotations0(randRotOrder(1:nTrials0),:);
+        targetRotations = generatePseudorandomPairs(4, nTrials0, 1);
         targetRotations = targetRotations.*90 - 90;
     case 'card4wap'
         % same strategy as card4. however, all gratings will be zero tilt
         % originally, so add extra rotations as in cardobl.
-%         rotpairs = fullfact([4 4]);
-%         same = rotpairs(:,1)==rotpairs(:,2);
-%         rotpairs(same,:) = [];
-%         targetRotations0 = repmat(rotpairs,ceil(nTrials0/size(rotpairs,1)),1);
-%         randRotOrder = randperm(size(targetRotations0,1));
-%         targetRotations = targetRotations0(randRotOrder(1:nTrials0),:);
         targetRotations = generatePseudorandomPairs(4, nTrials0, 1);
         targetRotations = targetRotations.*90 - 90;
         % add rotations to all targets
@@ -298,13 +277,8 @@ switch p.rotateTarget
 end
 
 % generate target phases
-nTrials = size(trials,1);
-phpairs = fullfact([4 4]);
-same = phpairs(:,1)==phpairs(:,2);
-phpairs(same,:) = [];
-targetPhases0 = repmat(phpairs,ceil(nTrials/size(phpairs,1)),1);
-randPhOrder = randperm(size(targetPhases0,1));
-targetPhases = targetPhases0(randPhOrder(1:nTrials0),:);
+targetPhases = generatePseudorandomPairs(4, size(trials,1), 1);
+targetPhases = targetPhases.*(pi/2) - pi/2;
 
 % set cue validity condition according to the cueValidityFactor (potentially unequal proportion of trials in each condition)
 cueValidityTrials = trials(:,cueValidityIdx);
