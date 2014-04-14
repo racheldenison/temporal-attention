@@ -229,6 +229,24 @@ switch p.rotateTarget
         tiltJitterRange = [-0.75*baseTilt .75*baseTilt];
         tiltJitters = tiltJitterRange(1) + diff(tiltJitterRange).*rand(size(targetRotations));
         targetRotations = targetRotations + tiltJitters;
+    case 'cbvark'
+        % same as cbvar, but we'll only use tilt, tilt+k, and tilt-k
+        targetRotations(:,1) = repmat([zeros(nTrials0,1); 90*ones(nTrials0,1)],2,1);
+        targetRotations(:,2) = [zeros(nTrials0*2,1); 90*ones(nTrials0*2,1)];
+        trials = repmat(trials,4,1);
+        % use the strategy from cardobl to get roughly equal numbers of
+        % each tilt jitter pair. require that T1 and T2 never have
+        % identical tilts
+        rotpairs = fullfact([3 3]);
+        same = rotpairs(:,1)==rotpairs(:,2);
+        rotpairs(same,:) = [];
+        tilts0 = repmat(rotpairs,ceil(size(targetRotations,1)/size(rotpairs,1)),1);
+        randRotOrder = randperm(size(tilts0,1));
+        tiltJitters0 = tilts0(randRotOrder(1:size(targetRotations,1)),:);
+        tiltJitters = zeros(size(tiltJitters0));
+        tiltJitters(tiltJitters0==1) = -p.tiltJitter;
+        tiltJitters(tiltJitters0==3) = p.tiltJitter;
+        targetRotations = targetRotations + tiltJitters;
     case 'cardobl'
         % if we wanted to counterbalance across all possible rotation pairs
         % in the early and late trials, we would need to have 12x the

@@ -60,6 +60,7 @@ p.TLLineWidth = 5; % (pixels)
 p.triangleBlurProp = 0.3;
 p.triHWRatio = 1; % should be >= 1 so that targetSize corresponds to triangle width
 p.extraOblTilt = [-5 5];
+p.tiltJitter = 1;
 
 % Task
 p.task = 'targetOrientation'; % 'targetOrientation','spatialFrequency','TL'
@@ -71,7 +72,7 @@ end
 % target rotation
 switch p.task
     case 'targetOrientation'
-        p.rotateTarget = 'cb'; % 'none','rotT2'= rotate T2 90 deg, 'rotT1' = rotate T1 90 deg, 'cb'= counterbalanced vert/horiz, 'cbvar'= cb with tilt variability, 'cardobl'= cardinal + oblique orientations, 'card4'= 4 cardinal directions (triangle), 'card4wap'= like card4 but rotate the entire aperture ("card4 w/ aperture")
+        p.rotateTarget = 'cb'; % 'none','rotT2'= rotate T2 90 deg, 'rotT1' = rotate T1 90 deg, 'cb'= counterbalanced vert/horiz, 'cbvar'= cb with tilt variability, 'cbvark'= cb with +/-k tilt variability, 'cardobl'= cardinal + oblique orientations, 'card4'= 4 cardinal directions (triangle), 'card4wap'= like card4 but rotate the entire aperture ("card4 w/ aperture")
     case 'spatialFrequency'
         p.rotateTarget = 'random'; % random rotations
     case 'TL'
