@@ -81,50 +81,53 @@ targetSize = round(ang2pix(p.targetSize, p.screenSize(1), p.screenRes(1), p.view
 pixelsPerDegree = round(ang2pix(1, p.screenSize(1), p.screenRes(1), p.viewDist, 'central'));
 
 % Make target gratings
-for iC = 1:numel(p.targetContrasts)
-    targetContrast = p.targetContrasts(iC);
-    for iT = 1:numel(p.targetStates)
-        targetState = p.targetStates(iT);
-        
-        switch p.task
-            case 'TL'
-                targetColor = targetContrast*(1-p.backgroundColor) + p.backgroundColor;
-                t = makeTLImage(targetSize, p.TLLineWidth, targetState, targetColor, p.backgroundColor);
-            otherwise
-                switch p.task
-                    case 'targetOrientation'
-                        targetOrientation = targetState;
-                        spatialFrequency = p.spatialFrequency;
-                    case 'spatialFrequency'
-                        spatialFrequency = targetState;
-                        targetOrientation = p.targetOrientation;
-                    otherwise
-                        error('p.task not recognized')
-                end
-                
-                % overwrite targetOrientation if we are also rotating the
-                % aperture. will take care of the target tilt via
-                % targetRotations.
-                if strcmp(p.rotateTarget, 'card4wap')
-                    targetOrientation = 0;
-                end
-                
-                % make big grating
-                t = buildColorGrating(pixelsPerDegree, p.imSize, ...
-                    spatialFrequency, targetOrientation, 0, targetContrast, 0, 'bw');
-        end
-
-        % mask with an aperture (eg. 2d gaussian)
-        switch p.aperture
-            case 'gaussian'
-                target{iC,iT} = maskWithGaussian(t, size(t,1), targetSize);
-            case 'triangle'
-                blurSize = round(targetSize*p.triangleBlurProp);
-                target{iC,iT} = maskWithTriangle(t, ...
-                    round(size(t,2)/2), round(size(t,1)/2), ...
-                    targetSize, targetSize*p.triHWRatio, blurSize);
-            otherwise
-                error('p.aperture not recognized')
+for iP = 1:numel(p.targetPhases)
+    targetPhase = p.targetPhases(iP);
+    for iC = 1:numel(p.targetContrasts)
+        targetContrast = p.targetContrasts(iC);
+        for iT = 1:numel(p.targetStates)
+            targetState = p.targetStates(iT);
+            
+            switch p.task
+                case 'TL'
+                    targetColor = targetContrast*(1-p.backgroundColor) + p.backgroundColor;
+                    t = makeTLImage(targetSize, p.TLLineWidth, targetState, targetColor, p.backgroundColor);
+                otherwise
+                    switch p.task
+                        case 'targetOrientation'
+                            targetOrientation = targetState;
+                            spatialFrequency = p.spatialFrequency;
+                        case 'spatialFrequency'
+                            spatialFrequency = targetState;
+                            targetOrientation = p.targetOrientation;
+                        otherwise
+                            error('p.task not recognized')
+                    end
+                    
+                    % overwrite targetOrientation if we are also rotating the
+                    % aperture. will take care of the target tilt via
+                    % targetRotations.
+                    if strcmp(p.rotateTarget, 'card4wap')
+                        targetOrientation = 0;
+                    end
+                    
+                    % make big grating
+                    t = buildColorGrating(pixelsPerDegree, p.imSize, ...
+                        spatialFrequency, targetOrientation, targetPhase, targetContrast, 0, 'bw');
+            end
+            
+            % mask with an aperture (eg. 2d gaussian)
+            switch p.aperture
+                case 'gaussian'
+                    target{iC,iT,iP} = maskWithGaussian(t, size(t,1), targetSize);
+                case 'triangle'
+                    blurSize = round(targetSize*p.triangleBlurProp);
+                    target{iC,iT,iP} = maskWithTriangle(t, ...
+                        round(size(t,2)/2), round(size(t,1)/2), ...
+                        targetSize, targetSize*p.triHWRatio, blurSize);
+                otherwise
+                    error('p.aperture not recognized')
+            end
         end
     end
 end
@@ -158,9 +161,11 @@ switch p.maskType
 end
 
 %% Make textures
-for iC = 1:numel(p.targetContrasts)
-    for iT = 1:numel(p.targetStates)
-        targetTex(iC,iT) = Screen('MakeTexture', window, target{iC,iT}*white);
+for iP = 1:numel(p.targetPhases)
+    for iC = 1:numel(p.targetContrasts)
+        for iT = 1:numel(p.targetStates)
+            targetTex(iC,iT,iP) = Screen('MakeTexture', window, target{iC,iT,iP}*white);
+        end
     end
 end
 
@@ -277,12 +282,13 @@ switch p.rotateTarget
     case 'card4wap'
         % same strategy as card4. however, all gratings will be zero tilt
         % originally, so add extra rotations as in cardobl.
-        rotpairs = fullfact([4 4]);
-        same = rotpairs(:,1)==rotpairs(:,2);
-        rotpairs(same,:) = [];
-        targetRotations0 = repmat(rotpairs,ceil(nTrials0/size(rotpairs,1)),1);
-        randRotOrder = randperm(size(targetRotations0,1));
-        targetRotations = targetRotations0(randRotOrder(1:nTrials0),:);
+%         rotpairs = fullfact([4 4]);
+%         same = rotpairs(:,1)==rotpairs(:,2);
+%         rotpairs(same,:) = [];
+%         targetRotations0 = repmat(rotpairs,ceil(nTrials0/size(rotpairs,1)),1);
+%         randRotOrder = randperm(size(targetRotations0,1));
+%         targetRotations = targetRotations0(randRotOrder(1:nTrials0),:);
+        targetRotations = generatePseudorandomPairs(4, nTrials0, 1);
         targetRotations = targetRotations.*90 - 90;
         % add rotations to all targets
         tilts = trials(:,target1StateIdx | target2StateIdx);
@@ -290,6 +296,15 @@ switch p.rotateTarget
     otherwise
         error('p.rotateTarget not recognized')
 end
+
+% generate target phases
+nTrials = size(trials,1);
+phpairs = fullfact([4 4]);
+same = phpairs(:,1)==phpairs(:,2);
+phpairs(same,:) = [];
+targetPhases0 = repmat(phpairs,ceil(nTrials/size(phpairs,1)),1);
+randPhOrder = randperm(size(targetPhases0,1));
+targetPhases = targetPhases0(randPhOrder(1:nTrials0),:);
 
 % set cue validity condition according to the cueValidityFactor (potentially unequal proportion of trials in each condition)
 cueValidityTrials = trials(:,cueValidityIdx);
