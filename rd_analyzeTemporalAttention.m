@@ -26,7 +26,7 @@ correctIdx = strcmp(trials_headers,'correct');
 for iRI = 1:numel(p.respInterval)
     for iCV = 1:numel(p.cueValidity)
         for iTC = 1:numel(p.targetContrasts)
-%             w0 = abs(diff(targetRotations,1,2))<10;
+%             w0 = abs(diff(targetRotations,1,2))>10;
 %             w0 = abs(diff(targetRotations,1,2))<190 & abs(diff(targetRotations,1,2))>170;
             w = trials(:,respIntervalIdx)==iRI & trials(:,cueValidityIdx)==iCV & trials(:,targetContrastIdx)==iTC;
             totals.all{iCV,iRI}(:,:,iTC) = trials(w,:);
