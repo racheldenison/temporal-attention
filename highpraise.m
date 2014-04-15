@@ -9,8 +9,8 @@ if nargin==0
     idx = [];
 end
 
-praises = {1, 2, 3};
-% praises = {'Great work!','Rock star!','Champ!'};
+% praises = {1, 2, 3};
+praises = {'Great work!','Rock star!','Champ!'};
 weights = [4 1 1];
 
 if isempty(idx)
