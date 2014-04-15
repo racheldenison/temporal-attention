@@ -296,7 +296,19 @@ nBlocks = nTrials/p.nTrialsPerBlock;
 fprintf('\n%d trials, %1.2f blocks\n\n', nTrials, nBlocks)
 
 % Choose order of trial presentation
-trialOrder = randperm(nTrials);
+% trialOrder = randperm(nTrials);
+% This randomizes trial order within reps, but not across reps. So we will
+% present every trial in one rep before moving on to the next rep. In this
+% way the experiment is blocked into complete reps (though the number of
+% trials per block may be different then the number of trials in a rep).
+nt = nTrials/p.nReps;
+trialSet = ones(nt,1)*(1:p.nReps);
+repOrders = [];
+for i=1:p.nReps
+    repOrders = [repOrders randperm(nt)'];
+end
+trialOrder0 = repOrders + (trialSet-1).*nt;
+trialOrder = trialOrder0(:);
 
 %% Present trials
 % Show fixation and wait for a button press
