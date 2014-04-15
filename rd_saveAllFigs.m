@@ -25,7 +25,7 @@ if nargin < 5 || isempty(fileType)
 end
 
 if isempty(f)
-    f = findobj('Type','figure');
+    f = sort(findobj('Type','figure'));
 end
 if numel(f)~=numel(figNames)
     fprintf('\nSorry, the number of open figures does not match the number of figure names. Not saving anything.\n\n')
