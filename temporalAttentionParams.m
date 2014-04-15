@@ -1,6 +1,6 @@
 function p = temporalAttentionParams
 
-p.testingLocation = 'CarrascoL1'; % 'CarrascoL1','laptop','desk'
+p.testingLocation = 'desk'; % 'CarrascoL1','laptop','desk'
 
 switch p.testingLocation
     case {'laptop','desk'}
@@ -63,6 +63,14 @@ p.triHWRatio = 1; % should be >= 1 so that targetSize corresponds to triangle wi
 p.extraOblTilt = [-5 5];
 p.tiltJitter = 1;
 
+% Staircase (implemented only for targetOrientation for now)
+p.staircase = 1;
+p.stairs = [.5 1 1.5 2 3 4 6 8 12];
+if p.staircase
+    p.targetOrientation = [0 0];
+    fprintf('\nStaircase is ON\n')
+end
+
 % Task
 p.task = 'targetOrientation'; % 'targetOrientation','spatialFrequency','TL'
 p.targetStates = p.(p.task);
@@ -101,6 +109,7 @@ for iTone = 1:numel(p.cueFreqs)
     p.cueTones(iTone,:) = applyEnvelope(tone, p.Fs);
 end
 % 10^0.5 for every 10dB
+
 
 
 

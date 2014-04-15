@@ -319,6 +319,8 @@ Screen('Flip', window);
 KbWait(devNum);
 
 % Trials
+lastFewAcc = [];
+stairIdx = numel(p.stairs); % start easy
 timing.startTime = GetSecs;
 for iTrial = 1:nTrials
     WaitSecs(p.iti);
@@ -347,8 +349,10 @@ for iTrial = 1:nTrials
     switch respInterval
         case 1
             respTargetState = p.targetStates(ts1Cond);
+            respTargetCond = ts1Cond;
         case 2
             respTargetState = p.targetStates(ts2Cond);
+            respTargetCond = ts2Cond;
     end
     
     % Get rotations and phases
@@ -366,6 +370,15 @@ for iTrial = 1:nTrials
     % Select textures
     tex1 = targetTex(tcCond,ts1Cond,ph(1));
     tex2 = targetTex(tcCond,ts2Cond,ph(2));
+    
+    % Set rotation based on staircase (bypass previous)
+    if p.staircase
+        rotDirs = [-1 1];
+        extraRot(1) = rotDirs(ts1Cond)*p.stairs(stairIdx);
+        extraRot(2) = rotDirs(ts2Cond)*p.stairs(stairIdx);
+        rot = rot + extraRot;
+        targetRotations(trialIdx,:) = rot;
+    end
     
     % Present fixation
     DrawFormattedText(window, 'x', 'center', 'center', white);
@@ -451,7 +464,8 @@ for iTrial = 1:nTrials
     response = p.targetStates(responseKey);
     
     % Feedback
-    if response==respTargetState;
+%     if response==respTargetState;
+    if responseKey==respTargetCond;
         correct = 1;
         feedbackText = '+';
         feedbackColor = [0 1 0]*white;
@@ -464,6 +478,23 @@ for iTrial = 1:nTrials
     DrawFormattedText(window, feedbackText, 'center', 'center', feedbackColor);
     drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
     timeFeedback = Screen('Flip', window);
+    
+    % Adjust staircase level
+    if p.staircase
+        [stairIdx lastFewAcc] = updateStaircase(...
+            p.stairs, stairIdx, lastFewAcc, correct);
+        stairValues(iTrial) = stairIdx;
+        
+        % Show the current threshold estimate
+        reversalValues = getReversalValues(stairValues);
+        if numel(reversalValues)>=5
+            % average the last 5 reversals to get threshold
+            threshold = mean(p.stairs(reversalValues(end-4:end)));
+            fprintf('Threshold estimate = %f\n', threshold)
+        else
+            threshold = [];
+        end
+    end
    
     % Store trial info
     trials(trialIdx,cuedIntervalIdx) = cuedInterval;
@@ -516,6 +547,12 @@ expt.trials_headers = trials_headers;
 expt.trials = trials;
 expt.targetRotations = targetRotations;
 expt.targetPhases = targetPhases;
+
+if p.staircase
+    expt.staircase.stairValues = stairValues;
+    expt.staircase.reversalValues = reversalValues;
+    expt.staircase.threshold = threshold;
+end
 
 % Clean up
 PsychPortAudio('Stop', pahandle);
