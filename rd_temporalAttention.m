@@ -376,7 +376,7 @@ for iTrial = 1:nTrials
         rotDirs = [-1 1];
         extraRot(1) = rotDirs(ts1Cond)*p.stairs(stairIdx);
         extraRot(2) = rotDirs(ts2Cond)*p.stairs(stairIdx);
-        rot = rot + extraRot;
+        rot = rot + extraRot; % + [45 45];
         targetRotations(trialIdx,:) = rot;
     end
     
