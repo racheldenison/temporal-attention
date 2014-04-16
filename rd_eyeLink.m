@@ -236,11 +236,19 @@ switch command
         x = evt.gx(domEye);
         y = evt.gy(domEye);
         
-        % check eye position
-        if sqrt((x-cx)^2+(y-cy)^2)<rad
-            fixation = 1;
-        else
+        % check for blink
+        if isempty(x) || isempty(y)
             fixation = 0;
+        else
+            % check eye position
+            if sqrt((x-cx)^2+(y-cy)^2)<rad
+                fixation = 1;
+            else
+                fixation = 0;
+            end
+        end
+        
+        if fixation==0
             Eyelink('Message', sprintf('BROKE FIXATION'));
         end
         
