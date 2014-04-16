@@ -184,6 +184,11 @@ switch command
         evt = Eyelink('newestfloatsample');
         domEye = find(evt.gx ~= -32768);
         
+        % if tracking binocularly, just select one eye to be dominant
+        if numel(domEye)>1
+            domEye = domEye(1);
+        end
+        
         Eyelink('Message', 'EVENT_FixationCheck');
         
         tstart = GetSecs;
@@ -229,6 +234,11 @@ switch command
         % determine recorded eye
         evt = Eyelink('newestfloatsample');
         domEye = find(evt.gx ~= -32768);
+        
+        % if tracking binocularly, just select one eye to be dominant
+        if numel(domEye)>1
+            domEye = domEye(1);
+        end
         
         Eyelink('Message', 'EVENT_FixationCheck');
         
