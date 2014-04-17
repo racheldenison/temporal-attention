@@ -318,14 +318,14 @@ trialOrder = trialOrder0(:);
 if p.eyeTracking
     eyeFile = sprintf('%s_%s', subjectID, datestr(now, 'yyyymmdd'));
     
-    % initialize eye tracker
-    [el exitFlag] = rd_eyeLink(window, 'eyestart', eyeFile);
+    % Initialize eye tracker
+    [el exitFlag] = rd_eyeLink('eyestart', window, eyeFile);
     if exitFlag
         return
     end
-    
-    % calibrate eye tracker
-    [cal exitFlag] = rd_eyeLink(window, 'calibrate', el);
+
+    % Calibrate eye tracker
+    [cal exitFlag] = rd_eyeLink('calibrate', window, el);
     if exitFlag
         return
     end
