@@ -28,6 +28,7 @@ for iRI = 1:numel(p.respInterval)
         for iTC = 1:numel(p.targetContrasts)
 %             w0 = abs(diff(targetRotations,1,2))>10;
 %             w0 = abs(diff(targetRotations,1,2))<190 & abs(diff(targetRotations,1,2))>170;
+%             w = w0 & trials(:,respIntervalIdx)==iRI & trials(:,cueValidityIdx)==iCV & trials(:,targetContrastIdx)==iTC;
             w = trials(:,respIntervalIdx)==iRI & trials(:,cueValidityIdx)==iCV & trials(:,targetContrastIdx)==iTC;
             totals.all{iCV,iRI}(:,:,iTC) = trials(w,:);
             
