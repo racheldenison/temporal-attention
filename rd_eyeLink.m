@@ -189,7 +189,7 @@ switch command
             domEye = domEye(1);
         end
         
-        Eyelink('Message', 'EVENT_FixationHoldCheck');
+        Eyelink('Message', 'FIX_HOLD_CHECK');
         
         tstart = GetSecs;
         fixation = 0; % is the subject fixating now?
@@ -240,7 +240,7 @@ switch command
             domEye = domEye(1);
         end
         
-        Eyelink('Message', 'EVENT_FixationCheck');
+        Eyelink('Message', 'FIX_CHECK');
         
         % get eye position
         x = evt.gx(domEye);
