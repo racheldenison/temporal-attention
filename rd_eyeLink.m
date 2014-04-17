@@ -189,7 +189,7 @@ switch command
             domEye = domEye(1);
         end
         
-        Eyelink('Message', 'EVENT_FixationCheck');
+        Eyelink('Message', 'EVENT_FixationHoldCheck');
         
         tstart = GetSecs;
         fixation = 0; % is the subject fixating now?
@@ -259,7 +259,7 @@ switch command
         end
         
         if fixation==0
-            Eyelink('Message', sprintf('BROKE FIXATION'));
+            Eyelink('Message', sprintf('BROKE_FIXATION'));
         end
         
         out = fixation;

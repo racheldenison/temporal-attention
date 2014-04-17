@@ -93,6 +93,8 @@ for iTrial = 1:nTrials
         end
     end
     fix2(iTrial) = fixation;
+    
+    Eyelink('Message', 'TRIAL_END');
 end
 
 %% Final blank
