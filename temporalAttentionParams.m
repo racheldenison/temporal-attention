@@ -29,12 +29,12 @@ p.showPlaceholders = 1;
 p.phLineWidth = 2; % (pixels)
 
 % Conditions
-p.targetContrasts = [.8 .8];
+p.targetContrasts = [.64 1];
 p.respInterval = [1 2]; % [1=early 2=late]
 p.cueValidity = [1 -1 0]; % [1=valid -1=invalid 0=neutral]
 % p.propValid = 0.67;
 % p.cueValidityFactor = generatePropFactor(p.propValid);
-p.cueValidityFactor = [3]; % eg. [1 1 2 3] is 50% valid, 25% invalid, 25% neutral
+p.cueValidityFactor = [1 1 1 2 3]; % eg. [1 1 2 3] is 50% valid, 25% invalid, 25% neutral
 % p.cueValidityFactor = 3;
 p.propValid = nnz(p.cueValidityFactor==1)./nnz(p.cueValidityFactor<3);
 p.propNeutral = nnz(p.cueValidityFactor==3)./numel(p.cueValidityFactor);
@@ -64,7 +64,7 @@ p.extraOblTilt = [-5 5];
 p.tiltJitter = 1;
 
 % Staircase (implemented only for targetOrientation for now)
-p.staircase = 1;
+p.staircase = 0;
 p.stairs = [.5 1 1.5 2 3 4 6 8 12];
 if p.staircase
     p.targetOrientation = [0 0];
