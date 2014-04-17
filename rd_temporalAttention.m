@@ -10,6 +10,10 @@ saveFigs = 1;
 
 p = temporalAttentionParams;
 
+if strcmp(subjectID,'test')
+    p.eyeTracking = 0;
+end
+
 slack = p.refRate/2;
 
 % Running on PTB-3? Abort otherwise.
@@ -309,6 +313,23 @@ for i=1:p.nReps
 end
 trialOrder0 = repOrders + (trialSet-1).*nt;
 trialOrder = trialOrder0(:);
+
+%% Eyetracker
+if p.eyeTracking
+    eyeFile = sprintf('%s_%s', subjectID, datestr(now, 'yyyymmdd'));
+    
+    % initialize eye tracker
+    [el exitFlag] = rd_eyeLink(window, 'eyestart', eyeFile);
+    if exitFlag
+        return
+    end
+    
+    % calibrate eye tracker
+    [cal exitFlag] = rd_eyeLink(window, 'calibrate', el);
+    if exitFlag
+        return
+    end
+end
 
 %% Present trials
 % Show fixation and wait for a button press
