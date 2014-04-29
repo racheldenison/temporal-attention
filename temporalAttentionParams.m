@@ -23,7 +23,7 @@ end
 
 p.keyCodes = KbName(p.keyNames);
 p.backgroundColor = 0.5;
-p.nReps = 4;
+p.nReps = 1;
 p.nTrialsPerBlock = 64;
 p.font = 'Verdana';
 p.fontSize = 24;
@@ -37,7 +37,7 @@ p.cueValidity = [1 -1 0]; % [1=valid -1=invalid 0=neutral]
 % p.propValid = 0.67;
 % p.cueValidityFactor = generatePropFactor(p.propValid);
 p.cueValidityFactor = [1 1 1 2 3]; % eg. [1 1 2 3] is 50% valid, 25% invalid, 25% neutral
-% p.cueValidityFactor = 3;
+% p.cueValidityFactor = 1;
 p.propValid = nnz(p.cueValidityFactor==1)./nnz(p.cueValidityFactor<3);
 p.propNeutral = nnz(p.cueValidityFactor==3)./numel(p.cueValidityFactor);
 
@@ -56,7 +56,7 @@ p.imPos = [4 4];
 p.imSize = [4 4]; % this is the size of the image container that holds the stim
 p.targetSize = 0.5; % 0.5 sigma of gaussian / 1.5 side length of T/L / 1.5 width of triangle
 p.spatialFrequency = 4; % 4
-p.targetOrientation = [-2 2]; % eg. [-10 10]
+p.targetOrientation = [-1 1]; % eg. [-10 10]
 p.targetPhases = 0; % eg. 0, or [0 pi/2 pi 3*pi/2]
 p.TL = [0 0.5]; % [offset-for-T(=0) offset-for-L]
 p.TLLineWidth = 5; % (pixels)
@@ -83,7 +83,7 @@ end
 % target rotation
 switch p.task
     case 'targetOrientation'
-        p.rotateTarget = 'cardobl'; % 'none','rotT2'= rotate T2 90 deg, 'rotT1' = rotate T1 90 deg, 'cb'= counterbalanced vert/horiz, 'cbvar'= cb with tilt variability, 'cbvark'= cb with +/-k tilt variability, 'cardobl'= cardinal + oblique orientations, 'card4'= 4 cardinal directions (triangle), 'card4wap'= like card4 but rotate the entire aperture ("card4 w/ aperture")
+        p.rotateTarget = 'cb'; % 'none','rotT2'= rotate T2 90 deg, 'rotT1' = rotate T1 90 deg, 'cb'= counterbalanced vert/horiz, 'cbvar'= cb with tilt variability, 'cbvark'= cb with +/-k tilt variability, 'cardobl'= cardinal + oblique orientations, 'card4'= 4 cardinal directions (triangle), 'card4wap'= like card4 but rotate the entire aperture ("card4 w/ aperture")
     case 'spatialFrequency'
         p.rotateTarget = 'random'; % random rotations
     case 'TL'
