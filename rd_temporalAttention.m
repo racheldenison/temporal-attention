@@ -7,6 +7,7 @@ end
 
 saveData = 1;
 saveFigs = 1;
+saveTimingFigs = 1;
 
 p = temporalAttentionParams;
 
@@ -542,8 +543,13 @@ for iTrial = 1:nTrials
     save('data/TEMP') % saves the workspace on each trial
     
     if mod(iTrial,p.nTrialsPerBlock)==0 && iTrial<nTrials
+        % Calculate block accuracy
+        blockStartTrial = (iTrial/p.nTrialsPerBlock)*p.nTrialsPerBlock - p.nTrialsPerBlock + 1;
+        blockAcc = mean(trials(trialOrder(blockStartTrial:iTrial),correctIdx));
+        
+        accMessage = sprintf('Accuracy: %d%%', round(blockAcc*100));
         blockMessage = sprintf('%s You''ve completed %d of %d blocks.', highpraise, iTrial/p.nTrialsPerBlock, ceil(nBlocks));
-        breakMessage = sprintf('Break time\n%s\n\nPress any key to go on.', blockMessage);
+        breakMessage = sprintf('Break time\n%s\n%s\n\nPress any key to go on.', blockMessage, accMessage);
         DrawFormattedText(window, breakMessage, 'center', 'center', [1 1 1]*white);
         Screen('Flip', window);
         WaitSecs(1);
@@ -556,10 +562,7 @@ DrawFormattedText(window, 'All done! Thanks for your effort!', 'center', 'center
 Screen('Flip', window);
 WaitSecs(2);
 
-% Show end of block feedback
-% acc = mean(trials(:,correctIdx));
-
-% Store expt info
+%% Store expt info
 expt.subjectID = subjectID;
 expt.p = p;
 expt.timing = timing;
@@ -575,11 +578,56 @@ if p.staircase
     expt.staircase.threshold = threshold;
 end
 
-% Clean up
+%% Calculate more timing things
+expt.timing.dur.im1 = expt.timing.timeBlank1 - expt.timing.timeIm1;
+expt.timing.dur.im2 = expt.timing.timeBlank2 - expt.timing.timeIm2;
+expt.timing.dur.cueIm1SOA = expt.timing.timeIm1 - expt.timing.timeCue;
+expt.timing.dur.cueIm2SOA = expt.timing.timeIm2 - expt.timing.timeCue;
+expt.timing.dur.im1Im2SOA = expt.timing.timeIm2 - expt.timing.timeIm1;
+
+%% Analyze and save data
+results = rd_analyzeTemporalAttention(expt, saveData, saveFigs);
+
+%% Plot timing
+f0 = figure('Color','w');
+hold on
+plot(ones(nTrials,1), expt.timing.dur.im1,'o')
+plot(2*ones(nTrials,1), expt.timing.dur.im2,'o')
+plot(3*ones(nTrials,1), expt.timing.dur.im1Im2SOA,'o')
+plot(4*ones(nTrials,1), expt.timing.dur.cueIm1SOA,'o')
+plot(5*ones(nTrials,1), expt.timing.dur.cueIm2SOA,'o')
+set(gca,'XTick',[1 2 3 4 5])
+set(gca,'XTickLabel',{'im 1','im 2','im1-im2 SOA','cue-im1 SOA','cue-im2 SOA'})
+ylabel('duration')
+
+f1 = figure('Position',[1 1 700 250]);
+subplot(1,5,1)
+hist(expt.timing.dur.im1)
+xlabel('im 1 duration (s)')
+ylabel('number of trials')
+subplot(1,5,2)
+hist(expt.timing.dur.im2)
+xlabel('im 2 duration (s)')
+ylabel('number of trials')
+subplot(1,5,3)
+hist(expt.timing.dur.im1Im2SOA)
+xlabel('im1-im2 SOA (s)')
+ylabel('number of trials')
+subplot(1,5,4)
+hist(expt.timing.dur.cueIm1SOA)
+xlabel('cue-im1 SOA (s)')
+ylabel('number of trials')
+subplot(1,5,5)
+hist(expt.timing.dur.cueIm2SOA)
+xlabel('cue-im2 SOA (s)')
+ylabel('number of trials')
+
+if saveTimingFigs
+    print(f0, '-dpng', '-r100', ['figures/' subjectID '_timing'])
+    print(f1, '-dpng', '-r100', ['figures/' subjectID '_timingHist'])
+end
+
+%% Clean up
 PsychPortAudio('Stop', pahandle);
 PsychPortAudio('Close', pahandle);
 Screen('CloseAll')
-
-% Analyze data
-results = rd_analyzeTemporalAttention(expt, saveData, saveFigs);
-
