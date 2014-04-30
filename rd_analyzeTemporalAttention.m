@@ -1,9 +1,12 @@
-function results = rd_analyzeTemporalAttention(expt, saveData, saveFigs)
+function results = rd_analyzeTemporalAttention(expt, saveData, saveFigs, T1T2Axis)
 
-if nargin < 3
+if nargin < 4
+    T1T2Axis = 'all';
+end
+if nargin < 3 || isempty(saveFigs)
     saveFigs = 0;
 end
-if nargin < 2
+if nargin < 2 || isempty(saveData)
     saveData = 0;
 end
 
@@ -22,15 +25,27 @@ cueValidityIdx = strcmp(trials_headers,'cueValidity');
 rtIdx = strcmp(trials_headers,'rt');
 correctIdx = strcmp(trials_headers,'correct');
 
+%% Selection of T1&T2 same/different/all axes
+switch T1T2Axis
+    case 'all'
+        wAx = ones(size(targetRotations,1),1);
+        axTitle = '';
+    case 'same'
+        wAx = abs(diff(targetRotations,1,2))<10;
+        axTitle = 'T1 & T2 same axis';
+    case 'different'
+        wAx = abs(diff(targetRotations,1,2))>10;
+        axTitle = 'T1 & T2 different axes';
+    otherwise
+        error('T1T2Axis option not recognized')
+end
+
 %% Analyze data
 for iRI = 1:numel(p.respInterval)
     for iCV = 1:numel(p.cueValidity)
         for iTC = 1:numel(p.targetContrasts)
-%             w0 = abs(diff(targetRotations,1,2))<10;
-%             w0 = abs(diff(targetRotations,1,2))<190 & abs(diff(targetRotations,1,2))>170;
-
-%             w = w0 & trials(:,respIntervalIdx)==iRI & trials(:,cueValidityIdx)==iCV & trials(:,targetContrastIdx)==iTC;
-            w = trials(:,respIntervalIdx)==iRI & trials(:,cueValidityIdx)==iCV & trials(:,targetContrastIdx)==iTC;
+            w = wAx & trials(:,respIntervalIdx)==iRI & trials(:,cueValidityIdx)==iCV & trials(:,targetContrastIdx)==iTC;
+%             w = trials(:,respIntervalIdx)==iRI & trials(:,cueValidityIdx)==iCV & trials(:,targetContrastIdx)==iTC;
             
             totals.all{iCV,iRI}(:,:,iTC) = trials(w,:);
             
@@ -84,6 +99,7 @@ for iRI = 1:numel(p.respInterval)
     ylim(accLims)
     rd_supertitle(subjectID);
     rd_raiseAxis(gca);
+    rd_supertitle(axTitle);
 end
 
 fig(2) = figure;
@@ -100,12 +116,13 @@ for iRI = 1:numel(p.respInterval)
     box off
     rd_supertitle(subjectID);
     rd_raiseAxis(gca);
+    rd_supertitle(axTitle);
 end
 
 %% Save figs
 if saveFigs
     figNames = {'acc','rt'};
-    rd_saveAllFigs(fig, figNames, [subjectID '_TemporalAttention'])
+    rd_saveAllFigs(fig, figNames, sprintf('%s_TemporalAttention_T1T2%s', subjectID, T1T2Axis))
 end
 
 
