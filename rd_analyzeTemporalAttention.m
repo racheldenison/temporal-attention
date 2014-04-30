@@ -33,7 +33,7 @@ switch T1T2Axis
     case 'same'
         wAx = abs(diff(targetRotations,1,2))<10;
         axTitle = 'T1 & T2 same axis';
-    case 'different'
+    case 'diff'
         wAx = abs(diff(targetRotations,1,2))>10;
         axTitle = 'T1 & T2 different axes';
     otherwise
@@ -74,7 +74,7 @@ results.whenSaved = datestr(now);
 
 %% Save data
 if saveData
-    fileName = sprintf('data/%s_TemporalAttention_%s.mat', subjectID, datestr(now, 'yyyymmdd'));
+    fileName = sprintf('data/%s_TemporalAttention_T1T2%s_%s.mat', subjectID, T1T2Axis, datestr(now, 'yyyymmdd'));
     save(fileName, 'expt', 'results')
 end
 
