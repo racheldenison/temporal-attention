@@ -1,6 +1,6 @@
 function p = temporalAttentionParams
 
-p.testingLocation = 'CarrascoL1'; % 'CarrascoL1','laptop','desk'
+p.testingLocation = 'laptop'; % 'CarrascoL1','laptop','desk'
 
 switch p.testingLocation
     case {'laptop','desk'}
@@ -36,8 +36,8 @@ p.respInterval = [1 2]; % [1=early 2=late]
 p.cueValidity = [1 -1 0]; % [1=valid -1=invalid 0=neutral]
 % p.propValid = 0.67;
 % p.cueValidityFactor = generatePropFactor(p.propValid);
-p.cueValidityFactor = [1 1 1 2 3]; % eg. [1 1 2 3] is 50% valid, 25% invalid, 25% neutral
-% p.cueValidityFactor = 3;
+% p.cueValidityFactor = [1 1 1 2 3]; % eg. [1 1 2 3] is 50% valid, 25% invalid, 25% neutral
+p.cueValidityFactor = 3;
 p.propValid = nnz(p.cueValidityFactor==1)./nnz(p.cueValidityFactor<3);
 p.propNeutral = nnz(p.cueValidityFactor==3)./numel(p.cueValidityFactor);
 
@@ -50,6 +50,7 @@ p.maskSOA = 5/100; % 4/60 time between target onset and mask onset
 p.maskDur = 1/100; % 1/60, 3/60
 p.respCueSOA = p.soas(2) + 0.5;
 p.iti = 0.5; % inter-trial interval (also, the duration of the feedback symbol)
+p.eyeSlack = 0.1; % cushion between last fixation check and next stimulus presentation
 
 % Images
 p.imPos = [4 4];

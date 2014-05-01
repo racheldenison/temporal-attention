@@ -20,6 +20,16 @@ slack = p.refRate/2;
 % Running on PTB-3? Abort otherwise.
 AssertOpenGL;
 
+%% Eye data i/o
+eyeDataDir = 'eyedata';
+eyeFile = sprintf('%s%s', subjectID([1:2 end]), datestr(now, 'mmdd'));
+
+% Check to see if this eye file already exists
+existingEyeFile = dir(sprintf('%s/%s.edf', eyeDataDir, eyeFile));
+if ~isempty(existingEyeFile) && p.eyeTracking
+    error('eye file already exists! please choose another name.')
+end
+
 %% Keyboard
 % Find keyboard device number
 devNum = findKeyboardDevNumsAtLocationNYU(p.testingLocation);
@@ -296,9 +306,8 @@ targetRotations = repmat(targetRotations, p.nReps, 1);
 targetPhases = repmat(targetPhases, p.nReps, 1);
 nTrials = size(trials,1);
 
-% determine blocks
-nBlocks = nTrials/p.nTrialsPerBlock;
-fprintf('\n%d trials, %1.2f blocks\n\n', nTrials, nBlocks)
+% show trials and blocks
+fprintf('\n%d trials, %1.2f blocks\n\n', nTrials, nTrials/p.nTrialsPerBlock)
 
 % Choose order of trial presentation
 % trialOrder = randperm(nTrials);
@@ -344,11 +353,17 @@ KbWait(devNum);
 lastFewAcc = [];
 stairIdx = numel(p.stairs); % start easy
 timing.startTime = GetSecs;
-for iTrial = 1:nTrials
+trialCounter = 1;
+while trialCounter <= nTrials
     WaitSecs(p.iti);
     
+    % Initialize for eye tracking trial breaks
+    stopThisTrial = 0;
+    
     % Current trial number
-    trialIdx = trialOrder(iTrial);
+    iTrial = trialCounter; % the trial we're on now
+    trialIdx = trialOrder(iTrial); % the current index into trials
+    trialCounter = trialCounter+1; % update the trial counter so that we will move onto the next trial, even if there is a fixation break
     
     % Get conditions for this trial
     tcCond = trials(trialIdx,targetContrastIdx);
@@ -407,6 +422,11 @@ for iTrial = 1:nTrials
     drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
     timeFix = Screen('Flip', window);
     
+    % Check fixation hold
+    if p.eyeTracking
+        rd_eyeLink('trialstart', window, {el, iTrial, cx, cy, rad});
+    end
+    
     % Present cue
     PsychPortAudio('FillBuffer', pahandle, cueTone);
     timeCue = PsychPortAudio('Start', pahandle, [], timeFix + p.preCueDur, 1);
@@ -414,6 +434,9 @@ for iTrial = 1:nTrials
     % More useful sound commands:
 	% status = PsychPortAudio('GetStatus', pahandle);
     % soundsc(cueTone, p.Fs)
+    if p.eyeTracking
+        Eyelink('Message', 'EVENT_CUE');
+    end
     
     % Present images
     % target 1
@@ -421,6 +444,9 @@ for iTrial = 1:nTrials
     drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
     Screen('DrawTexture', window, tex1, [], imRect, rot(1));
     timeIm1 = Screen('Flip', window, timeCue + p.soas(1) - slack);
+    if p.eyeTracking
+        Eyelink('Message', 'EVENT_T1');
+    end
     
     % blank
     if p.maskSOA > p.targetDur
@@ -444,11 +470,29 @@ for iTrial = 1:nTrials
     drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
     timeMaskBlank1 = Screen('Flip', window, timeMask1 + p.maskDur - slack);
     
+    % Check for eye movements
+    if p.eyeTracking
+        while GetSecs < timeCue + p.soas(2) - p.eyeSlack && ~stopThisTrial
+            WaitSecs(.01);
+%             fixation = mod(iTrial,10); %%% for testing
+            fixation = rd_eyeLink('fixcheck', window, {cx, cy, rad});
+            [stopThisTrial trialOrder, nTrials] = fixationBreakTasks(...
+                fixation, window, white*p.backgroundColor, trialOrder, iTrial, nTrials);
+        end
+        fixT1(iTrial) = fixation;
+        if stopThisTrial
+            continue
+        end
+    end
+    
     % target 2
     DrawFormattedText(window, 'x', 'center', 'center');
     drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
     Screen('DrawTexture', window, tex2, [], imRect, rot(2));
     timeIm2 = Screen('Flip', window, timeCue + p.soas(2) - slack);
+    if p.eyeTracking
+        Eyelink('Message', 'EVENT_T2');
+    end
     
     % blank
     if p.maskSOA > p.targetDur
@@ -472,9 +516,26 @@ for iTrial = 1:nTrials
     drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
     timeMaskBlank2 = Screen('Flip', window, timeMask2 + p.maskDur - slack);
     
+    % Check for eye movements
+    if p.eyeTracking
+        while GetSecs < timeCue + p.respCueSOA - p.eyeSlack && ~stopThisTrial
+            WaitSecs(.01);
+            fixation = rd_eyeLink('fixcheck', window, {cx, cy, rad});
+            [stopThisTrial trialOrder, nTrials] = fixationBreakTasks(...
+                fixation, window, white*p.backgroundColor, trialOrder, iTrial, nTrials);
+        end
+        fixT2(iTrial) = fixation;
+        if stopThisTrial
+            continue
+        end
+    end
+    
     % Present response cue
     PsychPortAudio('FillBuffer', pahandle, respTone);
     timeRespCue = PsychPortAudio('Start', pahandle, [], timeCue + p.respCueSOA, 1);
+    if p.eyeTracking
+        Eyelink('Message', 'EVENT_RESPCUE');
+    end
     
     % Collect response
     responseKey = [];
@@ -484,6 +545,9 @@ for iTrial = 1:nTrials
         responseKey = find(p.keyCodes==find(keyCode));
     end
     response = p.targetStates(responseKey);
+    if p.eyeTracking
+        Eyelink('Message', 'TRIAL_END');
+    end
     
     % Feedback
 %     if response==respTargetState;
@@ -548,7 +612,7 @@ for iTrial = 1:nTrials
         blockAcc = mean(trials(trialOrder(blockStartTrial:iTrial),correctIdx));
         
         accMessage = sprintf('Accuracy: %d%%', round(blockAcc*100));
-        blockMessage = sprintf('%s You''ve completed %d of %d blocks.', highpraise, iTrial/p.nTrialsPerBlock, ceil(nBlocks));
+        blockMessage = sprintf('%s You''ve completed %d of %d blocks.', highpraise, iTrial/p.nTrialsPerBlock, ceil(nTrials/p.nTrialsPerBlock));
         breakMessage = sprintf('Break time\n%s\n%s\n\nPress any key to go on.', blockMessage, accMessage);
         DrawFormattedText(window, breakMessage, 'center', 'center', [1 1 1]*white);
         Screen('Flip', window);
@@ -578,6 +642,11 @@ if p.staircase
     expt.staircase.threshold = threshold;
 end
 
+if p.eyeTracking
+    expt.eye.fixT1 = fixT1;
+    expt.eye.fixT2 = fixT2;
+end
+
 %% Calculate more timing things
 expt.timing.dur.im1 = expt.timing.timeBlank1 - expt.timing.timeIm1;
 expt.timing.dur.im2 = expt.timing.timeBlank2 - expt.timing.timeIm2;
@@ -587,6 +656,11 @@ expt.timing.dur.im1Im2SOA = expt.timing.timeIm2 - expt.timing.timeIm1;
 
 %% Analyze and save data
 results = rd_analyzeTemporalAttention(expt, saveData, saveFigs);
+
+%% Save eye data and shut down the eye tracker
+if p.eyeTracking
+    rd_eyeLink('eyestop', window, {eyeFile, eyeDataDir});
+end
 
 %% Plot timing
 f0 = figure('Color','w');
