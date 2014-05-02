@@ -662,8 +662,8 @@ if p.eyeTracking
 end
 
 % rename eye file
-eyeFileFull = sprintf('%s/%s_TemporalAttention_T1T2%s_%s.edf', eyeDataDir, subjectID, T1T2Axis, datestr(now, 'yyyymmdd'));
-mv([eyeDataDir '/' eyeFile], eyeFileFull)
+eyeFileFull = sprintf('%s/%s_TemporalAttention_%s.edf', eyeDataDir, subjectID, datestr(now, 'yyyymmdd'));
+cp([eyeDataDir '/' eyeFile], eyeFileFull)
 
 %% Clean up
 PsychPortAudio('Stop', pahandle);
