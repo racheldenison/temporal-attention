@@ -5,6 +5,7 @@ run = 2;
 
 saveData = 0;
 saveFigs = 1;
+plotTimingFigs = 0;
 
 % load data file
 dataFile = dir(sprintf('%s/%s_run%02d*', ...
@@ -13,5 +14,5 @@ dataFile = dir(sprintf('%s/%s_run%02d*', ...
 load(sprintf('%s/%s',pathToExpt('data'), dataFile.name))
 
 for t1t2 = {'all','same','diff'}
-	rd_analyzeTemporalAttention(expt, saveData, saveFigs, saveTimingFigs, t1t2{1});
+	rd_analyzeTemporalAttention(expt, saveData, saveFigs, plotTimingFigs, saveTimingFigs, t1t2{1});
 end

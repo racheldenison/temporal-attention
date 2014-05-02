@@ -1,10 +1,13 @@
-function results = rd_analyzeTemporalAttention(expt, saveData, saveFigs, saveTimingFigs, T1T2Axis)
+function results = rd_analyzeTemporalAttention(expt, saveData, saveFigs, plotTimingFigs, saveTimingFigs, T1T2Axis)
 
-if nargin < 5 || isempty(T1T2Axis)
+if nargin < 6 || isempty(T1T2Axis)
     T1T2Axis = 'all';
 end
-if nargin < 4 || isempty(saveTimingFigs)
+if nargin < 5 || isempty(saveTimingFigs)
     saveTimingFigs = 0;
+end
+if nargin < 4 || isempty(plotTimingFigs)
+    plotTimingFigs = 0;
 end
 if nargin < 3 || isempty(saveFigs)
     saveFigs = 0;
@@ -129,42 +132,46 @@ if saveFigs
 end
 
 %% Plot timing
-tfig(1) = figure('Color','w');
-hold on
-nTrials = size(timing.dur.im1,1);
-plot(ones(nTrials,1), timing.dur.im1,'o')
-plot(2*ones(nTrials,1), timing.dur.im2,'o')
-plot(3*ones(nTrials,1), timing.dur.im1Im2SOA,'o')
-plot(4*ones(nTrials,1), timing.dur.cueIm1SOA,'o')
-plot(5*ones(nTrials,1), timing.dur.cueIm2SOA,'o')
-set(gca,'XTick',[1 2 3 4 5])
-set(gca,'XTickLabel',{'im 1','im 2','im1-im2 SOA','cue-im1 SOA','cue-im2 SOA'})
-ylabel('duration')
-
-tfig(2) = figure('Position',[1 1 700 300]);
-subplot(1,5,1)
-hist(timing.dur.im1)
-xlabel('im 1 duration (s)')
-ylabel('number of trials')
-subplot(1,5,2)
-hist(timing.dur.im2)
-xlabel('im 2 duration (s)')
-ylabel('number of trials')
-subplot(1,5,3)
-hist(timing.dur.im1Im2SOA)
-xlabel('im1-im2 SOA (s)')
-ylabel('number of trials')
-subplot(1,5,4)
-hist(timing.dur.cueIm1SOA)
-xlabel('cue-im1 SOA (s)')
-ylabel('number of trials')
-subplot(1,5,5)
-hist(timing.dur.cueIm2SOA)
-xlabel('cue-im2 SOA (s)')
-ylabel('number of trials')
-
-%% Save timing figs
-if saveTimingFigs
-    figNames = {'timing','timingHist'};
-    rd_saveAllFigs(tfig, figNames, sprintf('%s_TemporalAttention', subjectID))
+if plotTimingFigs
+    tfig(1) = figure('Color','w');
+    hold on
+    nTrials = size(timing.dur.im1,1);
+    plot(ones(nTrials,1), timing.dur.im1,'o')
+    plot(2*ones(nTrials,1), timing.dur.im2,'o')
+    plot(3*ones(nTrials,1), timing.dur.im1Im2SOA,'o')
+    plot(4*ones(nTrials,1), timing.dur.cueIm1SOA,'o')
+    plot(5*ones(nTrials,1), timing.dur.cueIm2SOA,'o')
+    set(gca,'XTick',[1 2 3 4 5])
+    set(gca,'XTickLabel',{'im 1','im 2','im1-im2 SOA','cue-im1 SOA','cue-im2 SOA'})
+    ylabel('duration')
+    
+    tfig(2) = figure('Position',[1 1 700 300]);
+    subplot(1,5,1)
+    hist(timing.dur.im1)
+    xlabel('im 1 duration (s)')
+    ylabel('number of trials')
+    subplot(1,5,2)
+    hist(timing.dur.im2)
+    xlabel('im 2 duration (s)')
+    ylabel('number of trials')
+    subplot(1,5,3)
+    hist(timing.dur.im1Im2SOA)
+    xlabel('im1-im2 SOA (s)')
+    ylabel('number of trials')
+    subplot(1,5,4)
+    hist(timing.dur.cueIm1SOA)
+    xlabel('cue-im1 SOA (s)')
+    ylabel('number of trials')
+    subplot(1,5,5)
+    hist(timing.dur.cueIm2SOA)
+    xlabel('cue-im2 SOA (s)')
+    ylabel('number of trials')
+    
+    %% Save timing figs
+    if saveTimingFigs
+        figNames = {'timing','timingHist'};
+        rd_saveAllFigs(tfig, figNames, sprintf('%s_TemporalAttention', subjectID))
+    end
 end
+
+

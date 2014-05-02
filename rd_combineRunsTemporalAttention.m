@@ -1,8 +1,8 @@
 % rd_combineRunsTemporalAttention.m
 
 %% setup
-subject = 'ldPilot_cb_tilt2+5_tc64-100_soa1000-1250';
-runs = [2 3];
+subject = 'idPilot_cb_tilt1pt5_tc64-100_soa1000-1250';
+runs = [1 2];
 combinedRun = 9;
 nRuns = numel(runs);
 
@@ -26,7 +26,7 @@ for iRun = 1:nRuns
     
     trials = [trials; data.expt.trials];
     targetRotations = [targetRotations; data.expt.targetRotations];
-    trialOrder = [trialOrder, data.expt.trialOrder + size(trialOrder,2)];
+    trialOrder = [trialOrder; data.expt.trialOrder + size(trialOrder,2)];
     
     timing(iRun) = data.expt.timing;
 end
@@ -42,17 +42,6 @@ expt.trials = trials;
 expt.targetRotations = targetRotations;
 
 %% analyze data
-results = rd_analyzeTemporalAttention(expt);
+results = rd_analyzeTemporalAttention(expt, 1, 1);
 
-%% save data
-if saveData
-    fileName = sprintf('%s/%s_TemporalAttention_%s.mat', dataDir, subjectID, datestr(now, 'yyyymmdd'));
-    save(fileName, 'expt', 'results')
-end
-
-%% save figs
-if saveFigs
-    figNames = {'acc','rt'};
-    rd_saveAllFigs([], figNames, [subjectID '_TemporalAttention'], figDir)
-end
     
