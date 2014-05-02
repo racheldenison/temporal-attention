@@ -7,7 +7,6 @@ end
 
 saveData = 1;
 saveFigs = 1;
-saveTimingFigs = 1;
 
 p = temporalAttentionParams;
 
@@ -16,6 +15,8 @@ if strcmp(subjectID,'test')
 end
 
 slack = p.refRate/2;
+
+rad = round(ang2pix(p.eyeRad, p.screenSize(1), p.screenRes(1), p.viewDist, 'central'));
 
 % Running on PTB-3? Abort otherwise.
 AssertOpenGL;
@@ -325,9 +326,7 @@ trialOrder0 = repOrders + (trialSet-1).*nt;
 trialOrder = trialOrder0(:);
 
 %% Eyetracker
-if p.eyeTracking
-    eyeFile = sprintf('%s_%s', subjectID, datestr(now, 'yyyymmdd'));
-    
+if p.eyeTracking    
     % Initialize eye tracker
     [el exitFlag] = rd_eyeLink('eyestart', window, eyeFile);
     if exitFlag
@@ -344,7 +343,7 @@ end
 %% Present trials
 % Show fixation and wait for a button press
 Screen('FillRect', window, white*p.backgroundColor);
-DrawFormattedText(window, 'x', 'center', 'center');
+DrawFormattedText(window, 'x', 'center', 'center', white);
 drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
 Screen('Flip', window);
 KbWait(devNum);
@@ -440,7 +439,7 @@ while trialCounter <= nTrials
     
     % Present images
     % target 1
-    DrawFormattedText(window, 'x', 'center', 'center');
+    DrawFormattedText(window, 'x', 'center', 'center', white);
     drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
     Screen('DrawTexture', window, tex1, [], imRect, rot(1));
     timeIm1 = Screen('Flip', window, timeCue + p.soas(1) - slack);
@@ -451,7 +450,7 @@ while trialCounter <= nTrials
     % blank
     if p.maskSOA > p.targetDur
         Screen('FillRect', window, white*p.backgroundColor);
-        DrawFormattedText(window, 'x', 'center', 'center');
+        DrawFormattedText(window, 'x', 'center', 'center', white);
         drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
         timeBlank1 = Screen('Flip', window, timeIm1 + p.targetDur - slack);
     else
@@ -459,14 +458,14 @@ while trialCounter <= nTrials
     end
     
     % mask 1
-    DrawFormattedText(window, 'x', 'center', 'center');
+    DrawFormattedText(window, 'x', 'center', 'center', white);
     drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
     Screen('DrawTexture', window, maskTex, [], imRect);
     timeMask1 = Screen('Flip', window, timeIm1 + p.maskSOA - slack);
 
     % blank
     Screen('FillRect', window, white*p.backgroundColor);
-    DrawFormattedText(window, 'x', 'center', 'center');
+    DrawFormattedText(window, 'x', 'center', 'center', white);
     drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
     timeMaskBlank1 = Screen('Flip', window, timeMask1 + p.maskDur - slack);
     
@@ -486,7 +485,7 @@ while trialCounter <= nTrials
     end
     
     % target 2
-    DrawFormattedText(window, 'x', 'center', 'center');
+    DrawFormattedText(window, 'x', 'center', 'center', white);
     drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
     Screen('DrawTexture', window, tex2, [], imRect, rot(2));
     timeIm2 = Screen('Flip', window, timeCue + p.soas(2) - slack);
@@ -497,7 +496,7 @@ while trialCounter <= nTrials
     % blank
     if p.maskSOA > p.targetDur
         Screen('FillRect', window, white*p.backgroundColor);
-        DrawFormattedText(window, 'x', 'center', 'center');
+        DrawFormattedText(window, 'x', 'center', 'center', white);
         drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
         timeBlank2 = Screen('Flip', window, timeIm2 + p.targetDur - slack);
     else
@@ -505,14 +504,14 @@ while trialCounter <= nTrials
     end
     
     % mask 2
-    DrawFormattedText(window, 'x', 'center', 'center');
+    DrawFormattedText(window, 'x', 'center', 'center', white);
     drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
     Screen('DrawTexture', window, maskTex, [], imRect);
     timeMask2 = Screen('Flip', window, timeIm2 + p.maskSOA - slack);
 
     % blank
     Screen('FillRect', window, white*p.backgroundColor);
-    DrawFormattedText(window, 'x', 'center', 'center');
+    DrawFormattedText(window, 'x', 'center', 'center', white);
     drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
     timeMaskBlank2 = Screen('Flip', window, timeMask2 + p.maskDur - slack);
     
@@ -662,44 +661,9 @@ if p.eyeTracking
     rd_eyeLink('eyestop', window, {eyeFile, eyeDataDir});
 end
 
-%% Plot timing
-f0 = figure('Color','w');
-hold on
-plot(ones(nTrials,1), expt.timing.dur.im1,'o')
-plot(2*ones(nTrials,1), expt.timing.dur.im2,'o')
-plot(3*ones(nTrials,1), expt.timing.dur.im1Im2SOA,'o')
-plot(4*ones(nTrials,1), expt.timing.dur.cueIm1SOA,'o')
-plot(5*ones(nTrials,1), expt.timing.dur.cueIm2SOA,'o')
-set(gca,'XTick',[1 2 3 4 5])
-set(gca,'XTickLabel',{'im 1','im 2','im1-im2 SOA','cue-im1 SOA','cue-im2 SOA'})
-ylabel('duration')
-
-f1 = figure('Position',[1 1 700 250]);
-subplot(1,5,1)
-hist(expt.timing.dur.im1)
-xlabel('im 1 duration (s)')
-ylabel('number of trials')
-subplot(1,5,2)
-hist(expt.timing.dur.im2)
-xlabel('im 2 duration (s)')
-ylabel('number of trials')
-subplot(1,5,3)
-hist(expt.timing.dur.im1Im2SOA)
-xlabel('im1-im2 SOA (s)')
-ylabel('number of trials')
-subplot(1,5,4)
-hist(expt.timing.dur.cueIm1SOA)
-xlabel('cue-im1 SOA (s)')
-ylabel('number of trials')
-subplot(1,5,5)
-hist(expt.timing.dur.cueIm2SOA)
-xlabel('cue-im2 SOA (s)')
-ylabel('number of trials')
-
-if saveTimingFigs
-    print(f0, '-dpng', '-r100', ['figures/' subjectID '_timing'])
-    print(f1, '-dpng', '-r100', ['figures/' subjectID '_timingHist'])
-end
+% rename eye file
+eyeFileFull = sprintf('%s/%s_TemporalAttention_T1T2%s_%s.edf', eyeDataDir, subjectID, T1T2Axis, datestr(now, 'yyyymmdd'));
+mv([eyeDataDir '/' eyeFile], eyeFileFull)
 
 %% Clean up
 PsychPortAudio('Stop', pahandle);

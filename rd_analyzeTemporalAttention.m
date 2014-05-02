@@ -119,10 +119,44 @@ for iRI = 1:numel(p.respInterval)
     rd_supertitle(axTitle);
 end
 
+%% Plot timing
+fig(3) = figure('Color','w');
+hold on
+nTrials = size(timing.dur.im1,1);
+plot(ones(nTrials,1), timing.dur.im1,'o')
+plot(2*ones(nTrials,1), timing.dur.im2,'o')
+plot(3*ones(nTrials,1), timing.dur.im1Im2SOA,'o')
+plot(4*ones(nTrials,1), timing.dur.cueIm1SOA,'o')
+plot(5*ones(nTrials,1), timing.dur.cueIm2SOA,'o')
+set(gca,'XTick',[1 2 3 4 5])
+set(gca,'XTickLabel',{'im 1','im 2','im1-im2 SOA','cue-im1 SOA','cue-im2 SOA'})
+ylabel('duration')
+
+fig(4) = figure('Position',[1 1 700 300]);
+subplot(1,5,1)
+hist(timing.dur.im1)
+xlabel('im 1 duration (s)')
+ylabel('number of trials')
+subplot(1,5,2)
+hist(timing.dur.im2)
+xlabel('im 2 duration (s)')
+ylabel('number of trials')
+subplot(1,5,3)
+hist(timing.dur.im1Im2SOA)
+xlabel('im1-im2 SOA (s)')
+ylabel('number of trials')
+subplot(1,5,4)
+hist(timing.dur.cueIm1SOA)
+xlabel('cue-im1 SOA (s)')
+ylabel('number of trials')
+subplot(1,5,5)
+hist(timing.dur.cueIm2SOA)
+xlabel('cue-im2 SOA (s)')
+ylabel('number of trials')
+
 %% Save figs
 if saveFigs
-    figNames = {'acc','rt'};
+    figNames = {'acc','rt','timing','timingHist'};
     rd_saveAllFigs(fig, figNames, sprintf('%s_TemporalAttention_T1T2%s', subjectID, T1T2Axis))
 end
-
 

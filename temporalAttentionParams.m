@@ -1,6 +1,6 @@
 function p = temporalAttentionParams
 
-p.testingLocation = 'laptop'; % 'CarrascoL1','laptop','desk'
+p.testingLocation = 'CarrascoL1'; % 'CarrascoL1','laptop','desk'
 
 switch p.testingLocation
     case {'laptop','desk'}
@@ -16,7 +16,7 @@ switch p.testingLocation
         p.screenSize = [40 30];
         p.screenRes = [1024 768];
         p.viewDist = 56;
-        p.eyeTracking = 0;
+        p.eyeTracking = 1;
     otherwise
         error('Testing location not found in temporalAttentionParams.')
 end     
@@ -29,6 +29,7 @@ p.font = 'Verdana';
 p.fontSize = 24;
 p.showPlaceholders = 1;
 p.phLineWidth = 2; % (pixels)
+p.eyeRad = 1.5; % allowed fixation radius (degrees)
 
 % Conditions
 p.targetContrasts = [.64 1];
