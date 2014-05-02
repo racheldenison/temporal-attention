@@ -7,6 +7,7 @@ end
 
 saveData = 1;
 saveFigs = 1;
+saveTimingFigs = 1;
 
 p = temporalAttentionParams;
 
@@ -654,7 +655,7 @@ expt.timing.dur.cueIm2SOA = expt.timing.timeIm2 - expt.timing.timeCue;
 expt.timing.dur.im1Im2SOA = expt.timing.timeIm2 - expt.timing.timeIm1;
 
 %% Analyze and save data
-results = rd_analyzeTemporalAttention(expt, saveData, saveFigs);
+results = rd_analyzeTemporalAttention(expt, saveData, saveFigs, saveTimingFigs);
 
 %% Save eye data and shut down the eye tracker
 if p.eyeTracking
