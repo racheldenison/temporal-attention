@@ -16,6 +16,9 @@ if nargin < 2 || isempty(saveData)
     saveData = 0;
 end
 
+steOption = 'trial'; % 'trial','set'
+fprintf('\nStandard error by %s\n\n', steOption)
+
 %% Read out variables from expt
 subjectID = expt.subjectID;
 p = expt.p;
@@ -30,6 +33,18 @@ respIntervalIdx = strcmp(trials_headers,'respInterval');
 cueValidityIdx = strcmp(trials_headers,'cueValidity');
 rtIdx = strcmp(trials_headers,'rt');
 correctIdx = strcmp(trials_headers,'correct');
+
+%% Description of trial sets
+% *2 so we have 8 trials per rep for invalid/neutral
+unitSet = ones(numel(p.targetContrasts)*numel(p.respInterval)*numel(p.cueValidityFactor)*2,1);
+if strcmp(p.rotateTarget,'cb')
+    setNum = unitSet*(1:size(trials,1)/4/size(unitSet,1));
+    setNum = repmat(setNum(:),4,1);
+else
+    setNum = unitSet*(1:size(trials,1)/size(unitSet,1));
+    setNum = setNum(:);
+end
+setNums = unique(setNum);
 
 %% Selection of T1&T2 same/different/all axes
 switch T1T2Axis
@@ -47,21 +62,48 @@ switch T1T2Axis
 end
 
 %% Analyze data
-for iRI = 1:numel(p.respInterval)
-    for iCV = 1:numel(p.cueValidity)
-        for iTC = 1:numel(p.targetContrasts)
-            w = wAx & trials(:,respIntervalIdx)==iRI & trials(:,cueValidityIdx)==iCV & trials(:,targetContrastIdx)==iTC;
-%             w = trials(:,respIntervalIdx)==iRI & trials(:,cueValidityIdx)==iCV & trials(:,targetContrastIdx)==iTC;
-            
-            totals.all{iCV,iRI}(:,:,iTC) = trials(w,:);
-            
-            totals.means{iRI}(iCV,:,iTC) = mean(totals.all{iCV,iRI}(:,:,iTC),1);
-            totals.stds{iRI}(iCV,:,iTC) = std(totals.all{iCV,iRI}(:,:,iTC),0,1);
-            totals.stes{iRI}(iCV,:,iTC) = totals.stds{iRI}(iCV,:,iTC)./sqrt(size(totals.all{iCV,iRI}(:,:,iTC),1));
+switch steOption
+    case 'trial'
+        %% standard error by trial
+        for iRI = 1:numel(p.respInterval)
+            for iCV = 1:numel(p.cueValidity)
+                for iTC = 1:numel(p.targetContrasts)
+                    w = wAx & trials(:,respIntervalIdx)==iRI & trials(:,cueValidityIdx)==iCV & trials(:,targetContrastIdx)==iTC;
+                    %             w = trials(:,respIntervalIdx)==iRI & trials(:,cueValidityIdx)==iCV & trials(:,targetContrastIdx)==iTC;
+                    
+                    totals.all{iCV,iRI}(:,:,iTC) = trials(w,:);
+                    
+                    totals.means{iRI}(iCV,:,iTC) = mean(totals.all{iCV,iRI}(:,:,iTC),1);
+                    totals.stds{iRI}(iCV,:,iTC) = std(totals.all{iCV,iRI}(:,:,iTC),0,1);
+                    totals.stes{iRI}(iCV,:,iTC) = totals.stds{iRI}(iCV,:,iTC)./sqrt(size(totals.all{iCV,iRI}(:,:,iTC),1));
+                end
+            end
         end
-    end
+        
+    case 'set'
+        %% standard error by trial set
+        for iSet = 1:numel(setNums)
+            for iRI = 1:numel(p.respInterval)
+                for iCV = 1:numel(p.cueValidity)
+                    for iTC = 1:numel(p.targetContrasts)
+                        w = setNum==iSet & wAx & trials(:,respIntervalIdx)==iRI & trials(:,cueValidityIdx)==iCV & trials(:,targetContrastIdx)==iTC;
+                        
+                        totals.all{iCV,iRI}(:,:,iTC,iSet) = trials(w,:);
+                        
+                        totals.setMeans{iRI}(iCV,:,iTC,iSet) = mean(totals.all{iCV,iRI}(:,:,iTC,iSet),1);
+                    end
+                end
+                
+                totals.means{iRI} = mean(totals.setMeans{iRI},4);
+                totals.stds{iRI} = std(totals.setMeans{iRI},0,4);
+                totals.stes{iRI} = totals.stds{iRI}./sqrt(numel(setNums));
+            end
+        end
+    otherwise
+        error('steOption not recognized')
 end
 
+%% Acc and RT means
 for iRI = 1:numel(p.respInterval)
     accMean{iRI} = squeeze(totals.means{iRI}(:,correctIdx,:)); % [validity x contrast]
     accSte{iRI} = squeeze(totals.stes{iRI}(:,correctIdx,:));

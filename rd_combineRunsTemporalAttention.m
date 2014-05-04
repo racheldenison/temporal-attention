@@ -42,6 +42,19 @@ expt.trials = trials;
 expt.targetRotations = targetRotations;
 
 %% analyze data
-results = rd_analyzeTemporalAttention(expt, 1, 1);
+results = rd_analyzeTemporalAttention(expt);
 
+%% save data
+% saving data and figs separately in order to save them into the mcq
+% directory, and not locally
+if saveData
+    fileName = sprintf('%s/%s_TemporalAttention_%s.mat', dataDir, subjectID, datestr(now, 'yyyymmdd'));
+    save(fileName, 'expt', 'results')
+end
+
+%% save figs
+if saveFigs
+    figNames = {'acc','rt'};
+    rd_saveAllFigs([], figNames, [subjectID '_TemporalAttention'], figDir)
+end
     
