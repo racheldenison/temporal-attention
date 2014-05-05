@@ -69,7 +69,6 @@ switch steOption
             for iCV = 1:numel(p.cueValidity)
                 for iTC = 1:numel(p.targetContrasts)
                     w = wAx & trials(:,respIntervalIdx)==iRI & trials(:,cueValidityIdx)==iCV & trials(:,targetContrastIdx)==iTC;
-                    %             w = trials(:,respIntervalIdx)==iRI & trials(:,cueValidityIdx)==iCV & trials(:,targetContrastIdx)==iTC;
                     
                     totals.all{iCV,iRI}(:,:,iTC) = trials(w,:);
                     
@@ -131,14 +130,24 @@ intervalNames = {'early','late'};
 accLims = [0.2 1];
 rtLims = [0.3 1.6];
 contrastLims = [p.targetContrasts(1)-0.05 p.targetContrasts(end)+0.05];
+colors = get(0,'DefaultAxesColorOrder');
 
 fig(1) = figure;
 for iRI = 1:numel(p.respInterval)
     subplot(1,numel(p.respInterval),iRI)
     hold on
     plot(contrastLims, [0.5 0.5], '--k');
-    p1 = errorbar(repmat(p.targetContrasts',1,numel(p.cueValidity)),...
-        accMean{iRI}', accSte{iRI}', '.', 'MarkerSize', 20);
+    
+    if numel(p.targetContrasts)>1
+        p1 = errorbar(repmat(p.targetContrasts',1,numel(p.cueValidity)),...
+            accMean{iRI}', accSte{iRI}', '.', 'MarkerSize', 20);
+    else
+        for i = 1:length(accMean{iRI})
+            p1(i) = errorbar(p.targetContrasts,...
+                accMean{iRI}(i), accSte{iRI}(i), '.', 'MarkerSize', 20);
+            set(p1(i),'color', colors(i,:))
+        end
+    end
     xlabel('contrast')
     ylabel('acc')
     legend(p1, num2str(p.cueValidity'),'location','best')
@@ -153,8 +162,19 @@ end
 fig(2) = figure;
 for iRI = 1:numel(p.respInterval)
     subplot(1,numel(p.respInterval),iRI)
-    errorbar(repmat(p.targetContrasts',1,numel(p.cueValidity)),...
-        rtMean{iRI}', rtSte{iRI}', '.', 'MarkerSize', 20)
+    hold on
+    
+    if numel(p.targetContrasts)>1
+        p1 = errorbar(repmat(p.targetContrasts',1,numel(p.cueValidity)),...
+            rtMean{iRI}', rtSte{iRI}', '.', 'MarkerSize', 20);
+    else
+        for i = 1:length(rtMean{iRI})
+            p1(i) = errorbar(p.targetContrasts,...
+                rtMean{iRI}(i), rtSte{iRI}(i), '.', 'MarkerSize', 20);
+            set(p1(i),'color', colors(i,:))
+        end
+    end
+
     xlabel('contrast')
     ylabel('rt')
     legend(num2str(p.cueValidity'),'location','best')

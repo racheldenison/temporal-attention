@@ -7,6 +7,7 @@ end
 
 saveData = 1;
 saveFigs = 1;
+plotTimingFigs = 1;
 saveTimingFigs = 1;
 
 p = temporalAttentionParams;
@@ -606,14 +607,14 @@ while trialCounter <= nTrials
     
     save('data/TEMP') % saves the workspace on each trial
     
-    if mod(iTrial,p.nTrialsPerBlock)==0 && iTrial<nTrials
+    if mod(iTrial,p.nTrialsPerBlock)==0 || iTrial==nTrials
         % Calculate block accuracy
         blockStartTrial = (iTrial/p.nTrialsPerBlock)*p.nTrialsPerBlock - p.nTrialsPerBlock + 1;
         blockAcc = mean(trials(trialOrder(blockStartTrial:iTrial),correctIdx));
         
         accMessage = sprintf('Accuracy: %d%%', round(blockAcc*100));
         blockMessage = sprintf('%s You''ve completed %d of %d blocks.', highpraise, iTrial/p.nTrialsPerBlock, ceil(nTrials/p.nTrialsPerBlock));
-        breakMessage = sprintf('Break time\n%s\n%s\n\nPress any key to go on.', blockMessage, accMessage);
+        breakMessage = sprintf('%s\n%s\n\nPress any key to go on.', blockMessage, accMessage);
         DrawFormattedText(window, breakMessage, 'center', 'center', [1 1 1]*white);
         Screen('Flip', window);
         WaitSecs(1);
@@ -660,11 +661,11 @@ results = rd_analyzeTemporalAttention(expt, saveData, saveFigs, plotTimingFigs, 
 %% Save eye data and shut down the eye tracker
 if p.eyeTracking
     rd_eyeLink('eyestop', window, {eyeFile, eyeDataDir});
+    
+    % rename eye file
+    eyeFileFull = sprintf('%s/%s_TemporalAttention_%s.edf', eyeDataDir, subjectID, datestr(now, 'yyyymmdd'));
+    copyfile([eyeDataDir '/' eyeFile], eyeFileFull)
 end
-
-% rename eye file
-eyeFileFull = sprintf('%s/%s_TemporalAttention_%s.edf', eyeDataDir, subjectID, datestr(now, 'yyyymmdd'));
-cp([eyeDataDir '/' eyeFile], eyeFileFull)
 
 %% Clean up
 PsychPortAudio('Stop', pahandle);
