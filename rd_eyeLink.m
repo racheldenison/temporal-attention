@@ -141,6 +141,8 @@ switch command
         cy = in{4};
         rad = in{5};
         
+        driftCorrected = 0;
+        
         % Displays a title at the bottom of the eye tracker display
         Eyelink('Command', 'record_status_message ''Starting trial %d''', trialNum);
 
@@ -162,11 +164,14 @@ switch command
             % Drift correct if fixation timed out
             if ~fixation
                 rd_eyeLink('driftcorrect', window, {el, cx, cy});
+                driftCorrected = 1;
                 ready = 0;
             else
                 ready = 1;
             end
         end
+        
+        out = driftCorrected;
         
         Eyelink('Message', 'TRIAL_START %d', trialNum);
         Eyelink('Message', 'SYNCTIME');		% zero-plot time for EDFVIEW

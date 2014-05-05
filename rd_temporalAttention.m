@@ -425,7 +425,14 @@ while trialCounter <= nTrials
     
     % Check fixation hold
     if p.eyeTracking
-        rd_eyeLink('trialstart', window, {el, iTrial, cx, cy, rad});
+        driftCorrected = rd_eyeLink('trialstart', window, {el, iTrial, cx, cy, rad});
+        
+        if driftCorrected
+            % restart trial
+            DrawFormattedText(window, 'x', 'center', 'center', white);
+            drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
+            timeFix = Screen('Flip', window);
+        end
     end
     
     % Present cue
