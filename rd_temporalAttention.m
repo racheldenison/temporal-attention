@@ -619,6 +619,10 @@ while trialCounter <= nTrials
         Screen('Flip', window);
         WaitSecs(1);
         KbWait(devNum);
+        
+        if ~isempty(strfind(subjectID,'PRAC'))
+            save(sprintf('data/WORKSPACE_%s', subjectID))
+        end
     end
 end
 timing.endTime = GetSecs;
