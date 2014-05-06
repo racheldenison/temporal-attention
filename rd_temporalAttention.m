@@ -446,6 +446,21 @@ while trialCounter <= nTrials
         Eyelink('Message', 'EVENT_CUE');
     end
     
+    % Check for eye movements
+    if p.eyeTracking
+        while GetSecs < timeCue + p.soas(1) - p.eyeSlack && ~stopThisTrial
+            WaitSecs(.01);
+            %             fixation = mod(iTrial,10); %%% for testing
+            fixation = rd_eyeLink('fixcheck', window, {cx, cy, rad});
+            [stopThisTrial trialOrder, nTrials] = fixationBreakTasks(...
+                fixation, window, white*p.backgroundColor, trialOrder, iTrial, nTrials);
+        end
+        fixCue(iTrial) = fixation;
+        if stopThisTrial
+            continue
+        end
+    end
+    
     % Present images
     % target 1
     DrawFormattedText(window, 'x', 'center', 'center', white);
@@ -655,6 +670,7 @@ if p.staircase
 end
 
 if p.eyeTracking
+    expt.eye.fixCue = fixCue;
     expt.eye.fixT1 = fixT1;
     expt.eye.fixT2 = fixT2;
 end
