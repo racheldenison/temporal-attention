@@ -25,7 +25,7 @@ AssertOpenGL;
 
 %% Eye data i/o
 eyeDataDir = 'eyedata';
-eyeFile = sprintf('%s%s', subjectID([1:2 end]), datestr(now, 'mmdd'));
+eyeFile = sprintf('%s%s', subjectID([1:2 end-1:end]), datestr(now, 'mmdd'));
 
 % Check to see if this eye file already exists
 existingEyeFile = dir(sprintf('%s/%s.edf', eyeDataDir, eyeFile));
@@ -425,7 +425,14 @@ while trialCounter <= nTrials
     
     % Check fixation hold
     if p.eyeTracking
-        rd_eyeLink('trialstart', window, {el, iTrial, cx, cy, rad});
+        driftCorrected = rd_eyeLink('trialstart', window, {el, iTrial, cx, cy, rad});
+        
+        if driftCorrected
+            % restart trial
+            DrawFormattedText(window, 'x', 'center', 'center', white);
+            drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
+            timeFix = Screen('Flip', window);
+        end
     end
     
     % Present cue
@@ -592,18 +599,18 @@ while trialCounter <= nTrials
     trials(trialIdx,correctIdx) = correct;
         
     % Store timing
-    timing.timeFix(iTrial,1) = timeFix;
-    timing.timeCue(iTrial,1) = timeCue;
-    timing.timeIm1(iTrial,1) = timeIm1;
-    timing.timeBlank1(iTrial,1) = timeBlank1;
-    timing.timeMask1(iTrial,1) = timeMask1;
-    timing.timeMaskBlank1(iTrial,1) = timeMaskBlank1;
-    timing.timeIm2(iTrial,1) = timeIm2;
-    timing.timeBlank2(iTrial,1) = timeBlank2;
-    timing.timeMask2(iTrial,1) = timeMask2;
-    timing.timeMaskBlank2(iTrial,1) = timeMaskBlank2;
-    timing.timeRespCue(iTrial,1) = timeRespCue;
-    timing.timeFeedback(iTrial,1) = timeFeedback;
+    timing.timeFix(trialIdx,1) = timeFix;
+    timing.timeCue(trialIdx,1) = timeCue;
+    timing.timeIm1(trialIdx,1) = timeIm1;
+    timing.timeBlank1(trialIdx,1) = timeBlank1;
+    timing.timeMask1(trialIdx,1) = timeMask1;
+    timing.timeMaskBlank1(trialIdx,1) = timeMaskBlank1;
+    timing.timeIm2(trialIdx,1) = timeIm2;
+    timing.timeBlank2(trialIdx,1) = timeBlank2;
+    timing.timeMask2(trialIdx,1) = timeMask2;
+    timing.timeMaskBlank2(trialIdx,1) = timeMaskBlank2;
+    timing.timeRespCue(trialIdx,1) = timeRespCue;
+    timing.timeFeedback(trialIdx,1) = timeFeedback;
     
     save('data/TEMP') % saves the workspace on each trial
     
@@ -613,7 +620,7 @@ while trialCounter <= nTrials
         blockAcc = mean(trials(trialOrder(blockStartTrial:iTrial),correctIdx));
         
         accMessage = sprintf('Accuracy: %d%%', round(blockAcc*100));
-        blockMessage = sprintf('%s You''ve completed %d of %d blocks.', highpraise, iTrial/p.nTrialsPerBlock, ceil(nTrials/p.nTrialsPerBlock));
+        blockMessage = sprintf('%s You''ve completed %d of %d blocks.', highpraise, round(iTrial/p.nTrialsPerBlock), ceil(nTrials/p.nTrialsPerBlock));
         breakMessage = sprintf('%s\n%s\n\nPress any key to go on.', blockMessage, accMessage);
         DrawFormattedText(window, breakMessage, 'center', 'center', [1 1 1]*white);
         Screen('Flip', window);
@@ -668,7 +675,7 @@ if p.eyeTracking
     
     % rename eye file
     eyeFileFull = sprintf('%s/%s_TemporalAttention_%s.edf', eyeDataDir, subjectID, datestr(now, 'yyyymmdd'));
-    copyfile([eyeDataDir '/' eyeFile], eyeFileFull)
+    copyfile(sprintf('%s/%s.edf', eyeDataDir, eyeFile), eyeFileFull)
 end
 
 %% Clean up
