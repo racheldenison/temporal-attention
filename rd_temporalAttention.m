@@ -630,20 +630,33 @@ while trialCounter <= nTrials
     save('data/TEMP') % saves the workspace on each trial
     
     if mod(iTrial,p.nTrialsPerBlock)==0 || iTrial==nTrials
+        % Save workspace if practice block (since we might quit after just
+        % one block)
+        if ~isempty(strfind(subjectID,'PRAC'))
+            save(sprintf('data/WORKSPACE_%s', subjectID))
+        end
+        
         % Calculate block accuracy
         blockStartTrial = (iTrial/p.nTrialsPerBlock)*p.nTrialsPerBlock - p.nTrialsPerBlock + 1;
+        if blockStartTrial < 0 % we are doing less than one block
+            blockStartTrial = 1;
+        end
         blockAcc = mean(trials(trialOrder(blockStartTrial:iTrial),correctIdx));
         
         accMessage = sprintf('Accuracy: %d%%', round(blockAcc*100));
         blockMessage = sprintf('%s You''ve completed %d of %d blocks.', highpraise, round(iTrial/p.nTrialsPerBlock), ceil(nTrials/p.nTrialsPerBlock));
-        breakMessage = sprintf('%s\n%s\n\nPress any key to go on.', blockMessage, accMessage);
+        if iTrial==nTrials
+            keyMessage = '';
+        else
+            keyMessage = 'Press any key to go on.';
+        end
+        
+        breakMessage = sprintf('%s\n%s\n\n%s', blockMessage, accMessage, keyMessage);
         DrawFormattedText(window, breakMessage, 'center', 'center', [1 1 1]*white);
         Screen('Flip', window);
         WaitSecs(1);
-        KbWait(devNum);
-        
-        if ~isempty(strfind(subjectID,'PRAC'))
-            save(sprintf('data/WORKSPACE_%s', subjectID))
+        if iTrial < nTrials
+            KbWait(devNum);
         end
     end
 end
