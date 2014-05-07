@@ -1,7 +1,7 @@
 % rd_combineRunsTemporalAttention.m
 
 %% setup
-subject = 'idPilot_cb_tilt1pt5_tc64-100_soa1000-1250';
+subject = 'rdPilot_cb_tilt2_tc64_soa500-750';
 runs = [1 2];
 combinedRun = 9;
 nRuns = numel(runs);
@@ -48,13 +48,13 @@ results = rd_analyzeTemporalAttention(expt);
 % saving data and figs separately in order to save them into the mcq
 % directory, and not locally
 if saveData
-    fileName = sprintf('%s/%s_TemporalAttention_%s.mat', dataDir, subjectID, datestr(now, 'yyyymmdd'));
+    fileName = sprintf('%s/%s_TemporalAttention_T1T2all_%s.mat', dataDir, subjectID, datestr(now, 'yyyymmdd'));
     save(fileName, 'expt', 'results')
 end
 
 %% save figs
 if saveFigs
     figNames = {'acc','rt'};
-    rd_saveAllFigs([], figNames, [subjectID '_TemporalAttention'], figDir)
+    rd_saveAllFigs([], figNames, [subjectID '_TemporalAttention_T1T2all'], figDir)
 end
     
