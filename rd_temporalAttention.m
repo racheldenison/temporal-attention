@@ -340,9 +340,11 @@ if p.eyeTracking
 %     Eyelink('message', 'Subject code: %s', subjectID);
 %     Eyelink('message', 'END OF DESCRIPTIONS');
 %     
-%     % No sounds indicating success of calibration
-%     el.calibrationfailedsound = 0;				
-%     el.calibrationsuccesssound = 0;
+    el.drift_correction_target_beep = 0;
+    el.drift_correction_failed_beep = 0;
+    el.drift_correction_success_beep = 0;
+    
+    el.devicenumber = -1; %see KbCheck for details of this value
 
     % Calibrate eye tracker
     [cal exitFlag] = rd_eyeLink('calibrate', window, el);

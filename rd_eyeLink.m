@@ -86,7 +86,7 @@ switch command
         while isempty(find(strcmp(contKey,'space'), 1))
             keyIsDown = 0;
             while ~keyIsDown
-                [keyIsDown, keyTime, keyCode] = KbCheck;
+                [keyIsDown, keyTime, keyCode] = KbCheck(-1); %% listen to all keyboards
             end
             contKey = KbName(find(keyCode));
         end
