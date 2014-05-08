@@ -336,15 +336,23 @@ if p.eyeTracking
     end
     
     % Write subject ID into the edf file
-    Eyelink('message', 'BEGIN OF DESCRIPTIONS');
+    Eyelink('message', 'BEGIN DESCRIPTIONS');
     Eyelink('message', 'Subject code: %s', subjectID);
-    Eyelink('message', 'END OF DESCRIPTIONS');
+    Eyelink('message', 'END DESCRIPTIONS');
     
-    el.drift_correction_target_beep = 0;
-    el.drift_correction_failed_beep = 0;
-    el.drift_correction_success_beep = 0;
+    % No sounds indicating success of calibration
+%     el.targetbeep = false;
+%     el.calibration_failed_beep = [0 0 0];
+%     el.calibration_success_beep = [0 0 0];
+    el.drift_correction_target_beep = [0 0 0];
+    el.drift_correction_failed_beep = [0 0 0];
+    el.drift_correction_success_beep = [0 0 0];
     
+    % Accept input from all keyboards
     el.devicenumber = -1; %see KbCheck for details of this value
+    
+    % Update with custom settings
+    EyelinkUpdateDefaults(el);
 
     % Calibrate eye tracker
     [cal exitFlag] = rd_eyeLink('calibrate', window, el);
