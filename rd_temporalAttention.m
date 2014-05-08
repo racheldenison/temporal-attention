@@ -335,14 +335,14 @@ if p.eyeTracking
         return
     end
     
-    % Write subject ID into the edf file
-    Eyelink('message', 'BEGIN OF DESCRIPTIONS');
-    Eyelink('message', 'Subject code: %s', subjectID);
-    Eyelink('message', 'END OF DESCRIPTIONS');
-    
-    % No sounds indicating success of calibration
-    el.calibrationfailedsound = 0;				
-    el.calibrationsuccesssound = 0;
+%     % Write subject ID into the edf file
+%     Eyelink('message', 'BEGIN OF DESCRIPTIONS');
+%     Eyelink('message', 'Subject code: %s', subjectID);
+%     Eyelink('message', 'END OF DESCRIPTIONS');
+%     
+%     % No sounds indicating success of calibration
+%     el.calibrationfailedsound = 0;				
+%     el.calibrationsuccesssound = 0;
 
     % Calibrate eye tracker
     [cal exitFlag] = rd_eyeLink('calibrate', window, el);
@@ -650,7 +650,7 @@ while trialCounter <= nTrials
         if blockStartTrial < 0 % we are doing less than one block
             blockStartTrial = 1;
         end
-        blockAcc = mean(trials(trialOrder(blockStartTrial:iTrial),correctIdx));
+        blockAcc = mean(trials(trialOrder(blockStartTrial:iTrial),correctIdx))
         
         accMessage = sprintf('Accuracy: %d%%', round(blockAcc*100));
         blockMessage = sprintf('%s You''ve completed %d of %d blocks.', highpraise, round(iTrial/p.nTrialsPerBlock), ceil(nTrials/p.nTrialsPerBlock));

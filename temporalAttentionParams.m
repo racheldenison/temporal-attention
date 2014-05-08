@@ -16,7 +16,7 @@ switch p.testingLocation
         p.screenSize = [40 30];
         p.screenRes = [1024 768];
         p.viewDist = 56;
-        p.eyeTracking = 0;
+        p.eyeTracking = 1;
     otherwise
         error('Testing location not found in temporalAttentionParams.')
 end     
@@ -37,8 +37,8 @@ p.respInterval = [1 2]; % [1=early 2=late]
 p.cueValidity = [1 -1 0]; % [1=valid -1=invalid 0=neutral]
 % p.propValid = 0.67;
 % p.cueValidityFactor = generatePropFactor(p.propValid);
-% p.cueValidityFactor = [1 1 1 2 3]; % eg. [1 1 2 3] is 50% valid, 25% invalid, 25% neutral
-p.cueValidityFactor = 3;
+p.cueValidityFactor = [1 1 1 2 3]; % eg. [1 1 2 3] is 50% valid, 25% invalid, 25% neutral
+% p.cueValidityFactor = 3;
 p.propValid = nnz(p.cueValidityFactor==1)./nnz(p.cueValidityFactor<3);
 p.propNeutral = nnz(p.cueValidityFactor==3)./numel(p.cueValidityFactor);
 
