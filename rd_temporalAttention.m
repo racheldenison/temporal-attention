@@ -335,11 +335,11 @@ if p.eyeTracking
         return
     end
     
-%     % Write subject ID into the edf file
-%     Eyelink('message', 'BEGIN OF DESCRIPTIONS');
-%     Eyelink('message', 'Subject code: %s', subjectID);
-%     Eyelink('message', 'END OF DESCRIPTIONS');
-%     
+    % Write subject ID into the edf file
+    Eyelink('message', 'BEGIN OF DESCRIPTIONS');
+    Eyelink('message', 'Subject code: %s', subjectID);
+    Eyelink('message', 'END OF DESCRIPTIONS');
+    
     el.drift_correction_target_beep = 0;
     el.drift_correction_failed_beep = 0;
     el.drift_correction_success_beep = 0;
