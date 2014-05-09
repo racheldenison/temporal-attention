@@ -30,7 +30,7 @@ eyeFile = sprintf('%s%s', subjectID([1:2 end-1:end]), datestr(now, 'mmdd'));
 % Check to see if this eye file already exists
 existingEyeFile = dir(sprintf('%s/%s.edf', eyeDataDir, eyeFile));
 if ~isempty(existingEyeFile) && p.eyeTracking
-    error('eye file already exists! please choose another name.')
+%     error('eye file already exists! please choose another name.')
 end
 
 %% Keyboard
