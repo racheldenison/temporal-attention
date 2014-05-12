@@ -33,6 +33,14 @@ if ~isempty(existingEyeFile) && p.eyeTracking
 %     error('eye file already exists! please choose another name.')
 end
 
+%% Check for existing data file
+% note the real data file is made in the analyze function
+dataFile = sprintf('%s_TemporalAttention_T1T2all_%s.mat', subjectID, datestr(now, 'yyyymmdd'));
+existingDataFile = dir(sprintf('data/%s', dataFile));
+if ~isempty(existingDataFile) && ~strcmp(subjectID, 'test') && ~strcmp(subjectID, 'testy')
+    error('data file already exists!')
+end
+
 %% Keyboard
 % Find keyboard device number
 devNum = findKeyboardDevNumsAtLocationNYU(p.testingLocation);
