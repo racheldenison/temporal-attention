@@ -1,6 +1,6 @@
 % rd_runAnalyzeTemporalAttention.m
 
-subject = 'rd_cb_tilt2_tc64_soa1000-1100';
+subject = 'id_cb_tilt1pt5_tc64_soa1000-2500';
 run = 9;
 
 saveData = 0;
