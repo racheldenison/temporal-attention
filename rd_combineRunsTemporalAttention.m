@@ -1,7 +1,7 @@
 % rd_combineRunsTemporalAttention.m
 
 %% setup
-subject = 'id_cb_tilt1pt5_tc64_soa1000-2500';
+subject = 'id_cb_tilt1pt5_tc64_soa1000-1250';
 runs = 1:3;
 combinedRun = 9;
 nRuns = numel(runs);
@@ -11,6 +11,8 @@ saveFigs = 1;
 
 dataDir = pathToExpt('data');
 figDir = pathToExpt('figures');
+% dataDir = 'data';
+% figDir = 'figures';
 
 %% initializations
 subjectID = sprintf('%s_run%02d', subject, combinedRun);
