@@ -318,7 +318,7 @@ targetPhases = repmat(targetPhases, p.nReps, 1);
 nTrials = size(trials,1);
 
 % show trials and blocks
-fprintf('\n%d trials, %1.2f blocks\n\n', nTrials, nTrials/p.nTrialsPerBlock)
+fprintf('\n%s\n\n%d trials, %1.2f blocks\n\n', datestr(now), nTrials, nTrials/p.nTrialsPerBlock)
 
 % Choose order of trial presentation
 % trialOrder = randperm(nTrials);

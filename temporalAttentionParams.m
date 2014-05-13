@@ -32,7 +32,7 @@ p.phLineWidth = 2; % (pixels)
 p.eyeRad = 1.5; % allowed fixation radius (degrees)
 
 % Conditions
-p.targetContrasts = .16; % [.64 1];
+p.targetContrasts = .64; % [.64 1];
 p.respInterval = [1 2]; % [1=early 2=late]
 p.cueValidity = [1 -1 0]; % [1=valid -1=invalid 0=neutral]
 % p.propValid = 0.67;
