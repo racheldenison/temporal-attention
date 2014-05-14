@@ -230,6 +230,7 @@ trials = fullfact([numel(p.targetContrasts) ...
     numel(p.cueValidityFactor) ...
     numel(p.targetStates) ...
     numel(p.targetStates)]);
+nBaseCond = size(trials,2);
 
 % generate target rotations
 % these are applied over and above any initial orientation
@@ -445,6 +446,21 @@ while trialCounter <= nTrials
         targetRotations(trialIdx,:) = rot;
     end
     
+    % Store presented trial info
+    trialsPresented.trials(iTrial,:) = nan(1,length(trials_headers));
+    trialsPresented.trials(iTrial,1:nBaseCond) = trials(trialIdx,1:nBaseCond);
+    trialsPresented.vals(iTrial).trialIdx = trialIdx;
+    trialsPresented.vals(iTrial).tcCond = tcCond;
+    trialsPresented.vals(iTrial).ts1Cond = ts1Cond;
+    trialsPresented.vals(iTrial).ts2Cond = ts2Cond;
+    trialsPresented.vals(iTrial).respInterval = respInterval;
+    trialsPresented.vals(iTrial).cueValidity = cueValidity;
+    trialsPresented.vals(iTrial).cuedInterval = cuedInterval;
+    trialsPresented.vals(iTrial).respTargetState = respTargetState;
+    trialsPresented.vals(iTrial).respTargetCond = respTargetCond;
+    trialsPresented.vals(iTrial).rot = rot;
+    trialsPresented.vals(iTrial).ph = ph;
+    
     % Present fixation
     DrawFormattedText(window, 'x', 'center', 'center', white);
     drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
@@ -653,6 +669,10 @@ while trialCounter <= nTrials
     timing.timeMaskBlank2(trialIdx,1) = timeMaskBlank2;
     timing.timeRespCue(trialIdx,1) = timeRespCue;
     timing.timeFeedback(trialIdx,1) = timeFeedback;
+
+    % Store presented trial info
+    trialsPresented.trials(iTrial,nBaseCond+1:end) = trials(trialIdx,nBaseCond+1:end);
+
     
     save('data/TEMP') % saves the workspace on each trial
     
@@ -702,6 +722,7 @@ expt.trials_headers = trials_headers;
 expt.trials = trials;
 expt.targetRotations = targetRotations;
 expt.targetPhases = targetPhases;
+expt.trialsPresented = trialsPresented;
 
 if p.staircase
     expt.staircase.stairValues = stairValues;
