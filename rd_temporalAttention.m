@@ -671,7 +671,7 @@ while trialCounter <= nTrials
         blockAcc = mean(trials(trialOrder(blockStartTrial:iTrial),correctIdx))
         
         accMessage = sprintf('Accuracy: %d%%', round(blockAcc*100));
-        blockMessage = sprintf('%s You''ve completed %d of %d blocks.', highpraise, round(iTrial/p.nTrialsPerBlock), ceil(nTrials/p.nTrialsPerBlock));
+        blockMessage = sprintf('%s You''ve completed %d of %d blocks.', highpraise, ceil(iTrial/p.nTrialsPerBlock), ceil(nTrials/p.nTrialsPerBlock));
         if iTrial==nTrials
             keyMessage = '';
         else
