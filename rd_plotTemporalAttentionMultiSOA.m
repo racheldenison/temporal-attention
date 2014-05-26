@@ -1,9 +1,9 @@
 % rd_plotTemporalAttentionMultiSOA.m
 
-subjectInit = 'id';
+subjectInit = 'ld';
 exptName = 'cb';
-tilt = '1pt5';
-contrast = 16;
+tilt = '2';
+contrast = 64;
 
 soa1 = [1000 1000 1000];
 soa2 = [1100 1250 2500];
