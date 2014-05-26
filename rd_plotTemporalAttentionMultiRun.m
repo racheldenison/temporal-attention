@@ -1,6 +1,6 @@
 % rd_plotTemporalAttentionMultiRun.m
 
-subjectInit = 'rd';
+subjectInit = 'ld';
 exptName = 'cb';
 tilt = '2';
 contrast = '64';
