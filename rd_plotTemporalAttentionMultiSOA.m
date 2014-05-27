@@ -1,8 +1,8 @@
-% rd_plotTemporalAttentionMultiSOA.m
+function [accMean rtMean t1t2soa p] = rd_plotTemporalAttentionMultiSOA(subjectInit)
 
-subjectInit = 'ld';
+% subjectInit = 'rd';
 exptName = 'cb';
-tilt = '2';
+tilt = '*';
 contrast = 64;
 
 soa1 = [1000 1000 1000];
@@ -52,7 +52,7 @@ p = expt.p;
 %% Plot figs
 intervalNames = {'early','late'};
 accLims = [0.2 1];
-rtLims = [0.3 1.6];
+rtLims = [0.2 1.6];
 soaLims = [t1t2soa(1)-100 t1t2soa(end)+100];
 colors = get(0,'DefaultAxesColorOrder');
 axTitle = '';

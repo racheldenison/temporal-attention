@@ -1,12 +1,12 @@
 % rd_plotTemporalAttentionMultiRun.m
 
-subjectInit = 'ld';
+subjectInit = 'id';
 exptName = 'cb';
-tilt = '2';
+tilt = '1pt5';
 contrast = '64';
 contrastIdx = 1; % only plot one contrast at a time
 soa1 = 1000;
-soa2 = 1250;
+soa2 = 1100;
 
 runs = 1:3;
 

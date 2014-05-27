@@ -1,6 +1,6 @@
 % rd_runAnalyzeTemporalAttention.m
 
-subject = 'ld_cb_tilt2_tc64_soa1000-1250';
+subject = 'id_cb_tilt1pt5_tc64_soa1000-1100';
 run = 9;
 
 subjectID = sprintf('%s_run%02d', subject, run);

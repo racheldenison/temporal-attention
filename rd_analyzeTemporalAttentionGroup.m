@@ -1,12 +1,12 @@
 % rd_analyzeTemporalAttentionGroup.m
 
 exptName = 'cb';
-subjectInits = {'rdPilot','ldPilot','idPilot'};
+subjectInits = {'rd','ld','id'};
 tilt = '*';
-contrast = '64-1*';
+contrast = '64'; % '64-1*'
 contrastIdx = 1; % only plot one contrast at a time
 soa1 = 1000;
-soa2 = 1250;
+soa2 = 2500;
 
 run = 9;
 
@@ -16,14 +16,14 @@ nSubjects = numel(subjectInits);
 exptStr = sprintf('%s_tilt%s_tc%s_soa%d-%d*', ...
     exptName, tilt, contrast, soa1, soa2);
 
-% dataDir = pathToExpt('data');
+dataDir = pathToExpt('data');
 % dataDir = [pathToExpt('data') '/pilot/rd'];
 
 %% Get data
 for iSubject = 1:nSubjects 
     subjectInit = subjectInits{iSubject};
     
-    dataDir = sprintf('%s/pilot/%s', pathToExpt('data'), subjectInit(1:2));
+%     dataDir = sprintf('%s/pilot/%s', pathToExpt('data'), subjectInit(1:2));
     subjectID = sprintf('%s_%s', subjectInit, exptStr);
     
     % load data from a given soa
