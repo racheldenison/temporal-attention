@@ -61,6 +61,12 @@ switch T1T2Axis
         error('T1T2Axis option not recognized')
 end
 
+%% Extra selection step if desired
+% % only horizontal targets
+% for i=1:size(targetRotations,1)
+%     w0(i,1) = targetRotations(i,trials(i,2))==90;
+% end
+
 %% Analyze data
 switch steOption
     case 'trial'
