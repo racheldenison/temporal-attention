@@ -21,7 +21,7 @@ dataFile = dir(sprintf('%s/%s*', dataDir, subjectID));
 
 load(sprintf('%s/%s', dataDir, dataFile.name))
 
-for t1t2 = {'same','diff'} % {'all'}
+for t1t2 = {'same','diff'} % {'all'} % 
     rd_analyzeTemporalAttention(expt, 0, 0, 0, 0, t1t2{1});
     
     % save data
