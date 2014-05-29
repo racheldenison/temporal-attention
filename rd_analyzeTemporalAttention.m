@@ -1,4 +1,4 @@
-function results = rd_analyzeTemporalAttention(expt, saveData, saveFigs, plotTimingFigs, saveTimingFigs, T1T2Axis, cleanRT)
+function [expt results] = rd_analyzeTemporalAttention(expt, saveData, saveFigs, plotTimingFigs, saveTimingFigs, T1T2Axis, cleanRT)
 
 if nargin < 7 || isempty(cleanRT)
     cleanRT = 0;
@@ -45,6 +45,10 @@ if cleanRT
     rt(rt0 > cutoff) = NaN;
     trials(:,rtIdx) = rt;
     subjectID = [subjectID '_RTx'];
+    
+    % update expt
+    expt.trials = trials;
+    expt.subjectID = subjectID;
     
     figure
     subplot(2,1,1)

@@ -744,7 +744,7 @@ expt.timing.dur.cueIm2SOA = expt.timing.timeIm2 - expt.timing.timeCue;
 expt.timing.dur.im1Im2SOA = expt.timing.timeIm2 - expt.timing.timeIm1;
 
 %% Analyze and save data
-results = rd_analyzeTemporalAttention(expt, saveData, saveFigs, plotTimingFigs, saveTimingFigs);
+[expt results] = rd_analyzeTemporalAttention(expt, saveData, saveFigs, plotTimingFigs, saveTimingFigs);
 
 %% Save eye data and shut down the eye tracker
 if p.eyeTracking

@@ -1,15 +1,15 @@
 % rd_runAnalyzeTemporalAttention.m
 
-subject = 'rd_cb_tilt2_tc64_soa1000-2500';
+subject = 'ld_cb_tilt2_tc64_soa1000-2500';
 run = 9;
 
 subjectID = sprintf('%s_run%02d', subject, run);
 
-saveData = 0;
+saveData = 1;
 saveFigs = 0;
 plotTimingFigs = 0;
 saveTimingFigs = 0;
-cleanRT = 1;
+cleanRT = 0;
 
 dataDir = pathToExpt('data');
 % dataDir = 'data';
@@ -27,7 +27,7 @@ else
 end
 
 for t1t2 = {'all'} % {'same','diff'} %
-    rd_analyzeTemporalAttention(expt, 0, 0, 0, 0, t1t2{1}, cleanRT);
+    [expt results] = rd_analyzeTemporalAttention(expt, 0, 0, 0, 0, t1t2{1}, cleanRT);
     
     % change subjectID for saving if cleaning RT
     if cleanRT

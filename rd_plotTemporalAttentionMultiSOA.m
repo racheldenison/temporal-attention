@@ -10,11 +10,18 @@ soa2 = [1100 1250 2500];
 t1t2soa = soa2 - soa1;
 run = 9;
 
+cleanRT = 1;
+
 dataDir = pathToExpt('data');
 
 subjectID = sprintf('%s_%s_tilt%s_tc%d', ...
     subjectInit, exptName, tilt, contrast);
 
+if cleanRT
+    rtStr = '_RTx';
+else
+    rtStr = '';
+end
 
 %% Get data
 for iSOA = 1:numel(soa1)
@@ -22,8 +29,8 @@ for iSOA = 1:numel(soa1)
         subjectID, soa1(iSOA), soa2(iSOA));
     
     % load data from a given soa
-    dataFile = dir(sprintf('%s/%s_run%02d*', ...
-        dataDir, subject, run));
+    dataFile = dir(sprintf('%s/%s_run%02d%s_T*', ...
+        dataDir, subject, run, rtStr));
     if numel(dataFile)~=1
         error('more or fewer than one matching data file')
     else
