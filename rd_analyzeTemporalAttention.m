@@ -1,5 +1,8 @@
-function results = rd_analyzeTemporalAttention(expt, saveData, saveFigs, plotTimingFigs, saveTimingFigs, T1T2Axis)
+function results = rd_analyzeTemporalAttention(expt, saveData, saveFigs, plotTimingFigs, saveTimingFigs, T1T2Axis, cleanRT)
 
+if nargin < 7 || isempty(cleanRT)
+    cleanRT = 0;
+end
 if nargin < 6 || isempty(T1T2Axis)
     T1T2Axis = 'all';
 end
@@ -33,6 +36,29 @@ respIntervalIdx = strcmp(trials_headers,'respInterval');
 cueValidityIdx = strcmp(trials_headers,'cueValidity');
 rtIdx = strcmp(trials_headers,'rt');
 correctIdx = strcmp(trials_headers,'correct');
+
+%% Clean RT if requested
+if cleanRT
+    rt0 = trials(:,rtIdx);
+    cutoff = prctile(rt0,95);
+    rt = rt0;
+    rt(rt0 > cutoff) = NaN;
+    trials(:,rtIdx) = rt;
+    subjectID = [subjectID '_RTx'];
+    
+    figure
+    subplot(2,1,1)
+    hold on
+    hist(rt0, 40)
+    plot_vertical_line(cutoff);
+    title('pre-clean')
+    subplot(2,1,2)
+    hold on
+    hist(rt, 40)
+    plot_vertical_line(cutoff);
+    title('post-clean')
+    xlabel('RT')
+end
 
 %% Description of trial sets
 % *2 so we have 8 trials per rep for invalid/neutral
@@ -78,8 +104,8 @@ switch steOption
                     
                     totals.all{iCV,iRI}(:,:,iTC) = trials(w,:);
                     
-                    totals.means{iRI}(iCV,:,iTC) = mean(totals.all{iCV,iRI}(:,:,iTC),1);
-                    totals.stds{iRI}(iCV,:,iTC) = std(totals.all{iCV,iRI}(:,:,iTC),0,1);
+                    totals.means{iRI}(iCV,:,iTC) = nanmean(totals.all{iCV,iRI}(:,:,iTC),1);
+                    totals.stds{iRI}(iCV,:,iTC) = nanstd(totals.all{iCV,iRI}(:,:,iTC),0,1);
                     totals.stes{iRI}(iCV,:,iTC) = totals.stds{iRI}(iCV,:,iTC)./sqrt(size(totals.all{iCV,iRI}(:,:,iTC),1));
                 end
             end
