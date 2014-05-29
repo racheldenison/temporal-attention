@@ -1,8 +1,8 @@
 % rd_combineRunsTemporalAttention.m
 
 %% setup
-subject = 'id_cb_tilt1pt5_tc64_soa1000-1100';
-runs = 1:3;
+subject = 'rdHPTest_cb_tilt2_tc64_soa1000-1250_withoutHP';
+runs = 1:2;
 combinedRun = 9;
 nRuns = numel(runs);
 
