@@ -8,10 +8,13 @@ groupStr = sprintf('N=%d', nSubjects);
 %% Get indiv subject data
 for iSubject = 1:nSubjects
     subjectInit = subjectInits{iSubject};
-    [acc rt t1t2soa p] = rd_plotTemporalAttentionMultiSOA(subjectInit);
+    [acc rt t1t2soa p dp crit eff] = rd_plotTemporalAttentionMultiSOA(subjectInit);
     for iEL = 1:numel(acc)
         accData{iEL}(:,:,iSubject) = acc{iEL};
         rtData{iEL}(:,:,iSubject) = rt{iEL};
+        dpData{iEL}(:,:,iSubject) = dp{iEL};
+        critData{iEL}(:,:,iSubject) = crit{iEL};
+        effData{iEL}(:,:,iSubject) = eff{iEL};
     end
 end
 
@@ -19,15 +22,23 @@ end
 for iEL = 1:numel(accData)
     accMean{iEL} = mean(accData{iEL},3);
     rtMean{iEL} = mean(rtData{iEL},3);
+    dpMean{iEL} = mean(dpData{iEL},3);
+    critMean{iEL} = mean(critData{iEL},3);
+    effMean{iEL} = mean(effData{iEL},3);
     
     accSte{iEL} = std(accData{iEL},0,3)./sqrt(nSubjects);
     rtSte{iEL} = std(rtData{iEL},0,3)./sqrt(nSubjects);
+    dpSte{iEL} = std(dpData{iEL},0,3)./sqrt(nSubjects);
+    critSte{iEL} = std(critData{iEL},0,3)./sqrt(nSubjects);
+    effSte{iEL} = std(effData{iEL},0,3)./sqrt(nSubjects);
 end
 
 %% Plot figs
 intervalNames = {'early','late'};
 accLims = [0.2 1];
 rtLims = [0.2 1.6];
+dpLims = [-0.5 2.7];
+critLims = [-1 1];
 soaLims = [t1t2soa(1)-100 t1t2soa(end)+100];
 colors = get(0,'DefaultAxesColorOrder');
 axTitle = '';
@@ -66,6 +77,65 @@ for iRI = 1:numel(p.respInterval)
     xlim(soaLims)
     ylim(rtLims)
     box off
+    rd_supertitle(subjectInits);
+    rd_raiseAxis(gca);
+    rd_supertitle(axTitle);
+end
+
+fig(3) = figure;
+for iRI = 1:numel(p.respInterval)
+    subplot(1,numel(p.respInterval),iRI)
+    hold on
+    plot(soaLims, [0 0], '--k');
+    
+    p1 = errorbar(repmat(t1t2soa',1,numel(p.cueValidity)),...
+        dpMean{iRI}', dpSte{iRI}', '.-', 'MarkerSize', 20);
+
+    xlabel('soa')
+    ylabel('dprime')
+    legend(p1, num2str(p.cueValidity'),'location','best')
+    title(intervalNames{iRI})
+    xlim(soaLims)
+    ylim(dpLims)
+    rd_supertitle(subjectInits);
+    rd_raiseAxis(gca);
+    rd_supertitle(axTitle);
+end
+
+fig(4) = figure;
+for iRI = 1:numel(p.respInterval)
+    subplot(1,numel(p.respInterval),iRI)
+    hold on
+    plot(soaLims, [0 0], '--k');
+    
+    p1 = errorbar(repmat(t1t2soa',1,numel(p.cueValidity)),...
+        critMean{iRI}', critSte{iRI}', '.-', 'MarkerSize', 20);
+
+    xlabel('soa')
+    ylabel('crit')
+    legend(p1, num2str(p.cueValidity'),'location','best')
+    title(intervalNames{iRI})
+    xlim(soaLims)
+    ylim(critLims)
+    rd_supertitle(subjectInits);
+    rd_raiseAxis(gca);
+    rd_supertitle(axTitle);
+end
+
+fig(5) = figure;
+for iRI = 1:numel(p.respInterval)
+    subplot(1,numel(p.respInterval),iRI)
+    hold on
+    
+    p1 = errorbar(repmat(t1t2soa',1,numel(p.cueValidity)),...
+        effMean{iRI}', effSte{iRI}', '.-', 'MarkerSize', 20);
+
+    xlabel('soa')
+    ylabel('efficiency (dprime/rt)')
+    legend(p1, num2str(p.cueValidity'),'location','best')
+    title(intervalNames{iRI})
+    xlim(soaLims)
+%     ylim(effLims)
     rd_supertitle(subjectInits);
     rd_raiseAxis(gca);
     rd_supertitle(axTitle);

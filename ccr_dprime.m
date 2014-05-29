@@ -1,6 +1,6 @@
 function [dprime,criterion] = ccr_dprime(h,fa,option)
 
-if (h >= 1) | (fa >= 1) | (h <= 0) | (fa <= 0)
+if any(h >= 1) | any(fa >= 1) | any(h <= 0) | any(fa <= 0)
     error('h and fa must be non-ceiling proportions, i.e. >= 0 & =< 1!')
 end
 
