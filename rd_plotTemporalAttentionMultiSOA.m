@@ -10,7 +10,7 @@ soa2 = [1100 1250 2500];
 t1t2soa = soa2 - soa1;
 run = 9;
 
-cleanRT = 1;
+cleanRT = 0;
 
 dataDir = pathToExpt('data');
 
