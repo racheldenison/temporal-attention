@@ -23,6 +23,7 @@ end
 
 p.keyCodes = KbName(p.keyNames);
 p.backgroundColor = 0.5;
+p.goCueColor = 0.75;
 p.nReps = 1;
 p.nTrialsPerBlock = 64;
 p.font = 'Verdana';
@@ -50,6 +51,7 @@ p.targetDur = 3/100; % 30 ms / 33 ms
 p.maskSOA = 5/100; % 4/60 time between target onset and mask onset
 p.maskDur = 1/100; % 1/60, 3/60
 p.respCueSOA = p.soas(2) + 0.5;
+p.respGoSOA = 0.5; % time between resp cue onset and go onset. set to zero for no go cue.
 p.iti = 0.5; % inter-trial interval (also, the duration of the feedback symbol)
 p.eyeSlack = 0.1; % cushion between last fixation check and next stimulus presentation
 

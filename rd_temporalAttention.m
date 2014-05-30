@@ -603,11 +603,21 @@ while trialCounter <= nTrials
         Eyelink('Message', 'EVENT_RESPCUE');
     end
     
+    % Present go cue (indicating you're allowed to make a response)
+    if p.respGoSOA > 0
+        Screen('FillRect', window, white*p.backgroundColor);
+        DrawFormattedText(window, 'x', 'center', 'center', white*p.goCueColor);
+        drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
+        timeGoCue = Screen('Flip', window, timeRespCue + p.respGoSOA - slack);
+    else
+        timeGoCue = timeRespCue;
+    end
+    
     % Collect response
     responseKey = [];
     while isempty(responseKey) % record wrong key as missed trial
         [secs, keyCode] = KbWait(devNum);
-        rt = secs - timeRespCue;
+        rt = secs - timeGoCue;
         responseKey = find(p.keyCodes==find(keyCode));
     end
     response = p.targetStates(responseKey);
@@ -668,6 +678,7 @@ while trialCounter <= nTrials
     timing.timeMask2(trialIdx,1) = timeMask2;
     timing.timeMaskBlank2(trialIdx,1) = timeMaskBlank2;
     timing.timeRespCue(trialIdx,1) = timeRespCue;
+    timing.timeGoCue(trialIdx,1) = timeGoCue;
     timing.timeFeedback(trialIdx,1) = timeFeedback;
 
     % Store presented trial info
