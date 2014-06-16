@@ -617,7 +617,7 @@ while trialCounter <= nTrials
     responseKey = [];
     while isempty(responseKey) % record wrong key as missed trial
         [secs, keyCode] = KbWait(devNum);
-        rt = secs - timeGoCue;
+        rt = secs - timeRespCue;
         responseKey = find(p.keyCodes==find(keyCode));
     end
     response = p.targetStates(responseKey);
