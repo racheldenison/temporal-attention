@@ -1,8 +1,8 @@
 % rd_combineRunsTemporalAttention.m
 
 %% setup
-subject = 'rd_cbD6_tc64_soa1000-1150';
-runs = 2:3;
+subject = 'ld_cbD6_tc64_soa1000-1250';
+runs = 1:2;
 combinedRun = 9;
 nRuns = numel(runs);
 
@@ -44,7 +44,7 @@ expt.trials = trials;
 expt.targetRotations = targetRotations;
 
 %% analyze data
-results = rd_analyzeTemporalAttention(expt);
+[expt results] = rd_analyzeTemporalAttention(expt);
 
 %% save data
 % saving data and figs separately in order to save them into the mcq

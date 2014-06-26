@@ -1,12 +1,12 @@
 function [accMean rtMean t1t2soa p dprime crit eff] = rd_plotTemporalAttentionMultiSOA(subjectInit)
 
-% subjectInit = 'rd';
-exptName = 'cb';
-tilt = '*';
+subjectInit = 'rd';
+exptName = 'cbD6';
+% tilt = '*';
 contrast = 64;
 
-soa1 = [1000 1000 1000];
-soa2 = [1100 1250 2500];
+soa1 = [1000 1000 1000 1000];
+soa2 = [1100 1150 1200 1250];
 t1t2soa = soa2 - soa1;
 run = 9;
 
@@ -14,8 +14,10 @@ cleanRT = 0;
 
 dataDir = pathToExpt('data');
 
-subjectID = sprintf('%s_%s_tilt%s_tc%d', ...
-    subjectInit, exptName, tilt, contrast);
+% subjectID = sprintf('%s_%s_tilt%s_tc%d', ...
+%     subjectInit, exptName, tilt, contrast);
+subjectID = sprintf('%s_%s*tc%d', ...
+    subjectInit, exptName, contrast);
 
 if cleanRT
     rtStr = '_RTx';
@@ -32,6 +34,7 @@ for iSOA = 1:numel(soa1)
     dataFile = dir(sprintf('%s/%s_run%02d%s_T*', ...
         dataDir, subject, run, rtStr));
     if numel(dataFile)~=1
+        fprintf('%s/%s_run%02d%s_T*', dataDir, subject, run, rtStr)
         error('more or fewer than one matching data file')
     else
         load(sprintf('%s/%s', dataDir, dataFile.name))
