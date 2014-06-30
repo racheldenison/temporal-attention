@@ -30,13 +30,13 @@ white = WhiteIndex(win);  % Retrieves the CLUT color code for white.
 
 % Check screen size
 [sw, sh] = Screen('WindowSize', win); % height and width of screen (px)
-if ~all([sw sh] == p.screenRes)
+if ~all([sw sh] == p.screenRes) && ~strcmp(subjectID,'test')
     error('Screen resolution is different from requested!')
 end
 
 % Check refresh rate
 flipInterval = Screen('GetFlipInterval', win); % frame duration (s)
-if abs(flipInterval - p.refRate) > 0.001
+if abs(flipInterval - p.refRate) > 0.001 && ~strcmp(subjectID,'test')
     error('Refresh rate is different from requested!')
 end
 

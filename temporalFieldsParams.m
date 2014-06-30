@@ -1,10 +1,14 @@
 function p = temporalFieldsParams
 
-p.testingLocation = 'CarrascoL1'; % 'CarrascoL1','laptop'
+p.testingLocation = 'laptop'; % 'CarrascoL1','laptop'
 
 switch p.testingLocation
     case 'laptop'
         p.keyNames = {'1!','2@'};
+        p.refRate = 1/60;
+        p.screenSize = [9 13]; % (in)
+        p.screenRes = [900 1440];
+        p.viewDist = 21; % (in)
     case 'CarrascoL1'
         p.keyNames = {'1!','2@'};
         p.refRate = 1/120;
