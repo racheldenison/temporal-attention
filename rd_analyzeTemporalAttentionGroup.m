@@ -1,30 +1,30 @@
 % rd_analyzeTemporalAttentionGroup.m
 
 exptName = 'cb';
-subjectInits = {'rd','ld','id'};
+subjectInits = {'rd','ld','id','bl','ad'};
 tilt = '*';
-contrast = '64'; % '64-1*'
-contrastIdx = 1; % only plot one contrast at a time
+contrast = '64-1*'; % '64'; % 
+contrastIdx = 2; % only plot one contrast at a time
 soa1 = 1000;
-soa2 = 2500;
+soa2 = 1250;
 
 run = 9;
 
 saveFigs = 1;
 
 nSubjects = numel(subjectInits);
-exptStr = sprintf('%s_tilt%s_tc%s_soa%d-%d*', ...
-    exptName, tilt, contrast, soa1, soa2);
+exptStr = sprintf('%s_*tc%s_soa%d-%d*', ...
+    exptName, contrast, soa1, soa2);
 
-dataDir = pathToExpt('data');
+% dataDir = pathToExpt('data');
 % dataDir = [pathToExpt('data') '/pilot/rd'];
 
 %% Get data
 for iSubject = 1:nSubjects 
     subjectInit = subjectInits{iSubject};
     
-%     dataDir = sprintf('%s/pilot/%s', pathToExpt('data'), subjectInit(1:2));
-    subjectID = sprintf('%s_%s', subjectInit, exptStr);
+    dataDir = sprintf('%s/pilot/%s', pathToExpt('data'), subjectInit(1:2));
+    subjectID = sprintf('%s*_%s', subjectInit, exptStr);
     
     % load data from a given soa
     dataFile = dir(sprintf('%s/%s_run%02d*', ...
@@ -52,6 +52,8 @@ for iSubject = 1:nSubjects
 end
 
 p = expt.p;
+nCV = numel(p.cueValidity);
+tc = p.targetContrasts(contrastIdx)*100;
 
 %% Plot figs
 intervalNames = {'early','late'};
@@ -68,10 +70,10 @@ for iRI = 1:numel(p.respInterval)
     hold on
     plot(xlims, [0.5 0.5], '--k');
     
-    p1 = bar(repmat((1:nSubjects)',1,numel(p.cueValidity)),...
+    p1 = bar(repmat((1:nSubjects)',1,nCV),...
         accData{iRI}(idx,:)');
 %     colormap(colors(idx,:))
-    colormap(flag(numel(p.cueValidity)));
+    colormap(flag(nCV));
 
     set(gca,'XTick',1:nSubjects)
     xlabel('subject')
@@ -80,7 +82,7 @@ for iRI = 1:numel(p.respInterval)
     title(intervalNames{iRI})
     xlim(xlims)
     ylim(accLims)
-    rd_supertitle(sprintf('%s run %d, N=%d', exptStr, run, nSubjects));
+    rd_supertitle(sprintf('%s run %d, contrast = %d%%, N=%d', exptStr, run, tc, nSubjects));
     rd_raiseAxis(gca);
 end
 
@@ -88,10 +90,10 @@ fig(2) = figure;
 for iRI = 1:numel(p.respInterval)
     subplot(1,numel(p.respInterval),iRI);
     
-    p1 = bar(repmat((1:nSubjects)',1,numel(p.cueValidity)),...
+    p1 = bar(repmat((1:nSubjects)',1,nCV),...
         rtData{iRI}(idx,:)');
 %     colormap(colors(idx,:))
-    colormap(flag(numel(p.cueValidity)));
+    colormap(flag(nCV));
     
     set(gca,'XTick',1:nSubjects)
     xlabel('subject')
@@ -101,7 +103,7 @@ for iRI = 1:numel(p.respInterval)
     xlim(xlims)
     ylim(rtLims)
     box off
-    rd_supertitle(sprintf('%s run %d, N=%d', exptStr, run, nSubjects));
+    rd_supertitle(sprintf('%s run %d, contrast = %d%%, N=%d', exptStr, run, tc, nSubjects));
     rd_raiseAxis(gca);
 end
 
@@ -110,18 +112,18 @@ for iRI = 1:numel(p.respInterval)
     subplot(1,numel(p.respInterval),iRI);
     hold on
     
-    plot([0 numel(p.cueValidity)+1], [0.5 0.5], '--k');
-    b1 = bar(1:nSubjects, accMean(idx,iRI),'FaceColor',[.5 .5 .5]);
-    p1 = errorbar(1:nSubjects, accMean(idx,iRI)', accSte(idx,iRI)','k','LineStyle','none');
+    plot([0 nCV+1], [0.5 0.5], '--k');
+    b1 = bar(1:nCV, accMean(idx,iRI),'FaceColor',[.5 .5 .5]);
+    p1 = errorbar(1:nCV, accMean(idx,iRI)', accSte(idx,iRI)','k','LineStyle','none');
     
-    set(gca,'XTick',1:numel(p.cueValidity))
+    set(gca,'XTick',1:nCV)
     set(gca,'XTickLabel', p.cueValidity(idx))
     xlabel('cue validity')
     ylabel('acc')
     title(intervalNames{iRI})
     ylim([0.3 max(accMean(:))*1.1])
     box off
-    rd_supertitle(sprintf('%s run %d, N=%d', exptStr, run, nSubjects));
+    rd_supertitle(sprintf('%s run %d, contrast = %d%%, N=%d', exptStr, run, tc, nSubjects));
     rd_raiseAxis(gca);
 end
 
@@ -130,21 +132,21 @@ for iRI = 1:numel(p.respInterval)
     subplot(1,numel(p.respInterval),iRI);
     hold on
     
-    b1 = bar(1:nSubjects, rtMean(idx,iRI),'FaceColor',[.5 .5 .5]);
-    p1 = errorbar(1:nSubjects, rtMean(idx,iRI)', rtSte(idx,iRI)','k','LineStyle','none');
+    b1 = bar(1:nCV, rtMean(idx,iRI),'FaceColor',[.5 .5 .5]);
+    p1 = errorbar(1:nCV, rtMean(idx,iRI)', rtSte(idx,iRI)','k','LineStyle','none');
     
-    set(gca,'XTick',1:numel(p.cueValidity))
+    set(gca,'XTick',1:nCV)
     set(gca,'XTickLabel', p.cueValidity(idx))
     xlabel('cue validity')
     ylabel('rt')
     title(intervalNames{iRI})
     ylim([min(rtMean(:))*0.9 max(rtMean(:))*1.1])
     box off
-    rd_supertitle(sprintf('%s run %d, N=%d', exptStr, run, nSubjects));
+    rd_supertitle(sprintf('%s run %d, contrast = %d%%, N=%d', exptStr, run, tc, nSubjects));
     rd_raiseAxis(gca);
 end
 
 if saveFigs
     figNames = {'indivAcc','indivRT','groupAcc','groupRT'};
-    rd_saveAllFigs(fig, figNames, sprintf('groupData_%s_run%02d_TemporalAttention_T1T2all_N%d', exptStr, run, nSubjects))
+    rd_saveAllFigs(fig, figNames, sprintf('groupData_%s_run%02d_TemporalAttention_T1T2all_contrast%d_N%d', exptStr, run, tc, nSubjects))
 end
