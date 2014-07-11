@@ -1,7 +1,7 @@
 % rd_combineRunsTemporalAttention.m
 
 %% setup
-subject = 'blPilot_cb_tc64-100_soa1000-1250';
+subject = 'adPilot_cb_tc64-100_soa1000-1250';
 runs = 1:2;
 combinedRun = 9;
 nRuns = numel(runs);

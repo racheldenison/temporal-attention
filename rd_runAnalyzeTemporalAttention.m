@@ -1,12 +1,12 @@
 % rd_runAnalyzeTemporalAttention.m
 
-subject = 'ld_cb_tilt2_tc64_soa1000-2500';
+subject = 'adPilot_cb_tc64-100_soa1000-1250';
 run = 9;
 
 subjectID = sprintf('%s_run%02d', subject, run);
 
-saveData = 1;
-saveFigs = 0;
+saveData = 0;
+saveFigs = 1;
 plotTimingFigs = 0;
 saveTimingFigs = 0;
 cleanRT = 0;
@@ -26,7 +26,7 @@ else
     load(sprintf('%s/%s', dataDir, dataFile.name))
 end
 
-for t1t2 = {'all'} % {'same','diff'} %
+for t1t2 = {'same','diff'} % {'all'} % 
     [expt results] = rd_analyzeTemporalAttention(expt, 0, 0, 0, 0, t1t2{1}, cleanRT);
     
     % change subjectID for saving if cleaning RT
