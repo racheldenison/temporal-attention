@@ -16,7 +16,7 @@ switch p.testingLocation
         p.screenSize = [40 30];
         p.screenRes = [1024 768];
         p.viewDist = 56;
-        p.eyeTracking = 0;
+        p.eyeTracking = 1; 
     otherwise
         error('Testing location not found in temporalAttentionParams.')
 end     
@@ -33,7 +33,7 @@ p.phLineWidth = 2; % (pixels)
 p.eyeRad = 1.5; % allowed fixation radius (degrees)
 
 % Conditions
-p.targetContrasts = [.8]; % [.64 1];
+p.targetContrasts = [.64 1]; % [.64 1];
 p.respInterval = [1 2]; % [1=early 2=late]
 p.cueValidity = [1 -1 0]; % [1=valid -1=invalid 0=neutral]
 % p.propValid = 0.67;
@@ -48,7 +48,7 @@ p.soas = [1000 1250]/1000; % [short long]
 p.preCueDur = 0.75; % time between fixation onset and cue
 p.cueDur = 0.2;
 p.targetDur = 3/100; % 30 ms / 33 ms
-p.maskSOA = 5/100; % 4/60 time between target onset and mask onset
+p.maskSOA = 5/100; % 4/60 time between target onset and mask onset 
 p.maskDur = 1/100; % 1/60, 3/60
 p.respCueSOA = p.soas(2) + 0.5;
 p.respGoSOA = 0; % 0.6 % time between resp cue onset and go onset. set to zero for no go cue.
