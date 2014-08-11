@@ -60,10 +60,17 @@ pahandle = PsychPortAudio('Open', [], [], reqlatencyclass, p.Fs, 1); % 1 = singl
 % Set up screen
 screenNumber = max(Screen('Screens'));
 
-% Set resolution and refresh rate
-if strcmp(p.testingLocation, 'CarrascoL1')
-    Screen('Resolution',screenNumber, p.screenRes(1), p.screenRes(2), round(1/p.refRate));
+% Check screen resolution and refresh rate - if it's not set correctly to 
+% begin with, the color might be off
+scr = Screen('Resolution', screenNumber);
+if ~all([scr.width scr.height scr.hz] == [p.screenRes round(1/p.refRate)]) && ~strcmp(subjectID,'test')
+    error('Screen resolution and/or refresh rate has not been set correctly by the experimenter!')
 end
+
+% % Set resolution and refresh rate
+% if strcmp(p.testingLocation, 'CarrascoL1')
+%     Screen('Resolution',screenNumber, p.screenRes(1), p.screenRes(2), round(1/p.refRate));
+% end
 
 % Set up window
 [window rect] = Screen('OpenWindow', screenNumber);
@@ -96,6 +103,11 @@ switch p.testingLocation
     case 'CarrascoL1'
         load('../Displays/0001_james_TrinitonG520_1280x960_57cm_Input1_140129.mat');
         Screen('LoadNormalizedGammaTable', window, repmat(calib.table,1,3));
+        % check gamma table
+        gammatable = Screen('ReadNormalizedGammaTable', window);
+        if nnz(abs(gammatable-repmat(calib.table,1,3))>0.0001)
+            error('Gamma table not loaded correctly! Perhaps set screen res and retry.')
+        end
     otherwise
         fprintf('\nNot loading gamma table ...\n')
 end
