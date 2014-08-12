@@ -1,21 +1,23 @@
 % rd_plotTemporalAttentionMultiRun.m
 
-subjectInit = 'id';
+subjectInit = 'vpPilot';
 exptName = 'cb';
-tilt = '1pt5';
-contrast = '64';
+tilt = '*';
+contrast = '64-100';
 contrastIdx = 1; % only plot one contrast at a time
 soa1 = 1000;
-soa2 = 1100;
+soa2 = 1250;
 
-runs = 1:3;
+runs = 1:2;
 
 saveFigs = 1;
 
-dataDir = pathToExpt('data');
-% dataDir = [pathToExpt('data') '/pilot/rd'];
+% dataDir = pathToExpt('data');
+dataDir = [pathToExpt('data') '/pilot/vp'];
 
-subjectID = sprintf('%s_%s_tilt%s_tc%s_soa%d-%d', ...
+% subjectID = sprintf('%s_%s_tilt%s_tc%s_soa%d-%d', ...
+%     subjectInit, exptName, tilt, contrast, soa1, soa2);
+subjectID = sprintf('%s_%s_%stc%s_soa%d-%d', ...
     subjectInit, exptName, tilt, contrast, soa1, soa2);
 
 %% Get data
@@ -23,10 +25,10 @@ for iRun = 1:numel(runs)
     run = runs(iRun);
     
     % load data from a given soa
-    dataFile = dir(sprintf('%s/%s_run%02d*', ...
+    dataFile = dir(sprintf('%s/%s_run%02d_T*', ...
         dataDir, subjectID, run));
     if numel(dataFile)~=1
-        sprintf('%s/%s_run%02d*', dataDir, subjectID, run)
+        sprintf('%s/%s_run%02d_T*', dataDir, subjectID, run)
         error('more or fewer than one matching data file')
     else
         load(sprintf('%s/%s', dataDir, dataFile.name))
