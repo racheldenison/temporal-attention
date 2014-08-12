@@ -181,11 +181,19 @@ switch p.maskType
             p.spatialFrequency, 0, 0, p.maskContrast, 0, 'bw');
         mask = maskWithGaussian(m, size(m,1), targetSize);
     case 'crossedgratings'
-        for i=1:numel(p.targetOrientations)
+        for i=1:numel(p.targetOrientation)
             m(:,:,i) = buildColorGrating(pixelsPerDegree, p.imSize, ...
-                p.spatialFrequency, p.targetOrientations(i), 0, p.maskContrast, 0, 'bw');
+                p.spatialFrequency, p.targetOrientation(i), 0, p.maskContrast, 0, 'bw');
         end
-        m = sum(m,3)./numel(p.targetOrientations);
+        m = sum(m,3)./numel(p.targetOrientation);
+        mask = maskWithGaussian(m, size(m,1), targetSize);
+    case 'hvgratings'
+        hv = [0 90];
+        for i=1:numel(hv)
+            m(:,:,i) = buildColorGrating(pixelsPerDegree, p.imSize, ...
+                p.spatialFrequency, hv(i), 0, p.maskContrast, 0, 'bw');
+        end
+        m = sum(m,3)./numel(hv);
         mask = maskWithGaussian(m, size(m,1), targetSize);
     case 'filterednoise'
         m = rand(size(t));
