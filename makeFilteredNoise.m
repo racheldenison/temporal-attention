@@ -1,12 +1,12 @@
 function filteredNoiseIm = makeFilteredNoise(imSize, contrast, ...
     orientation, orientBandwidth, ...
     spatialFrequency, sfBandwidth, ...
-    pixelsPerDegree)
+    pixelsPerDegree, maskWithAperture)
 
 % function filteredNoiseIm = makeFilteredNoise(imSize, contrast, ...
 %     orientation, orientBandwidth, ...
 %     spatialFrequency, sfBandwidth, ...
-%     pixelsPerDegree)
+%     pixelsPerDegree, maskWithAperture)
 %
 % INPUTS:
 % imSize is the 1-element image size in degrees
@@ -16,6 +16,10 @@ function filteredNoiseIm = makeFilteredNoise(imSize, contrast, ...
 % spatialFrequency is the main spatial frequency in cpd
 % sfBandwidth is the width of the spatial frequency bandwidth in cpd
 % pixelsPerDegree is pixels per degree of visual angle
+% maskWithAperture is 1 if want to mask with an aperture, 0 if not. Note
+%   that the imSize will always determine the size of the visible noise
+%   patch. If we mask with an aperture, the size of the entire image will be
+%   1.3 times larger than if we don't (the aperture is added around the noise patch).
 
 %% example inputs
 if nargin==0
@@ -26,6 +30,7 @@ if nargin==0
     spatialFrequency = 4;
     sfBandwidth = .5;
     pixelsPerDegree = 100;
+    maskWithAperture = 1;
 end
 
 % viewDist = 60;
@@ -48,16 +53,20 @@ sigma=1/3*6;
 smoothfilter = 1*exp((-2.77*x1.^2)/(2.35*sigma)^2).*exp((-2.77*y1.^2)/(2.35*sigma)^2); 
 
 %% make aperture
-ap = ones(round(sz * 1.3), round(sz * 1.3));
-center = sz * 1.3/2;
-for i=1:sz * 1.3
-    for j=1:sz * 1.3
-        R(i,j)=sqrt(((i-center).^2)+((j-center).^2));
+if maskWithAperture
+    ap = ones(round(sz * 1.3), round(sz * 1.3));
+    center = sz * 1.3/2;
+    for i=1:sz * 1.3
+        for j=1:sz * 1.3
+            R(i,j)=sqrt(((i-center).^2)+((j-center).^2));
+        end
     end
+    out_index_L=find(R>sz/2);
+    ap(out_index_L) = 0;
+    aperture = filter2(fspecial('gaussian', round(sz/2), round(sz/8)), ap);
+else
+    aperture = ones(sz);
 end
-out_index_L=find(R>sz/2);
-ap(out_index_L) = 0;
-aperture = filter2(fspecial('gaussian', round(sz/2), round(sz/8)), ap);
 
 %% make filters
 oFilter = OrientationBandpass(length(aperture), orientation - orientBandwidth/2, orientation + orientBandwidth/2);

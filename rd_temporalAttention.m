@@ -196,12 +196,15 @@ switch p.maskType
         m = sum(m,3)./numel(hv);
         mask = maskWithGaussian(m, size(m,1), targetSize);
     case 'filterednoise'
-        m = rand(size(t));
-        f = lowpassfilter(size(m), 0.15, 5);
-        m = imifft(imfft(m).*f);
-%         m = (m-min(m(:))) ./ (max(m(:)-min(m(:)))); % rescale
-        m = histeq(m); % basically increases the contrast
-        mask = (m-0.5)*p.maskContrast + 0.5;
+%         m = rand(size(t));
+%         f = lowpassfilter(size(m), 0.15, 5);
+%         m = imifft(imfft(m).*f);
+% %         m = (m-min(m(:))) ./ (max(m(:)-min(m(:)))); % rescale
+%         m = histeq(m); % basically increases the contrast
+%         mask = (m-0.5)*p.maskContrast + 0.5;
+        m = makeFilteredNoise(p.imSize(1), p.maskContrast, ...
+            0, 180, p.spatialFrequency, 2, pixelsPerDegree, 0);
+        mask = maskWithGaussian(m, size(m,1), targetSize);
     otherwise
         error('maskType not recognized')
 end
