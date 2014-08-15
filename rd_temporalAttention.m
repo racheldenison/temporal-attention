@@ -528,6 +528,23 @@ while trialCounter <= nTrials
     end
     
     % Present images
+    if p.forwardMask
+        % mask 1 - forward mask
+        DrawFormattedText(window, 'x', 'center', 'center', white);
+        drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
+        Screen('DrawTexture', window, maskTex, [], imRect);
+        timeMask1f = Screen('Flip', window, timeCue + p.soas(1) - p.maskSOA - slack);
+        
+        % blank
+        Screen('FillRect', window, white*p.backgroundColor);
+        DrawFormattedText(window, 'x', 'center', 'center', white);
+        drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
+        timeMaskBlank1f = Screen('Flip', window, timeMask1f + p.maskDur - slack);
+    else
+        timeMask1f = NaN;
+        timeMaskBlank1f = NaN;
+    end
+    
     % target 1
     DrawFormattedText(window, 'x', 'center', 'center', white);
     drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
@@ -547,7 +564,7 @@ while trialCounter <= nTrials
         timeBlank1 = NaN;
     end
     
-    % mask 1
+    % mask 1 - backward mask
     DrawFormattedText(window, 'x', 'center', 'center', white);
     drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
     Screen('DrawTexture', window, maskTex, [], imRect);
@@ -574,6 +591,23 @@ while trialCounter <= nTrials
         end
     end
     
+    % mask 2 - forward mask
+    if p.forwardMask
+        DrawFormattedText(window, 'x', 'center', 'center', white);
+        drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
+        Screen('DrawTexture', window, maskTex, [], imRect);
+        timeMask2f = Screen('Flip', window, timeCue + p.soas(2) - p.maskSOA - slack);
+        
+        % blank
+        Screen('FillRect', window, white*p.backgroundColor);
+        DrawFormattedText(window, 'x', 'center', 'center', white);
+        drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
+        timeMaskBlank2f = Screen('Flip', window, timeMask2f + p.maskDur - slack);
+    else
+        timeMask2f = NaN;
+        timeMaskBlank2f = NaN;
+    end
+    
     % target 2
     DrawFormattedText(window, 'x', 'center', 'center', white);
     drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
@@ -593,7 +627,7 @@ while trialCounter <= nTrials
         timeBlank2 = NaN;
     end
     
-    % mask 2
+    % mask 2 - backward mask
     DrawFormattedText(window, 'x', 'center', 'center', white);
     drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
     Screen('DrawTexture', window, maskTex, [], imRect);
@@ -692,10 +726,14 @@ while trialCounter <= nTrials
     % Store timing
     timing.timeFix(trialIdx,1) = timeFix;
     timing.timeCue(trialIdx,1) = timeCue;
+    timing.timeMask1f(trialIdx,1) = timeMask1f;
+    timing.timeMaskBlank1f(trialIdx,1) = timeMaskBlank1f;
     timing.timeIm1(trialIdx,1) = timeIm1;
     timing.timeBlank1(trialIdx,1) = timeBlank1;
     timing.timeMask1(trialIdx,1) = timeMask1;
     timing.timeMaskBlank1(trialIdx,1) = timeMaskBlank1;
+    timing.timeMask2f(trialIdx,1) = timeMask2f;
+    timing.timeMaskBlank2f(trialIdx,1) = timeMaskBlank2f;
     timing.timeIm2(trialIdx,1) = timeIm2;
     timing.timeBlank2(trialIdx,1) = timeBlank2;
     timing.timeMask2(trialIdx,1) = timeMask2;

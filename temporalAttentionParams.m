@@ -53,7 +53,7 @@ p.maskDur = 1/100; % 1/60, 3/60
 p.respCueSOA = p.soas(2) + 0.5;
 p.respGoSOA = 0; % 0.6 % time between resp cue onset and go onset. set to zero for no go cue.
 p.iti = 0.5; % inter-trial interval (also, the duration of the feedback symbol)
-p.eyeSlack = 0.1; % cushion between last fixation check and next stimulus presentation
+p.eyeSlack = 0.12; % cushion between last fixation check and next stimulus presentation
 
 % Images
 p.imPos = [4 4];
@@ -106,6 +106,7 @@ end
 % Masks
 p.maskType = 'none'; % none, whitenoise, verticalgrating, crossedgratings, filterednoise
 p.maskContrast = 1;
+p.forwardMask = 1; % 1 to use forward mask, 0 for no forward mask
 
 % Sounds
 p.Fs = 44100;
