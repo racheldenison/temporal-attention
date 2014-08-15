@@ -202,9 +202,9 @@ switch p.maskType
 % %         m = (m-min(m(:))) ./ (max(m(:)-min(m(:)))); % rescale
 %         m = histeq(m); % basically increases the contrast
 %         mask = (m-0.5)*p.maskContrast + 0.5;
-        m = makeFilteredNoise(p.imSize(1), p.maskContrast, ...
-            0, 180, p.spatialFrequency, 2, pixelsPerDegree, 0);
-        mask = maskWithGaussian(m, size(m,1), targetSize);
+        mask = makeFilteredNoise(p.imSize(1)/1.3, p.maskContrast, ...
+            0, 180, p.spatialFrequency, 2, pixelsPerDegree, 1);
+%         mask = maskWithGaussian(m, size(m,1), targetSize);
     otherwise
         error('maskType not recognized')
 end
@@ -533,7 +533,7 @@ while trialCounter <= nTrials
         DrawFormattedText(window, 'x', 'center', 'center', white);
         drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
         Screen('DrawTexture', window, maskTex, [], imRect);
-        timeMask1f = Screen('Flip', window, timeCue + p.soas(1) - p.maskSOA - slack);
+        timeMask1f = Screen('Flip', window, timeCue + p.soas(1) - p.forwardMaskSOA - slack);
         
         % blank
         Screen('FillRect', window, white*p.backgroundColor);
@@ -596,7 +596,7 @@ while trialCounter <= nTrials
         DrawFormattedText(window, 'x', 'center', 'center', white);
         drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
         Screen('DrawTexture', window, maskTex, [], imRect);
-        timeMask2f = Screen('Flip', window, timeCue + p.soas(2) - p.maskSOA - slack);
+        timeMask2f = Screen('Flip', window, timeCue + p.soas(2) - p.forwardMaskSOA - slack);
         
         % blank
         Screen('FillRect', window, white*p.backgroundColor);
