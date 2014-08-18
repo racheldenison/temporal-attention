@@ -89,7 +89,7 @@ end
 
 % Check refresh rate
 flipInterval = Screen('GetFlipInterval', window); % frame duration (s)
-if abs(flipInterval - p.refRate) > 0.001
+if abs(flipInterval - p.refRate) > 0.001 && ~strcmp(subjectID,'test')
     error('Refresh rate is different from requested!')
 end
 
@@ -196,15 +196,10 @@ switch p.maskType
         m = sum(m,3)./numel(hv);
         mask = maskWithGaussian(m, size(m,1), targetSize);
     case 'filterednoise'
-%         m = rand(size(t));
-%         f = lowpassfilter(size(m), 0.15, 5);
-%         m = imifft(imfft(m).*f);
-% %         m = (m-min(m(:))) ./ (max(m(:)-min(m(:)))); % rescale
-%         m = histeq(m); % basically increases the contrast
-%         mask = (m-0.5)*p.maskContrast + 0.5;
-        mask = makeFilteredNoise(p.imSize(1)/1.3, p.maskContrast, ...
-            0, 180, p.spatialFrequency, 2, pixelsPerDegree, 1);
-%         mask = maskWithGaussian(m, size(m,1), targetSize);
+        for i=1:100
+            mask{i} = makeFilteredNoise(p.imSize(1)/1.3, p.maskContrast, ...
+                0, 180, p.spatialFrequency, 2, pixelsPerDegree, 1);
+        end
     otherwise
         error('maskType not recognized')
 end
@@ -218,7 +213,13 @@ for iP = 1:numel(p.targetPhases)
     end
 end
 
-maskTex = Screen('MakeTexture', window, mask*white);
+if iscell(mask)
+    for i=1:numel(mask)
+        maskTexs(i) = Screen('MakeTexture', window, mask{i}*white);
+    end
+else
+    maskTexs = Screen('MakeTexture', window, mask*white);
+end
 
 % Make the rects for placing the images
 imSize = size(target{1,1},1);
@@ -456,9 +457,13 @@ while trialCounter <= nTrials
     end
     respTone = p.cueTones(respInterval,:);
     
-    % Select textures
+    % Select target textures
     tex1 = targetTex(tcCond,ts1Cond,ph(1));
     tex2 = targetTex(tcCond,ts2Cond,ph(2));
+    
+    % Select mask texture randomly
+    maskIdx = randi(numel(maskTexs));
+    maskTex = maskTexs(maskIdx);
     
     % Set rotation based on staircase (bypass previous)
     if p.staircase
