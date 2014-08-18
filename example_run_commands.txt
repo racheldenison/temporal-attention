@@ -1,0 +1,14 @@
+EXAMPLE RUNS
+
+large tilt for practice, neutral only
+rd_temporalAttention('rdPilot_sandwich_tilt7_mc100_mdur10_msoa60_tc64_soa1000-1250_NEUTRAL_run01')
+
+staircase, neutral only, 2 reps
+rd_temporalAttention('rdPilot_sandwich_STAIRCASE_mc100_mdur10_msoa60_tc64_soa1000-1250_run01')
+
+all conditions, just do 1 block for practice (then quit)
+rd_temporalAttention('rdPilot_sandwich_tilt4_mc100_mdur10_msoa60_tc64_soa1000-1250_PRAC1')
+
+2 runs, all conditions, 1 block each
+rd_temporalAttention('rdPilot_sandwich_tilt4_mc100_mdur10_msoa60_tc64_soa1000-1250_run01')
+rd_temporalAttention('rdPilot_sandwich_tilt4_mc100_mdur10_msoa60_tc64_soa1000-1250_run02')
