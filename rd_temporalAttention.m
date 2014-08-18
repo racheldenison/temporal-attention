@@ -592,7 +592,9 @@ while trialCounter <= nTrials
     end
     
     % mask 2 - forward mask
-    if p.forwardMask
+    % to display the T2 forward mask, the mask must be scheduled to start
+    % *after* the end of the T1 backward mask
+    if p.forwardMask && (timeCue + p.soas(2) - p.forwardMaskSOA) > (timeMask1 + p.maskDur)
         DrawFormattedText(window, 'x', 'center', 'center', white);
         drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
         Screen('DrawTexture', window, maskTex, [], imRect);
