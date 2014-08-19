@@ -265,6 +265,15 @@ if plotTimingFigs
     xlabel('cue-im2 SOA (s)')
     ylabel('number of trials')
     
+%     tfig(3) = figure('Position',[1 1 700 300]);
+%     fnames = fieldnames(timing.dur);
+%     nFields = numel(fnames);
+%     for iField = 1:nFields
+%         subplot(nFields,1,iField)
+%         plot(timing.dur.(fnames{iField}))
+%         ylim([mean(timing.dur.(fnames{iField}))-0.01 mean(timing.dur.(fnames{iField}))+0.01])
+%     end
+
     %% Save timing figs
     if saveTimingFigs
         figNames = {'timing','timingHist'};
