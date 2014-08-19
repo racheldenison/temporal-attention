@@ -16,7 +16,7 @@ switch p.testingLocation
         p.screenSize = [40 30];
         p.screenRes = [1024 768];
         p.viewDist = 56;
-        p.eyeTracking = 0; 
+        p.eyeTracking = 1; 
     otherwise
         error('Testing location not found in temporalAttentionParams.')
 end     
@@ -44,14 +44,14 @@ p.propValid = nnz(p.cueValidityFactor==1)./nnz(p.cueValidityFactor<3);
 p.propNeutral = nnz(p.cueValidityFactor==3)./numel(p.cueValidityFactor);
 
 % Timing
-p.soas = [1000 1250]/1000; % [short long]
+p.soas = [1000 1300]/1000; % [short long]
 p.preCueDur = 0.75; % time between fixation onset and cue
 p.cueDur = 0.2;
 p.targetDur = 3/100; % 30 ms / 33 ms
 p.maskSOA = 6/100; % 4/60 time between target onset and backward mask onset 
 p.maskDur = 1/100; % 1/60, 3/60
 p.respCueSOA = p.soas(2) + 0.5;
-p.respGoSOA = 0; % 0.6 % time between resp cue onset and go onset. set to zero for no go cue.
+p.respGoSOA = 0.6; % 0.6 % time between resp cue onset and go onset. set to zero for no go cue.
 p.iti = 0.5; % inter-trial interval (also, the duration of the feedback symbol)
 p.eyeSlack = 0.12; % cushion between last fixation check and next stimulus presentation
 
@@ -104,7 +104,7 @@ switch p.rotateTarget
 end
 
 % Masks
-p.maskType = 'filterednoise'; % none, whitenoise, verticalgrating, crossedgratings, filterednoise
+p.maskType = 'none'; % none, whitenoise, verticalgrating, crossedgratings, filterednoise
 p.maskContrast = 1;
 p.forwardMask = 0; % 1 to use forward mask, 0 for no forward mask
 p.forwardMaskSOA = p.maskSOA - p.targetDur + p.maskDur; % equates ISIs between targets and masks
