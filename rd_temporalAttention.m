@@ -683,6 +683,9 @@ while trialCounter <= nTrials
         [secs, keyCode] = KbWait(devNum);
         rt = secs - timeRespCue;
         responseKey = find(p.keyCodes==find(keyCode));
+        if numel(responseKey)>1 % if more than one key was pressed simultaneously
+            responseKey = [];
+        end
     end
     response = p.targetStates(responseKey);
     if p.eyeTracking

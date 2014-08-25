@@ -8,7 +8,7 @@ contrast = 64;
 soa1 = [1000 1000 1000 1000 1000];
 soa2 = [1100 1150 1200 1250 1300];
 t1t2soa = soa2 - soa1;
-run = 8;
+run = 18;
 
 cleanRT = 0;
 
