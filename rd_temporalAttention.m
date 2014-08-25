@@ -403,6 +403,7 @@ Screen('Flip', window);
 KbWait(devNum);
 
 % Trials
+eyeSkip = zeros(size(trials,1),1); % trials skipped due to an eye movement, same size as trials matrix
 lastFewAcc = [];
 stairIdx = numel(p.stairs); % start easy
 timing.startTime = GetSecs;
@@ -411,6 +412,9 @@ while trialCounter <= nTrials
     WaitSecs(p.iti);
     
     % Initialize for eye tracking trial breaks
+    if trialCounter>1
+        eyeSkip(trialIdx) = stopThisTrial; % this is for the previous trial
+    end
     stopThisTrial = 0;
     
     % Current trial number
@@ -770,7 +774,11 @@ while trialCounter <= nTrials
         if blockStartTrial < 0 % we are doing less than one block
             blockStartTrial = 1;
         end
-        blockAcc = mean(trials(trialOrder(blockStartTrial:iTrial),correctIdx))
+        inBlock = zeros(size(trials,1),1);
+        inBlock(trialOrder(blockStartTrial:iTrial)) = 1;
+        completedInBlock = inBlock & ~eyeSkip;
+        nTrialsCompletedInBlock = nnz(completedInBlock)
+        blockAcc = mean(trials(completedInBlock,correctIdx))
         
         accMessage = sprintf('Accuracy: %d%%', round(blockAcc*100));
         blockMessage = sprintf('%s You''ve completed %d of %d blocks.', highpraise, ceil(iTrial/p.nTrialsPerBlock), ceil(nTrials/p.nTrialsPerBlock));

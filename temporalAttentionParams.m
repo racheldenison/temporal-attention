@@ -112,7 +112,7 @@ p.forwardMaskSOA = p.maskSOA - p.targetDur + p.maskDur; % equates ISIs between t
 % Sounds
 p.Fs = 44100;
 % p.cueFreqs = [784 523]; % [higher G = target 1, lower C = target 2]
-p.cueFreqs = [1046.5 440];
+p.cueFreqs = [1046.5 440]; % [higher high C = target 1, lower A = target 2]
 for iTone = 1:numel(p.cueFreqs)
     tone = MakeBeep(p.cueFreqs(iTone), p.cueDur, p.Fs);
     p.cueTones(iTone,:) = applyEnvelope(tone, p.Fs);
