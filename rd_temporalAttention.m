@@ -403,6 +403,7 @@ Screen('Flip', window);
 KbWait(devNum);
 
 % Trials
+block = 1; % this is only to still display a break message if the last trial in a block is skipped due to fixation break
 eyeSkip = zeros(size(trials,1),1); % trials skipped due to an eye movement, same size as trials matrix
 lastFewAcc = [];
 stairIdx = numel(p.stairs); % start easy
@@ -762,7 +763,9 @@ while trialCounter <= nTrials
     
     save('data/TEMP') % saves the workspace on each trial
     
-    if mod(iTrial,p.nTrialsPerBlock)==0 || iTrial==nTrials
+    if mod(iTrial,p.nTrialsPerBlock)==0 || iTrial==nTrials || iTrial>p.nTrialsPerBlock*block
+        block = block+1; % this is only to still display a break message if the last trial in a block is skipped due to fixation break
+        
         % Save workspace if practice block (since we might quit after just
         % one block)
         if ~isempty(strfind(subjectID,'PRAC'))
