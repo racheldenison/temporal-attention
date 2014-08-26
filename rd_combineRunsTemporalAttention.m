@@ -1,9 +1,9 @@
 % rd_combineRunsTemporalAttention.m
 
 %% setup
-subject = 'rd_cbD6_tc64_soa1000-1300';
-runs = 1:3;
-combinedRun = 18;
+subject = 'rd_cbD6_tc64_soa1000-1400';
+runs = 2:3;
+combinedRun = 9;
 nRuns = numel(runs);
 
 saveData = 1;
