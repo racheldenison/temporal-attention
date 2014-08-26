@@ -10,6 +10,9 @@ saveFigs = 1;
 plotTimingFigs = 1;
 saveTimingFigs = 1;
 
+% workspaceFile = [pathToExpt('data') '/pilot/ad/adPilot_cb_tc64-100_soa1000-1250_run01_WORKSPACE.mat'];
+workspaceFile = [];
+
 p = temporalAttentionParams;
 
 if strcmp(subjectID,'test')
@@ -414,6 +417,16 @@ lastFewAcc = [];
 stairIdx = numel(p.stairs); % start easy
 timing.startTime = GetSecs;
 trialCounter = 1;
+
+% Option to load a previous run from a saved workspace file (the TEMP.mat file)
+% note this will overwrite most of the settings generated above
+if ~isempty(workspaceFile)
+    load(workspaceFile)
+    fprintf('\nLOADING FROM WORKSPACE FILE:\n%s\n\n', workspaceFile)
+    subjectID(end+1) = 'W';
+end
+
+% Present trials
 while trialCounter <= nTrials
     WaitSecs(p.iti);
     
