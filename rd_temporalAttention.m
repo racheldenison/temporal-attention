@@ -196,9 +196,14 @@ switch p.maskType
         m = sum(m,3)./numel(hv);
         mask = maskWithGaussian(m, size(m,1), targetSize);
     case 'filterednoise'
-        for i=1:100
-            mask{i} = makeFilteredNoise(p.imSize(1)/1.3, p.maskContrast, ...
+        idx = 1;
+        while idx <= 100
+            masktemp = makeFilteredNoise(p.imSize(1)/1.3, p.maskContrast, ...
                 0, 180, p.spatialFrequency, 2, pixelsPerDegree, 1);
+            if mean(masktemp(:))<0.51 && mean(masktemp(:))>0.49
+                mask{idx} = masktemp;
+                idx = idx+1;
+            end
         end
     otherwise
         error('maskType not recognized')
