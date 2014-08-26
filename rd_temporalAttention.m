@@ -768,9 +768,7 @@ while trialCounter <= nTrials
     
     save('data/TEMP') % saves the workspace on each trial
     
-    if mod(iTrial,p.nTrialsPerBlock)==0 || iTrial==nTrials || iTrial>p.nTrialsPerBlock*block
-        block = block+1; % this is only to still display a break message if the last trial in a block is skipped due to fixation break
-        
+    if mod(iTrial,p.nTrialsPerBlock)==0 || iTrial==nTrials || iTrial>p.nTrialsPerBlock*block        
         % Save workspace if practice block (since we might quit after just
         % one block)
         if ~isempty(strfind(subjectID,'PRAC'))
@@ -789,7 +787,7 @@ while trialCounter <= nTrials
         blockAcc = mean(trials(completedInBlock,correctIdx))
         
         accMessage = sprintf('Accuracy: %d%%', round(blockAcc*100));
-        blockMessage = sprintf('%s You''ve completed %d of %d blocks.', highpraise, ceil(iTrial/p.nTrialsPerBlock), ceil(nTrials/p.nTrialsPerBlock));
+        blockMessage = sprintf('%s You''ve completed %d of %d blocks.', highpraise, block, ceil(nTrials/p.nTrialsPerBlock));
         if iTrial==nTrials
             keyMessage = '';
         else
@@ -803,6 +801,8 @@ while trialCounter <= nTrials
         if iTrial < nTrials
             KbWait(devNum);
         end
+        
+        block = block+1; % keep track of block for block message only
     end
 end
 timing.endTime = GetSecs;
