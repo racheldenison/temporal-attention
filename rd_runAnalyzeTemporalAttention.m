@@ -1,6 +1,6 @@
 % rd_runAnalyzeTemporalAttention.m
 
-subject = 'vpPilot_cb_tc64-100_soa1000-1250';
+subject = 'maPilot_cb_tilt5_soa1000-1250';
 run = 9;
 
 subjectID = sprintf('%s_run%02d', subject, run);
@@ -11,9 +11,9 @@ plotTimingFigs = 0;
 saveTimingFigs = 0;
 cleanRT = 0;
 
-% dataDir = pathToExpt('data');
+dataDir = pathToExpt('data');
 % dataDir = 'data';
-dataDir = [pathToExpt('data') '/pilot/vp'];
+% dataDir = [pathToExpt('data') '/pilot/vp'];
 
 figDir = pathToExpt('figures');
 
