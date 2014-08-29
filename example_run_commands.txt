@@ -12,3 +12,8 @@ rd_temporalAttention('rdPilot_sandwich_tilt4_mc100_mdur10_msoa60_tc64_soa1000-12
 2 runs, all conditions, 1 block each
 rd_temporalAttention('rdPilot_sandwich_tilt4_mc100_mdur10_msoa60_tc64_soa1000-1250_run01')
 rd_temporalAttention('rdPilot_sandwich_tilt4_mc100_mdur10_msoa60_tc64_soa1000-1250_run02')
+
+
+
+For testing masks:
+rdPilot_sandwich_tilt4_mc100_mdur30_msoa100_tc64_soa1000-1250_run01
