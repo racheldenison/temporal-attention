@@ -176,7 +176,8 @@ end
 % Make mask
 switch p.maskType
     case 'none'
-        mask = ones(size(t))*p.backgroundColor;
+%         mask = ones(size(t))*p.backgroundColor;
+        mask = ones(size(t)); % white so that it will be obvious if it is being presented when it shouldn't be
     case 'whitenoise'
         mask = (rand(size(t))-0.5)*p.maskContrast + 0.5;
     case 'verticalgrating'
@@ -556,7 +557,7 @@ while trialCounter <= nTrials
     end
     
     % Present images
-    if p.forwardMask
+    if p.forwardMask && ~strcmp(p.maskType,'none')
         % mask 1 - forward mask
         DrawFormattedText(window, 'x', 'center', 'center', white);
         drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
@@ -591,18 +592,23 @@ while trialCounter <= nTrials
     else
         timeBlank1 = NaN;
     end
-    
-    % mask 1 - backward mask
-    DrawFormattedText(window, 'x', 'center', 'center', white);
-    drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
-    Screen('DrawTexture', window, maskTex, [], imRect);
-    timeMask1 = Screen('Flip', window, timeIm1 + p.maskSOA - slack);
 
-    % blank
-    Screen('FillRect', window, white*p.backgroundColor);
-    DrawFormattedText(window, 'x', 'center', 'center', white);
-    drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
-    timeMaskBlank1 = Screen('Flip', window, timeMask1 + p.maskDur - slack);
+    % mask 1 - backward mask
+    if ~strcmp(p.maskType,'none')
+        DrawFormattedText(window, 'x', 'center', 'center', white);
+        drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
+        Screen('DrawTexture', window, maskTex, [], imRect);
+        timeMask1 = Screen('Flip', window, timeIm1 + p.maskSOA - slack);
+        
+        % blank
+        Screen('FillRect', window, white*p.backgroundColor);
+        DrawFormattedText(window, 'x', 'center', 'center', white);
+        drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
+        timeMaskBlank1 = Screen('Flip', window, timeMask1 + p.maskDur - slack);
+    else
+        timeMask1 = NaN;
+        timeMaskBlank1 = NaN;
+    end
     
     % Check for eye movements
     if p.eyeTracking
@@ -622,7 +628,7 @@ while trialCounter <= nTrials
     % mask 2 - forward mask
     % to display the T2 forward mask, the mask must be scheduled to start
     % *after* the end of the T1 backward mask
-    if p.forwardMask && (timeCue + p.soas(2) - p.forwardMaskSOA) > (timeMask1 + p.maskDur)
+    if p.forwardMask && (timeCue + p.soas(2) - p.forwardMaskSOA) > (timeMask1 + p.maskDur) && ~strcmp(p.maskType,'none')
         DrawFormattedText(window, 'x', 'center', 'center', white);
         drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
         Screen('DrawTexture', window, maskTex, [], imRect);
@@ -658,16 +664,21 @@ while trialCounter <= nTrials
     end
     
     % mask 2 - backward mask
-    DrawFormattedText(window, 'x', 'center', 'center', white);
-    drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
-    Screen('DrawTexture', window, maskTex, [], imRect);
-    timeMask2 = Screen('Flip', window, timeIm2 + p.maskSOA - slack);
-
-    % blank
-    Screen('FillRect', window, white*p.backgroundColor);
-    DrawFormattedText(window, 'x', 'center', 'center', white);
-    drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
-    timeMaskBlank2 = Screen('Flip', window, timeMask2 + p.maskDur - slack);
+    if ~strcmp(p.maskType,'none')
+        DrawFormattedText(window, 'x', 'center', 'center', white);
+        drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
+        Screen('DrawTexture', window, maskTex, [], imRect);
+        timeMask2 = Screen('Flip', window, timeIm2 + p.maskSOA - slack);
+        
+        % blank
+        Screen('FillRect', window, white*p.backgroundColor);
+        DrawFormattedText(window, 'x', 'center', 'center', white);
+        drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
+        timeMaskBlank2 = Screen('Flip', window, timeMask2 + p.maskDur - slack);
+    else
+        timeMask2 = NaN;
+        timeMaskBlank2 = NaN;
+    end
     
     % Check for eye movements
     if p.eyeTracking
