@@ -1,20 +1,20 @@
 function [accMean rtMean t1t2soa p dprime crit eff] = rd_plotTemporalAttentionMultiSOA(subjectInit)
 
-subjectInit = 'rd';
+% subjectInit = 'vp';
 exptName = 'cbD6'; % 'cbD6'
 tilt = '*';
 contrast = 64;
 
-soa1 = [1000 1000 1000 1000 1000 1000 1000 1000 1000];
-soa2 = [1100 1150 1200 1250 1300 1350 1400 1450 1500];
+soa1 = [1000 1000 1000 1000 1000 1000 1000 1000 1000 1000];
+soa2 = [1100 1150 1200 1250 1300 1350 1400 1450 1500 1800];
 t1t2soa = soa2 - soa1;
 run = 18;
 
 cleanRT = 0;
 
+expName = 'E2_SOA_cbD6';
 dataDir = pathToExpt('data');
-% dataDir = sprintf('%s/E1_SOA', dataDir);
-% dataDir = sprintf('%s/pilot/%s', dataDir, subjectInit(1:2));
+dataDir = sprintf('%s/%s/%s', dataDir, expName, subjectInit(1:2));
 
 % subjectID = sprintf('%s_%s_tilt%s_tc%d', ...
 %     subjectInit, exptName, tilt, contrast);

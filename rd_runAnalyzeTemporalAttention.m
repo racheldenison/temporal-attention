@@ -1,6 +1,6 @@
 % rd_runAnalyzeTemporalAttention.m
 
-subject = 'maPilot_cb_tilt5_soa1000-1250';
+subject = 'tyPilot_cb_tilt3_tc64-100_soa1000-1250';
 run = 9;
 
 subjectID = sprintf('%s_run%02d', subject, run);
@@ -11,16 +11,18 @@ plotTimingFigs = 0;
 saveTimingFigs = 0;
 cleanRT = 0;
 
-dataDir = pathToExpt('data');
+expName = 'E0_cb';
 % dataDir = 'data';
-% dataDir = [pathToExpt('data') '/pilot/vp'];
-
+% figDir = 'figures';
+dataDir = pathToExpt('data');
 figDir = pathToExpt('figures');
+dataDir = sprintf('%s/%s/%s', dataDir, expName, subject(1:2));
+figDir = sprintf('%s/%s/%s', figDir, expName, subject(1:2));
 
 % load data file
 dataFile = dir(sprintf('%s/%s_T*', dataDir, subjectID));
 if numel(dataFile)~=1
-    fprintf('/n%s/%s*', dataDir, subjectID)
+    fprintf('\n%s/%s*', dataDir, subjectID)
     error('more or fewer than 1 matching data file')
 else
     load(sprintf('%s/%s', dataDir, dataFile.name))
