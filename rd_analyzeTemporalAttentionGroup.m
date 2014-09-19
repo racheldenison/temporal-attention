@@ -1,9 +1,9 @@
 % rd_analyzeTemporalAttentionGroup.m
 
 exptName = 'cb';
-subjectInits = {'rd','ld','id','bl','ad','vp'};
+subjectInits = {'rd','ld','id','bl','ad','vp','ma','ty'};
 tilt = '*';
-contrast = '64-1*'; % '64'; % 
+contrast = '*'; % '64'; % 
 contrastIdx = 1; % only plot one contrast at a time
 soa1 = 1000;
 soa2 = 1250;
@@ -13,7 +13,7 @@ run = 9;
 saveFigs = 1;
 
 nSubjects = numel(subjectInits);
-exptStr = sprintf('%s_*tc%s_soa%d-%d*', ...
+exptStr = sprintf('%s_*%s_soa%d-%d*', ...
     exptName, contrast, soa1, soa2);
 
 % dataDir = pathToExpt('data');
@@ -23,7 +23,7 @@ exptStr = sprintf('%s_*tc%s_soa%d-%d*', ...
 for iSubject = 1:nSubjects 
     subjectInit = subjectInits{iSubject};
     
-    dataDir = sprintf('%s/pilot/%s', pathToExpt('data'), subjectInit(1:2));
+    dataDir = sprintf('%s/E0_cb/%s', pathToExpt('data'), subjectInit(1:2));
     subjectID = sprintf('%s*_%s', subjectInit, exptStr);
     
     % load data from a given soa
@@ -122,6 +122,7 @@ for iRI = 1:numel(p.respInterval)
     ylabel('acc')
     title(intervalNames{iRI})
     ylim([0.3 max(accMean(:))*1.1])
+    ylim([.3 .9])
     box off
     rd_supertitle(sprintf('%s run %d, contrast = %d%%, N=%d', exptStr, run, tc, nSubjects));
     rd_raiseAxis(gca);
