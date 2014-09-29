@@ -44,14 +44,14 @@ p.propValid = nnz(p.cueValidityFactor==1)./nnz(p.cueValidityFactor<3);
 p.propNeutral = nnz(p.cueValidityFactor==3)./numel(p.cueValidityFactor);
 
 % Timing
-p.soas = [1000 1250]/1000; % [short long]
+p.soas = [1000 1500]/1000; % [short long]
 p.preCueDur = 0.75; % time between fixation onset and cue
 p.cueDur = 0.2;
 p.targetDur = 3/100; % 30 ms / 33 ms
 p.maskSOA = 4/100; % 4/60 time between target onset and backward mask onset %%%% 1/100 to match other runs vp_cbD6
 p.maskDur = 1/100; % 1/60, 3/60
 p.respCueSOA = p.soas(2) + 0.5;
-p.respGoSOA = 0.6; % 0.6 % time between resp cue onset and go onset. set to zero for no go cue.
+p.respGoSOA = 1; % 0.6 % time between resp cue onset and go onset. set to zero for no go cue.
 p.iti = 0.5; % inter-trial interval (also, the duration of the feedback symbol)
 p.eyeSlack = 0.12; % cushion between last fixation check and next stimulus presentation
 
@@ -60,7 +60,7 @@ p.imPos = [4 4];
 p.imSize = [4 4]; % this is the size of the image container that holds the stim
 p.targetSize = 0.5; % 0.5 sigma of gaussian / 1.5 side length of T/L / 1.5 width of triangle
 p.spatialFrequency = 4; % 4
-p.targetOrientation = [-5 5]; % eg. [-10 10]
+p.targetOrientation = [-3 3]; % eg. [-10 10]
 p.targetPhases = 0; % eg. 0, or [0 pi/2 pi 3*pi/2]
 p.TL = [0 0.5]; % [offset-for-T(=0) offset-for-L]
 p.TLLineWidth = 5; % (pixels)
