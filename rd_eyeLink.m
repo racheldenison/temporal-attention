@@ -202,7 +202,7 @@ switch command
         tFix = 0; % how long has the current fixation lasted so far?
         
         t = tstart;
-        while ((t-tstart) < timeout && tFix<=tFixMin)
+        while (((t-tstart) < timeout) && (tFix<=tFixMin))
             % get eye position
             evt = Eyelink('newestfloatsample');
             x = evt.gx(domEye);
