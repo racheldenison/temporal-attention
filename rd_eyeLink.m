@@ -182,8 +182,8 @@ switch command
         cy = in{2}; % y coordinate of screen center
         rad = in{3}; % acceptable fixation radius %%% in px?
         
-        timeout = 2.00; % maximum fixation check time
-        tFixMin = 0.20; % minimum correct fixation time
+        timeout = 3.00; % maximum fixation check time
+        tFixMin = 0.10; % minimum correct fixation time
         
         % determine recorded eye
         evt = Eyelink('newestfloatsample');

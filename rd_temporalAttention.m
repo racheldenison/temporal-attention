@@ -104,7 +104,7 @@ end
 % Load calibration file
 switch p.testingLocation
     case 'CarrascoL1'
-        load('../Displays/0001_james_TrinitonG520_1280x960_57cm_Input1_140129.mat');
+        load('../../Displays/0001_james_TrinitonG520_1280x960_57cm_Input1_140129.mat');
         Screen('LoadNormalizedGammaTable', window, repmat(calib.table,1,3));
         % check gamma table
         gammatable = Screen('ReadNormalizedGammaTable', window);
