@@ -47,6 +47,10 @@ for iSubject = 1:nSubjects
         for iEL = 1:2 % early/late
             accDataAll{iEL}(:,iSubject,iContrast) = results.accMean{iEL}(:,iContrast);
             rtDataAll{iEL}(:,iSubject,iContrast) = results.rtMean{iEL}(:,iContrast);
+            
+            % average across contrasts
+            accDataC{iEL}(:,iSubject) = mean(results.accMean{iEL},2);
+            rtDataC{iEL}(:,iSubject) = mean(results.rtMean{iEL},2);
         end
     end
 end
