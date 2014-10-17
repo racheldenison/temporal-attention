@@ -18,6 +18,12 @@ for iSubject = 1:nSubjects
     end
 end
 
+%% Cuing effect and average across cue validities
+for iEL = 1:numel(accData)
+    accDataCueEff{iEL} = squeeze(accData{iEL}(1,:,:) - accData{iEL}(2,:,:));
+    accDataCueAve{iEL} = squeeze(mean(accData{iEL},1));
+end
+
 %% Group summary stats
 for iEL = 1:numel(accData)
     accMean{iEL} = mean(accData{iEL},3);
@@ -39,6 +45,7 @@ accLims = [0.2 1];
 rtLims = [0.2 1.6];
 dpLims = [-0.5 2.7];
 critLims = [-1 1];
+accDiffLims = [-0.15 0.25];
 soaLims = [t1t2soa(1)-100 t1t2soa(end)+100];
 colors = get(0,'DefaultAxesColorOrder');
 axTitle = '';
@@ -140,3 +147,43 @@ for iRI = 1:numel(p.respInterval)
     rd_raiseAxis(gca);
     rd_supertitle(axTitle);
 end
+
+fig(6) = figure;
+for iRI = 1:numel(p.respInterval)
+    subplot(1,numel(p.respInterval),iRI)
+    hold on
+    plot(soaLims, [0 0], '--k');
+    
+    plot(t1t2soa, accDataCueEff{iRI})
+    plot(t1t2soa, mean(accDataCueEff{iRI},2),'k','LineWidth',2)
+    
+    xlabel('soa')
+    ylabel('cuing effect (accuracy valid-invalid)')
+    title(intervalNames{iRI})
+    xlim(soaLims)
+    ylim(accDiffLims)
+    rd_supertitle(subjectInits);
+    rd_raiseAxis(gca);
+    rd_supertitle(axTitle);
+end
+
+fig(7) = figure;
+for iRI = 1:numel(p.respInterval)
+    subplot(1,numel(p.respInterval),iRI)
+    hold on
+    plot(soaLims, [0 0], '--k');
+    
+    plot(t1t2soa, accDataCueAve{iRI})
+    plot(t1t2soa, mean(accDataCueAve{iRI},2),'k','LineWidth',2)
+    
+    xlabel('soa')
+    ylabel('acc')
+    title(intervalNames{iRI})
+    xlim(soaLims)
+    ylim(accLims)
+    rd_supertitle(subjectInits);
+    rd_raiseAxis(gca);
+    rd_supertitle(axTitle);
+end
+
+
