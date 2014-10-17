@@ -1,23 +1,23 @@
 % rd_runAnalyzeTemporalAttention.m
 
-subject = 'kc_cbD10_tilt3_tc64_soa1000-1500_ALL';
-run = 1;
+subject = 'maPilot_cb_tilt5_soa1000-1250';
+run = 2;
 
 subjectID = sprintf('%s_run%02d', subject, run);
 
 saveData = 0;
-saveFigs = 0;
+saveFigs = 1;
 plotTimingFigs = 0;
 saveTimingFigs = 0;
 cleanRT = 0;
 
-expName = 'E2_cbD6';
-dataDir = 'data';
-figDir = 'figures';
-% dataDir = pathToExpt('data');
-% figDir = pathToExpt('figures');
-% dataDir = sprintf('%s/%s/%s', dataDir, expName, subject(1:2));
-% figDir = sprintf('%s/%s/%s', figDir, expName, subject(1:2));
+expName = 'E0_cb';
+% dataDir = 'data';
+% figDir = 'figures';
+dataDir = pathToExpt('data');
+figDir = pathToExpt('figures');
+dataDir = sprintf('%s/%s/%s', dataDir, expName, subject(1:2));
+figDir = sprintf('%s/%s/%s', figDir, expName, subject(1:2));
 
 % load data file
 dataFile = dir(sprintf('%s/%s_T*', dataDir, subjectID));

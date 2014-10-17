@@ -1,21 +1,21 @@
 % rd_combineRunsTemporalAttention.m
 
 %% setup
-subject = 'kc_cbD6_tilt3_tc64_soa1000-1250_ALL';
-runs = 1:2;
-combinedRun = 9;
+subject = 'hl_cbD6_tilt2_tc64_soa1000-1450';
+runs = 1:3;
+combinedRun = 8;
 nRuns = numel(runs);
 
 saveData = 1;
-saveFigs = 0;
+saveFigs = 1;
 
 expName = 'E2_SOA_cbD6';
-dataDir = 'data';
-figDir = 'figures';
-% dataDir = pathToExpt('data');
-% figDir = pathToExpt('figures');
-% dataDir = sprintf('%s/%s/%s', dataDir, expName, subject(1:2));
-% figDir = sprintf('%s/%s/%s', figDir, expName, subject(1:2));
+% dataDir = 'data';
+% figDir = 'figures';
+dataDir = pathToExpt('data');
+figDir = pathToExpt('figures');
+dataDir = sprintf('%s/%s/%s', dataDir, expName, subject(1:2));
+figDir = sprintf('%s/%s/%s', figDir, expName, subject(1:2));
 
 %% initializations
 subjectID = sprintf('%s_run%02d', subject, combinedRun);

@@ -10,7 +10,7 @@ soa2 = 1250;
 
 run = 9;
 
-saveFigs = 1;
+saveFigs = 0;
 
 nSubjects = numel(subjectInits);
 exptStr = sprintf('%s_*%s_soa%d-%d*', ...
@@ -42,13 +42,28 @@ for iSubject = 1:nSubjects
         rtData{iEL}(:,iSubject) = results.rtMean{iEL}(:,contrastIdx);
     end
     
-    % summary across subjects
-    for iEL = 1:2 % early/late
-        accMean(:,iEL) = mean(accData{iEL},2);
-        accSte(:,iEL) = std(accData{iEL},0,2)./sqrt(nSubjects);
-        rtMean(:,iEL) = mean(rtData{iEL},2);
-        rtSte(:,iEL) = std(rtData{iEL},0,2)./sqrt(nSubjects);
-    end 
+    % also gather all the data for all contrasts
+    for iContrast = 1:numel(expt.p.targetContrasts)
+        for iEL = 1:2 % early/late
+            accDataAll{iEL}(:,iSubject,iContrast) = results.accMean{iEL}(:,iContrast);
+            rtDataAll{iEL}(:,iSubject,iContrast) = results.rtMean{iEL}(:,iContrast);
+        end
+    end
+end
+
+% summary across subjects
+for iEL = 1:2 % early/late
+    accMean(:,iEL) = mean(accData{iEL},2);
+    accSte(:,iEL) = std(accData{iEL},0,2)./sqrt(nSubjects);
+    rtMean(:,iEL) = mean(rtData{iEL},2);
+    rtSte(:,iEL) = std(rtData{iEL},0,2)./sqrt(nSubjects);
+end
+
+for iEL = 1:2 % early/late
+    accMeanAll{iEL} = squeeze(mean(accDataAll{iEL},2));
+    accSteAll{iEL} = squeeze(std(accDataAll{iEL},0,2)./sqrt(nSubjects));
+    rtMeanAll{iEL} = squeeze(mean(rtDataAll{iEL},2));
+    rtSteAll{iEL} = squeeze(std(rtDataAll{iEL},0,2)./sqrt(nSubjects));
 end
 
 p = expt.p;
@@ -145,6 +160,61 @@ for iRI = 1:numel(p.respInterval)
     box off
     rd_supertitle(sprintf('%s run %d, contrast = %d%%, N=%d', exptStr, run, tc, nSubjects));
     rd_raiseAxis(gca);
+end
+
+contrastLims = [p.targetContrasts(1)-0.05 p.targetContrasts(end)+0.05];
+figure
+for iRI = 1:numel(p.respInterval)
+    subplot(1,numel(p.respInterval),iRI)
+    hold on
+    plot(contrastLims, [0.5 0.5], '--k');
+    
+    if numel(p.targetContrasts)>1
+        p1 = errorbar(repmat(p.targetContrasts',1,numel(p.cueValidity)),...
+            accMeanAll{iRI}', accSteAll{iRI}', '.', 'MarkerSize', 20);
+    else
+        for i = 1:length(accMean{iRI})
+            p1(i) = errorbar(p.targetContrasts,...
+                accMeanAll{iRI}(i), accSteAll{iRI}(i), '.', 'MarkerSize', 20);
+            set(p1(i),'color', colors(i,:))
+        end
+    end
+    xlabel('contrast')
+    ylabel('acc')
+    legend(p1, num2str(p.cueValidity'),'location','best')
+    title(intervalNames{iRI})
+    xlim(contrastLims)
+    ylim(accLims)
+    rd_supertitle(sprintf('%s run %d, contrast = %d%%, N=%d', exptStr, run, tc, nSubjects));
+    rd_raiseAxis(gca);
+    rd_supertitle(axTitle);
+end
+
+figure
+rtLims = [0 2];
+for iRI = 1:numel(p.respInterval)
+    subplot(1,numel(p.respInterval),iRI)
+    hold on
+    
+    if numel(p.targetContrasts)>1
+        p1 = errorbar(repmat(p.targetContrasts',1,numel(p.cueValidity)),...
+            rtMeanAll{iRI}', rtSteAll{iRI}', '.', 'MarkerSize', 20);
+    else
+        for i = 1:length(accMean{iRI})
+            p1(i) = errorbar(p.targetContrasts,...
+                rtMeanAll{iRI}(i), rtSteAll{iRI}(i), '.', 'MarkerSize', 20);
+            set(p1(i),'color', colors(i,:))
+        end
+    end
+    xlabel('contrast')
+    ylabel('RT')
+    legend(p1, num2str(p.cueValidity'),'location','best')
+    title(intervalNames{iRI})
+    xlim(contrastLims)
+    ylim(rtLims)
+    rd_supertitle(sprintf('%s run %d, contrast = %d%%, N=%d', exptStr, run, tc, nSubjects));
+    rd_raiseAxis(gca);
+    rd_supertitle(axTitle);
 end
 
 if saveFigs
