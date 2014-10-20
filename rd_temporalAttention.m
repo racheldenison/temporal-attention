@@ -11,6 +11,7 @@ plotTimingFigs = 1;
 saveTimingFigs = 1;
 
 % workspaceFile = [pathToExpt('data') '/pilot/ad/adPilot_cb_tc64-100_soa1000-1250_run01_WORKSPACE.mat'];
+% workspaceFile = 'data/adPilot_cb_tc64-100_soa1000-1250_run01_WORKSPACE.mat';
 workspaceFile = [];
 
 p = temporalAttentionParams;
@@ -432,9 +433,13 @@ trialCounter = 1;
 % Option to load a previous run from a saved workspace file (the TEMP.mat file)
 % note this will overwrite most of the settings generated above
 if ~isempty(workspaceFile)
+    eyeFile0 = eyeFile;
     load(workspaceFile)
     fprintf('\nLOADING FROM WORKSPACE FILE:\n%s\n\n', workspaceFile)
     subjectID(end+1) = 'W';
+    eyeFile = eyeFile0; % use a new eye file
+%     p.forwardMask = 0; % ad only
+%     block = floor(iTrial/p.nTrialsPerBlock); % ad only
 end
 
 % Present trials
