@@ -1,7 +1,7 @@
 % rd_plotTemporalAttentionMultiSOAGroup.m
 
 %% Setup
-subjectInits = {'rd','vp'};
+subjectInits = {'rd','vp','hl'};
 nSubjects = numel(subjectInits);
 groupStr = sprintf('N=%d', nSubjects);
 

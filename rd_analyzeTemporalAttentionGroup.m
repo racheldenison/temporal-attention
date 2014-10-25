@@ -225,3 +225,14 @@ if saveFigs
     figNames = {'indivAcc','indivRT','groupAcc','groupRT'};
     rd_saveAllFigs(fig, figNames, sprintf('groupData_%s_run%02d_TemporalAttention_T1T2all_contrast%d_N%d', exptStr, run, tc, nSubjects))
 end
+
+%% Reshape data for output to R
+acc1 = reshape(accData{1}', nSubjects*3, 1);
+acc2 = reshape(accData{2}', nSubjects*3, 1);
+rt1 = reshape(rtData{1}', nSubjects*3, 1);
+rt2 = reshape(rtData{2}', nSubjects*3, 1);
+
+acc_all = [acc1; acc2];
+rt_all = [rt1; rt2];
+
+
