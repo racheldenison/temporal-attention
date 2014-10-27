@@ -30,7 +30,7 @@ AssertOpenGL;
 %% Display key settings to the experimenter
 fprintf('\nExperiment settings:\n')
 fprintf('tilt = [%1.1f %1.1f]\n', p.targetOrientation(1), p.targetOrientation(2))
-fprintf('soa = %d ms\n\n', 1000*(p.soas(2)-p.soas(1)))
+fprintf('soa = %d ms\n\n', round(1000*(p.soas(2)-p.soas(1))))
 
 ok = input('Settings ok? [n if not]','s');
 if strcmp(ok,'n')
@@ -87,8 +87,8 @@ end
 % end
 
 % Set up window
-% [window rect] = Screen('OpenWindow', screenNumber);
-[window rect] = Screen('OpenWindow', screenNumber, [], [0 0 800 600]);
+[window rect] = Screen('OpenWindow', screenNumber);
+% [window rect] = Screen('OpenWindow', screenNumber, [], [0 0 800 600]);
 white = WhiteIndex(window);  % Retrieves the CLUT color code for white.
 [cx cy] = RectCenter(rect);
 Screen('TextSize', window, p.fontSize);

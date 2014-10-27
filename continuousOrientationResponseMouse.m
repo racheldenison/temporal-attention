@@ -4,9 +4,9 @@ function [angle rt] = continuousOrientationResponseMouse(window, white, targetTe
 angle = floor(180*rand);
 
 % set mouse position and get buttons
-% startX = round(targetRect(1) + targetRect(3)/2);
-% startY = round(targetRect(2) + targetRect(4)/2);
-% SetMouse(startX, startY);
+startX = round(targetRect(1) + targetRect(3)/2);
+startY = round(targetRect(2) + targetRect(4)/2);
+SetMouse(startX, startY);
 [x, y, buttons] = GetMouse(window);
 
 % make sure left mouse button is not pressed to start

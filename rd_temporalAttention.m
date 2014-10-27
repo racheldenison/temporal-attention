@@ -30,7 +30,7 @@ AssertOpenGL;
 %% Display key settings to the experimenter
 fprintf('\nExperiment settings:\n')
 fprintf('tilt = [%1.1f %1.1f]\n', p.targetOrientation(1), p.targetOrientation(2))
-fprintf('soa = %d ms\n\n', 1000*(p.soas(2)-p.soas(1)))
+fprintf('soa = %d ms\n\n', round(1000*(p.soas(2)-p.soas(1))))
 
 ok = input('Settings ok? [n if not]','s');
 if strcmp(ok,'n')

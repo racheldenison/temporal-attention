@@ -1,6 +1,6 @@
 function p = temporalAttentionAdjustParams
 
-p.testingLocation = 'laptop'; % 'CarrascoL1','laptop','desk'
+p.testingLocation = 'CarrascoL1'; % 'CarrascoL1','laptop','desk'
 
 switch p.testingLocation
     case {'laptop','desk'}
@@ -16,7 +16,7 @@ switch p.testingLocation
         p.screenSize = [40 30];
         p.screenRes = [1024 768];
         p.viewDist = 56;
-        p.eyeTracking = 1; 
+        p.eyeTracking = 0; 
     otherwise
         error('Testing location not found in temporalAttentionParams.')
 end     
@@ -24,8 +24,8 @@ end
 p.keyCodes = KbName(p.keyNames);
 p.backgroundColor = 0.5;
 p.goCueColor = 0.75;
-p.nReps = 1;
-p.nTrialsPerBlock = 64;
+p.nReps = 4;
+p.nTrialsPerBlock = 40;
 p.font = 'Verdana';
 p.fontSize = 24;
 p.showPlaceholders = 1;
@@ -44,7 +44,7 @@ p.propValid = nnz(p.cueValidityFactor==1)./nnz(p.cueValidityFactor<3);
 p.propNeutral = nnz(p.cueValidityFactor==3)./numel(p.cueValidityFactor);
 
 % Timing
-p.soas = [1000 1450]/1000; % [short long]
+p.soas = [1000 1250]/1000; % [short long]
 p.preCueDur = 0.75; % time between fixation onset and cue
 p.cueDur = 0.2;
 p.targetDur = 3/100; % 30 ms / 33 ms
