@@ -33,3 +33,6 @@ while ~doneKeyPressed
 end
 timeEnd = GetSecs;
 rt = timeEnd - timeStart;
+
+targetRot = mod(targetRot,180);
+

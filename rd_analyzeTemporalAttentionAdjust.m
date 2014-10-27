@@ -169,8 +169,9 @@ end
 
 %% Plot figs
 intervalNames = {'early','late'};
+errorLims = [0 30];
 accLims = [0 1];
-rtLims = [0 10];
+rtLims = [0 5];
 contrastLims = [p.targetContrasts(1)-0.05 p.targetContrasts(end)+0.05];
 colors = get(0,'DefaultAxesColorOrder');
 
@@ -178,7 +179,6 @@ fig(1) = figure;
 for iRI = 1:numel(p.respInterval)
     subplot(1,numel(p.respInterval),iRI)
     hold on
-    plot(contrastLims, [0.5 0.5], '--k');
     
     if numel(p.targetContrasts)>1
         p1 = errorbar(repmat(p.targetContrasts',1,numel(p.cueValidity)),...
@@ -195,7 +195,7 @@ for iRI = 1:numel(p.respInterval)
     legend(p1, num2str(p.cueValidity'),'location','best')
     title(intervalNames{iRI})
     xlim(contrastLims)
-%     ylim(errorLims)
+    ylim(errorLims)
     rd_supertitle(subjectID);
     rd_raiseAxis(gca);
     rd_supertitle(axTitle);
@@ -205,7 +205,6 @@ fig(2) = figure;
 for iRI = 1:numel(p.respInterval)
     subplot(1,numel(p.respInterval),iRI)
     hold on
-    plot(contrastLims, [0.5 0.5], '--k');
     
     if numel(p.targetContrasts)>1
         p1 = errorbar(repmat(p.targetContrasts',1,numel(p.cueValidity)),...

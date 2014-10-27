@@ -734,18 +734,11 @@ while trialCounter <= nTrials
         timeGoCue = timeRespCue;
     end
     
-    % Collect response    
-    [response rt] = collectContinuousOrientationResponse(...
+    % Collect response   
+    [response rt] = continuousOrientationResponseMouse(...
         window, white, tex0, imRect, phRect, p);
     responseKey = NaN;
-    % unify response to 0-179
-    while response < 0 || response > 179
-        if response < 0
-            response = response + 180;
-        elseif response > 179
-            response = response - 180;
-        end
-    end 
+%     fprintf('orientation = %d, response = %d\n', rot(respInterval), response)
     
     if p.eyeTracking
         Eyelink('Message', 'TRIAL_END');
