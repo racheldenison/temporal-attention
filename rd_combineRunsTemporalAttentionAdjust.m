@@ -2,14 +2,14 @@
 
 %% setup
 subject = 'rdTest';
-runs = 1:2;
+runs = 1:4;
 combinedRun = 9;
 nRuns = numel(runs);
 
 saveData = 1;
 saveFigs = 1;
 
-expName = 'E2_SOA_cbD6';
+expName = 'pilot';
 % dataDir = 'data';
 % figDir = 'figures';
 dataDir = pathToExpt('data');
@@ -47,7 +47,7 @@ expt.trials = trials;
 expt.targetRotations = targetRotations;
 
 %% analyze data
-[expt results] = rd_analyzeTemporalAttention(expt);
+[expt results] = rd_analyzeTemporalAttentionAdjust(expt);
 
 %% save data
 % saving data and figs separately in order to save them into the mcq
@@ -59,7 +59,7 @@ end
 
 %% save figs
 if saveFigs
-    figNames = {'acc','rt'};
+    figNames = {'error','acc','rt'};
     rd_saveAllFigs([], figNames, [subjectID '_TemporalAttentionAdjust_T1T2all'], figDir)
 end
     
