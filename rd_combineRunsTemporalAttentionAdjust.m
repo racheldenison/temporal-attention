@@ -1,8 +1,8 @@
 % rd_combineRunsTemporalAttention.m
 
 %% setup
-subject = 'rdTest';
-runs = 1:4;
+subject = 'kcTest';
+runs = 1:3;
 combinedRun = 9;
 nRuns = numel(runs);
 

@@ -1,7 +1,7 @@
 % rd_combineRunsTemporalAttention.m
 
 %% setup
-subject = 'ho_cbD6_tilt2pt5_tc64_soa1000-1450';
+subject = 'hl_cbD6_tilt2_tc64_soa1000-1400';
 runs = 1:3;
 combinedRun = 8;
 nRuns = numel(runs);

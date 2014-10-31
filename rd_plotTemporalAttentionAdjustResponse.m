@@ -4,7 +4,7 @@ binSize = 2;
 edges = 0:binSize:90;
 
 % load data
-load([pathToExpt '/data/pilot/rd/rdTest_run09_TemporalAttentionAdjust_T1T2all_20141029.mat'])
+load([pathToExpt '/data/pilot/kc/kcTest_run09_TemporalAttentionAdjust_T1T2all_20141030.mat'])
 
 errorIdx = strcmp(expt.trials_headers, 'responseError');
 
