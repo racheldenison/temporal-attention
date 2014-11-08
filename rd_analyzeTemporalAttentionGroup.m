@@ -1,14 +1,16 @@
 % rd_analyzeTemporalAttentionGroup.m
 
 exptName = 'cb';
-subjectInits = {'rd','ld','id','bl','ad','vp','ma','ty'};
+subjectInits = {'rd','ld','id','bl','ad','vp','ma','ty','zw','ec'};
 tilt = '*';
 contrast = '*'; % '64'; % 
-contrastIdx = 1; % only plot one contrast at a time
+contrastIdx = 2; % only plot one contrast at a time
 soa1 = 1000;
 soa2 = 1250;
 
 run = 9;
+
+normalizeData = 0;
 
 saveFigs = 0;
 
@@ -63,6 +65,19 @@ for iEL = 1:2 % early/late
     rtSte(:,iEL) = std(rtData{iEL},0,2)./sqrt(nSubjects);
 end
 
+% average across contrasts
+for iEL = 1:2 % early/late
+    if normalizeData
+        accDataC{iEL} = normalizeDC(accDataC{iEL});
+    end
+    
+    accMeanC(:,iEL) = mean(accDataC{iEL},2);
+    accSteC(:,iEL) = std(accDataC{iEL},0,2)./sqrt(nSubjects);
+    rtMeanC(:,iEL) = mean(rtDataC{iEL},2);
+    rtSteC(:,iEL) = std(rtDataC{iEL},0,2)./sqrt(nSubjects);
+end
+
+% all contrasts separately
 for iEL = 1:2 % early/late
     accMeanAll{iEL} = squeeze(mean(accDataAll{iEL},2));
     accSteAll{iEL} = squeeze(std(accDataAll{iEL},0,2)./sqrt(nSubjects));
@@ -166,6 +181,48 @@ for iRI = 1:numel(p.respInterval)
     rd_raiseAxis(gca);
 end
 
+% average across contrasts
+figure;
+for iRI = 1:numel(p.respInterval)
+    subplot(1,numel(p.respInterval),iRI);
+    hold on
+    
+    plot([0 nCV+1], [0.5 0.5], '--k');
+    b1 = bar(1:nCV, accMeanC(idx,iRI),'FaceColor',[.5 .5 .5]);
+    p1 = errorbar(1:nCV, accMeanC(idx,iRI)', accSteC(idx,iRI)','k','LineStyle','none');
+    
+    set(gca,'XTick',1:nCV)
+    set(gca,'XTickLabel', p.cueValidity(idx))
+    xlabel('cue validity')
+    ylabel('acc')
+    title(intervalNames{iRI})
+    ylim([0.3 max(accMeanC(:))*1.1])
+    ylim([.3 .9])
+    box off
+    rd_supertitle(sprintf('%s run %d, ave across contrasts, N=%d', exptStr, run, nSubjects));
+    rd_raiseAxis(gca);
+end
+
+figure;
+for iRI = 1:numel(p.respInterval)
+    subplot(1,numel(p.respInterval),iRI);
+    hold on
+    
+    b1 = bar(1:nCV, rtMeanC(idx,iRI),'FaceColor',[.5 .5 .5]);
+    p1 = errorbar(1:nCV, rtMeanC(idx,iRI)', rtSteC(idx,iRI)','k','LineStyle','none');
+    
+    set(gca,'XTick',1:nCV)
+    set(gca,'XTickLabel', p.cueValidity(idx))
+    xlabel('cue validity')
+    ylabel('rt')
+    title(intervalNames{iRI})
+    ylim([min(rtMeanC(:))*0.9 max(rtMeanC(:))*1.1])
+    box off
+    rd_supertitle(sprintf('%s run %d, ave across contrasts, N=%d', exptStr, run, nSubjects));
+    rd_raiseAxis(gca);
+end
+
+% all contrasts separately
 contrastLims = [p.targetContrasts(1)-0.05 p.targetContrasts(end)+0.05];
 figure
 for iRI = 1:numel(p.respInterval)
@@ -234,5 +291,17 @@ rt2 = reshape(rtData{2}', nSubjects*3, 1);
 
 acc_all = [acc1; acc2];
 rt_all = [rt1; rt2];
+
+%% Quick stats
+for iEL = 1:2
+    fprintf('T%d\n',iEL)
+    vals = accData{iEL};
+    [hvi pvi] = ttest(vals(1,:),vals(2,:));
+    [hvn pvn] = ttest(vals(1,:),vals(3,:));
+    [hni pni] = ttest(vals(2,:),vals(3,:));
+    fprintf('valid vs. invalid, p = %1.4f\n', pvi)
+    fprintf('valid vs. neutral, p = %1.4f\n', pvn)
+    fprintf('neutral vs. invalid, p = %1.4f\n\n', pni)
+end
 
 

@@ -5,6 +5,8 @@ subjectInits = {'rd','vp','hl'};
 nSubjects = numel(subjectInits);
 groupStr = sprintf('N=%d', nSubjects);
 
+normalizeData = 0;
+
 %% Get indiv subject data
 for iSubject = 1:nSubjects
     subjectInit = subjectInits{iSubject};
@@ -15,6 +17,17 @@ for iSubject = 1:nSubjects
         dpData{iEL}(:,:,iSubject) = dp{iEL};
         critData{iEL}(:,:,iSubject) = crit{iEL};
         effData{iEL}(:,:,iSubject) = eff{iEL};
+    end
+end
+
+%% Normalize data
+if normalizeData
+    for iEL = 1:numel(accData)
+        accData{iEL} = normalizeDC(accData{iEL});
+        rtData{iEL} = normalizeDC(rtData{iEL});
+        dpData{iEL} = normalizeDC(dpData{iEL});
+        critData{iEL} = normalizeDC(critData{iEL});
+        effData{iEL} = normalizeDC(effData{iEL});
     end
 end
 
