@@ -1,15 +1,16 @@
 % rd_combineRunsTemporalAttention.m
 
 %% setup
-subject = 'ecPilot_cb_tilt1pt5_tc64-100_soa1000-1250';
-runs = 1:2;
-combinedRun = 9;
+% subject = 'ecPilot_cb_tilt1pt5_tc64-100_soa1000-1250';
+subject = 'ho_cbD6_tilt2pt5_tc64_soa1000-1500';
+runs = 1:3;
+combinedRun = 8;
 nRuns = numel(runs);
 
 saveData = 1;
 saveFigs = 1;
 
-expName = 'E0_cb'; % 'E2_SOA_cbD6'
+expName = 'E2_SOA_cbD6'; % 'E2_SOA_cbD6', 'E0_cb'
 % dataDir = 'data';
 % figDir = 'figures';
 dataDir = pathToExpt('data');

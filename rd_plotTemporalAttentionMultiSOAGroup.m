@@ -1,7 +1,7 @@
 % rd_plotTemporalAttentionMultiSOAGroup.m
 
 %% Setup
-subjectInits = {'rd','vp','hl'};
+subjectInits = {'rd','vp','hl','ho'};
 nSubjects = numel(subjectInits);
 groupStr = sprintf('N=%d', nSubjects);
 
@@ -9,7 +9,7 @@ expName = 'E2';
 figPrefix = sprintf('g%s_N%d', expName, nSubjects);
 
 normalizeData = 0;
-saveFigs = 1;
+saveFigs = 0;
 
 %% Get indiv subject data
 for iSubject = 1:nSubjects
@@ -71,7 +71,7 @@ axTitle = '';
 
 % subjectColHSV = rgb2hsv(varycolor(nSubjects));
 % subjectColors = hsv2rgb([subjectColHSV(:,1:2) subjectColHSV(:,3)*0.8]);
-subjectColors = varycolor(3)*.9;
+subjectColors = varycolor(nSubjects)*.9;
 % subjectColors = colors((1:nSubjects)+2,:);
 
 fig(1) = figure;
