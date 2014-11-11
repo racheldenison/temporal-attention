@@ -5,7 +5,11 @@ subjectInits = {'rd','vp','hl'};
 nSubjects = numel(subjectInits);
 groupStr = sprintf('N=%d', nSubjects);
 
+expName = 'E2';
+figPrefix = sprintf('g%s_N%d', expName, nSubjects);
+
 normalizeData = 0;
+saveFigs = 1;
 
 %% Get indiv subject data
 for iSubject = 1:nSubjects
@@ -53,28 +57,39 @@ for iEL = 1:numel(accData)
 end
 
 %% Plot figs
-intervalNames = {'early','late'};
+intervalNames = {'T1','T2'};
+cueNames = {'valid','invalid','neutral'};
 accLims = [0.2 1];
 rtLims = [0.2 1.6];
 dpLims = [-0.5 2.7];
 critLims = [-1 1];
+effLims = [0 3.5];
 accDiffLims = [-0.15 0.25];
 soaLims = [t1t2soa(1)-100 t1t2soa(end)+100];
 colors = get(0,'DefaultAxesColorOrder');
 axTitle = '';
+
+% subjectColHSV = rgb2hsv(varycolor(nSubjects));
+% subjectColors = hsv2rgb([subjectColHSV(:,1:2) subjectColHSV(:,3)*0.8]);
+subjectColors = varycolor(3)*.9;
+% subjectColors = colors((1:nSubjects)+2,:);
 
 fig(1) = figure;
 for iRI = 1:numel(p.respInterval)
     subplot(1,numel(p.respInterval),iRI)
     hold on
     plot(soaLims, [0.5 0.5], '--k');
-    
-    p1 = errorbar(repmat(t1t2soa',1,numel(p.cueValidity)),...
-        accMean{iRI}', accSte{iRI}', '.-', 'MarkerSize', 20);
+
+    p1 = plot(repmat(t1t2soa',1,numel(p.cueValidity)),...
+        accMean{iRI}', '-', 'LineWidth', 1.5);
+    e1 = errorbar(repmat(t1t2soa',1,numel(p.cueValidity)),...
+        accMean{iRI}', accSte{iRI}', '.', 'MarkerSize', 20, ...
+        'LineWidth', 1);
 
     xlabel('soa')
     ylabel('acc')
-    legend(p1, num2str(p.cueValidity'),'location','best')
+%     legend(p1, num2str(p.cueValidity'),'location','best')
+    legend(p1, cueNames,'location','best')
     title(intervalNames{iRI})
     xlim(soaLims)
     ylim(accLims)
@@ -86,13 +101,18 @@ end
 fig(2) = figure;
 for iRI = 1:numel(p.respInterval)
     subplot(1,numel(p.respInterval),iRI)
-    
-    p1 = errorbar(repmat(t1t2soa',1,numel(p.cueValidity)),...
-        rtMean{iRI}', rtSte{iRI}', '.-', 'MarkerSize', 20);
+    hold on
+
+    p1 = plot(repmat(t1t2soa',1,numel(p.cueValidity)),...
+        rtMean{iRI}', '-', 'LineWidth', 1.5);
+    e1 = errorbar(repmat(t1t2soa',1,numel(p.cueValidity)),...
+        rtMean{iRI}', rtSte{iRI}', '.', 'MarkerSize', 20, ...
+        'LineWidth', 1);
     
     xlabel('soa')
     ylabel('rt')
-    legend(num2str(p.cueValidity'),'location','best')
+%     legend(num2str(p.cueValidity'),'location','best')
+    legend(p1, cueNames,'location','best')
     title(intervalNames{iRI})
     xlim(soaLims)
     ylim(rtLims)
@@ -108,12 +128,16 @@ for iRI = 1:numel(p.respInterval)
     hold on
     plot(soaLims, [0 0], '--k');
     
-    p1 = errorbar(repmat(t1t2soa',1,numel(p.cueValidity)),...
-        dpMean{iRI}', dpSte{iRI}', '.-', 'MarkerSize', 20);
+    p1 = plot(repmat(t1t2soa',1,numel(p.cueValidity)),...
+        dpMean{iRI}', '-','LineWidth', 1.5);
+    e1 = errorbar(repmat(t1t2soa',1,numel(p.cueValidity)),...
+        dpMean{iRI}', dpSte{iRI}', '.', 'MarkerSize', 20, ...
+        'LineWidth', 1);
 
     xlabel('soa')
     ylabel('dprime')
-    legend(p1, num2str(p.cueValidity'),'location','best')
+%     legend(p1, num2str(p.cueValidity'),'location','best')
+    legend(p1, cueNames,'location','best')
     title(intervalNames{iRI})
     xlim(soaLims)
     ylim(dpLims)
@@ -128,12 +152,16 @@ for iRI = 1:numel(p.respInterval)
     hold on
     plot(soaLims, [0 0], '--k');
     
-    p1 = errorbar(repmat(t1t2soa',1,numel(p.cueValidity)),...
-        critMean{iRI}', critSte{iRI}', '.-', 'MarkerSize', 20);
+    p1 = plot(repmat(t1t2soa',1,numel(p.cueValidity)),...
+        critMean{iRI}', '-', 'LineWidth', 1.5);
+    e1 = errorbar(repmat(t1t2soa',1,numel(p.cueValidity)),...
+        critMean{iRI}', critSte{iRI}', '.', 'MarkerSize', 20, ...
+        'LineWidth', 1);
 
     xlabel('soa')
     ylabel('crit')
-    legend(p1, num2str(p.cueValidity'),'location','best')
+%     legend(p1, num2str(p.cueValidity'),'location','best')
+    legend(p1, cueNames,'location','best')
     title(intervalNames{iRI})
     xlim(soaLims)
     ylim(critLims)
@@ -147,15 +175,20 @@ for iRI = 1:numel(p.respInterval)
     subplot(1,numel(p.respInterval),iRI)
     hold on
     
-    p1 = errorbar(repmat(t1t2soa',1,numel(p.cueValidity)),...
-        effMean{iRI}', effSte{iRI}', '.-', 'MarkerSize', 20);
+    p1 = plot(repmat(t1t2soa',1,numel(p.cueValidity)),...
+        effMean{iRI}', '-', 'LineWidth', 1.5);
+    e1 = errorbar(repmat(t1t2soa',1,numel(p.cueValidity)),...
+        effMean{iRI}', effSte{iRI}', '.', 'MarkerSize', 20, ...
+        'LineWidth', 1);
+    set(p1(2),'LineWidth',1.5)
 
     xlabel('soa')
     ylabel('efficiency (dprime/rt)')
-    legend(p1, num2str(p.cueValidity'),'location','best')
+%     legend(p1, num2str(p.cueValidity'),'location','best')
+    legend(p1, cueNames,'location','best')
     title(intervalNames{iRI})
     xlim(soaLims)
-%     ylim(effLims)
+    ylim(effLims)
     rd_supertitle(subjectInits);
     rd_raiseAxis(gca);
     rd_supertitle(axTitle);
@@ -164,11 +197,12 @@ end
 fig(6) = figure;
 for iRI = 1:numel(p.respInterval)
     subplot(1,numel(p.respInterval),iRI)
-    hold on
+    set(gca,'ColorOrder',subjectColors)
+    hold all
     plot(soaLims, [0 0], '--k');
     
-    plot(t1t2soa, accDataCueEff{iRI})
-    plot(t1t2soa, mean(accDataCueEff{iRI},2),'k','LineWidth',2)
+    p1 = plot(t1t2soa, accDataCueEff{iRI},'LineWidth',1.5);
+    plot(t1t2soa, mean(accDataCueEff{iRI},2),'k','LineWidth',2.5)
     
     xlabel('soa')
     ylabel('cuing effect (accuracy valid-invalid)')
@@ -183,14 +217,15 @@ end
 fig(7) = figure;
 for iRI = 1:numel(p.respInterval)
     subplot(1,numel(p.respInterval),iRI)
-    hold on
+    set(gca,'ColorOrder',subjectColors)
+    hold all
     plot(soaLims, [0 0], '--k');
     
-    plot(t1t2soa, accDataCueAve{iRI})
-    plot(t1t2soa, mean(accDataCueAve{iRI},2),'k','LineWidth',2)
+    plot(t1t2soa, accDataCueAve{iRI},'LineWidth',1.5)
+    plot(t1t2soa, mean(accDataCueAve{iRI},2),'k','LineWidth',2.5)
     
     xlabel('soa')
-    ylabel('acc')
+    ylabel('acc average')
     title(intervalNames{iRI})
     xlim(soaLims)
     ylim(accLims)
@@ -200,3 +235,47 @@ for iRI = 1:numel(p.respInterval)
 end
 
 
+fig(8) = figure;
+hold on
+plot(soaLims, [0 0], '--k')
+p1 = [];
+p1(1) = plot(t1t2soa, mean(accDataCueEff{1},2),'-','LineWidth',2);
+p1(2) = plot(t1t2soa, mean(accDataCueEff{2},2),'r-','LineWidth',2);
+
+plot(t1t2soa, mean(accDataCueEff{1},2),'o','LineWidth',1,'MarkerSize',10,'MarkerFaceColor','w')
+plot(t1t2soa, mean(accDataCueEff{2},2),'ro','LineWidth',1,'MarkerSize',10,'MarkerFaceColor','w')
+
+legend(p1, intervalNames)
+xlabel('soa')
+ylabel('cuing effect (accuracy valid-invalid)')
+xlim([100 800])
+
+
+fig(9) = figure;
+hold on
+plot(soaLims, [0.5 0.5], '--k');
+p1 = [];
+p1(1) = plot(t1t2soa, mean(accDataCueAve{1},2),'-','LineWidth',2);
+p1(2) = plot(t1t2soa, mean(accDataCueAve{2},2),'r-','LineWidth',2);
+
+plot(t1t2soa, mean(accDataCueAve{1},2),'o','LineWidth',1,'MarkerSize',10,'MarkerFaceColor','w')
+plot(t1t2soa, mean(accDataCueAve{2},2),'ro','LineWidth',1,'MarkerSize',10,'MarkerFaceColor','w')
+
+legend(p1, intervalNames)
+xlabel('soa')
+ylabel('acc average')
+xlim([100 800])
+ylim(accLims)
+
+%% set figure properties
+for iF = 1:numel(fig)
+    % set font size of titles, axis labels, and legends
+    % see also: http://stackoverflow.com/questions/8934468/changing-fonts-in-matlab-plots
+    set(findall(fig(iF),'type','text'),'FontSize',14)
+end
+
+%% Save figs
+if saveFigs
+    figNames = {'acc','rt','dprime','crit','eff','accCueEffect','accCueAve','accCueEffectOverlay','accCueAveOverlay'};
+    rd_saveAllFigs(fig, figNames, figPrefix, [], '-depsc2')
+end

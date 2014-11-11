@@ -90,7 +90,8 @@ nCV = numel(p.cueValidity);
 tc = p.targetContrasts(contrastIdx)*100;
 
 %% Plot figs
-intervalNames = {'early','late'};
+intervalNames = {'T1','T2'};
+cueNames = {'valid','invalid','neutral'};
 accLims = [0.2 1];
 rtLims = [0.3 1.3]; % [0.3 1.6]
 xlims = [0 nSubjects+1];
@@ -112,7 +113,7 @@ for iRI = 1:numel(p.respInterval)
     set(gca,'XTick',1:nSubjects)
     xlabel('subject')
     ylabel('acc')
-    legend(p1, num2str(p.cueValidity(idx)'),'location','best')
+    legend(p1, cueNames,'location','best')
     title(intervalNames{iRI})
     xlim(xlims)
     ylim(accLims)
@@ -132,10 +133,11 @@ for iRI = 1:numel(p.respInterval)
     set(gca,'XTick',1:nSubjects)
     xlabel('subject')
     ylabel('rt')
-    legend(num2str(p.cueValidity(idx)'),'location','best')
+    legend(cueNames,'location','best')
     title(intervalNames{iRI})
     xlim(xlims)
-    ylim(rtLims)
+%     ylim(rtLims)
+    ylim([0.2 4])
     box off
     rd_supertitle(sprintf('%s run %d, contrast = %d%%, N=%d', exptStr, run, tc, nSubjects));
     rd_raiseAxis(gca);
@@ -151,7 +153,8 @@ for iRI = 1:numel(p.respInterval)
     p1 = errorbar(1:nCV, accMean(idx,iRI)', accSte(idx,iRI)','k','LineStyle','none');
     
     set(gca,'XTick',1:nCV)
-    set(gca,'XTickLabel', p.cueValidity(idx))
+%     set(gca,'XTickLabel', p.cueValidity(idx))
+    set(gca,'XTickLabel', cueNames(idx))
     xlabel('cue validity')
     ylabel('acc')
     title(intervalNames{iRI})
@@ -171,7 +174,8 @@ for iRI = 1:numel(p.respInterval)
     p1 = errorbar(1:nCV, rtMean(idx,iRI)', rtSte(idx,iRI)','k','LineStyle','none');
     
     set(gca,'XTick',1:nCV)
-    set(gca,'XTickLabel', p.cueValidity(idx))
+%     set(gca,'XTickLabel', p.cueValidity(idx))
+    set(gca,'XTickLabel', cueNames(idx))
     xlabel('cue validity')
     ylabel('rt')
     title(intervalNames{iRI})
@@ -182,7 +186,7 @@ for iRI = 1:numel(p.respInterval)
 end
 
 % average across contrasts
-figure;
+fig(5) = figure;
 for iRI = 1:numel(p.respInterval)
     subplot(1,numel(p.respInterval),iRI);
     hold on
@@ -192,7 +196,8 @@ for iRI = 1:numel(p.respInterval)
     p1 = errorbar(1:nCV, accMeanC(idx,iRI)', accSteC(idx,iRI)','k','LineStyle','none');
     
     set(gca,'XTick',1:nCV)
-    set(gca,'XTickLabel', p.cueValidity(idx))
+%     set(gca,'XTickLabel', p.cueValidity(idx))
+    set(gca,'XTickLabel', cueNames(idx))
     xlabel('cue validity')
     ylabel('acc')
     title(intervalNames{iRI})
@@ -203,7 +208,7 @@ for iRI = 1:numel(p.respInterval)
     rd_raiseAxis(gca);
 end
 
-figure;
+fig(6) = figure;
 for iRI = 1:numel(p.respInterval)
     subplot(1,numel(p.respInterval),iRI);
     hold on
@@ -212,7 +217,8 @@ for iRI = 1:numel(p.respInterval)
     p1 = errorbar(1:nCV, rtMeanC(idx,iRI)', rtSteC(idx,iRI)','k','LineStyle','none');
     
     set(gca,'XTick',1:nCV)
-    set(gca,'XTickLabel', p.cueValidity(idx))
+%     set(gca,'XTickLabel', p.cueValidity(idx))
+    set(gca,'XTickLabel', cueNames(idx))
     xlabel('cue validity')
     ylabel('rt')
     title(intervalNames{iRI})
@@ -224,7 +230,7 @@ end
 
 % all contrasts separately
 contrastLims = [p.targetContrasts(1)-0.05 p.targetContrasts(end)+0.05];
-figure
+fig(7) = figure;
 for iRI = 1:numel(p.respInterval)
     subplot(1,numel(p.respInterval),iRI)
     hold on
@@ -242,7 +248,7 @@ for iRI = 1:numel(p.respInterval)
     end
     xlabel('contrast')
     ylabel('acc')
-    legend(p1, num2str(p.cueValidity'),'location','best')
+    legend(p1, cueNames,'location','best')
     title(intervalNames{iRI})
     xlim(contrastLims)
     ylim(accLims)
@@ -251,7 +257,7 @@ for iRI = 1:numel(p.respInterval)
     rd_supertitle(axTitle);
 end
 
-figure
+fig(8) = figure;
 rtLims = [0 2];
 for iRI = 1:numel(p.respInterval)
     subplot(1,numel(p.respInterval),iRI)
@@ -269,7 +275,7 @@ for iRI = 1:numel(p.respInterval)
     end
     xlabel('contrast')
     ylabel('RT')
-    legend(p1, num2str(p.cueValidity'),'location','best')
+    legend(p1, cueNames,'location','best')
     title(intervalNames{iRI})
     xlim(contrastLims)
     ylim(rtLims)
@@ -278,9 +284,21 @@ for iRI = 1:numel(p.respInterval)
     rd_supertitle(axTitle);
 end
 
+%% Set figure properties
+for iF = 1:numel(fig)
+    % set font size of titles, axis labels, and legends
+    set(findall(fig(iF),'type','text'),'FontSize',14)
+end
+
+%% Save figs
 if saveFigs
     figNames = {'indivAcc','indivRT','groupAcc','groupRT'};
-    rd_saveAllFigs(fig, figNames, sprintf('groupData_%s_run%02d_TemporalAttention_T1T2all_contrast%d_N%d', exptStr, run, tc, nSubjects))
+    figPrefix = sprintf('groupData_N%d_%s_run%02d_TemporalAttention_T1T2all_contrast%d', nSubjects, exptStr, run, tc);
+    rd_saveAllFigs(fig(1:4), figNames, figPrefix, [], '-depsc2')
+
+    figNames = {'groupAccContrastAve','groupRTContrastAve','groupAccAllContrasts','groupRTAllContrasts'};
+    figPrefix = sprintf('groupData_N%d_%s_run%02d_TemporalAttention_T1T2all', nSubjects, exptStr, run);
+    rd_saveAllFigs(fig(5:end), figNames, figPrefix, [], '-depsc2')
 end
 
 %% Reshape data for output to R
@@ -295,7 +313,7 @@ rt_all = [rt1; rt2];
 %% Quick stats
 for iEL = 1:2
     fprintf('T%d\n',iEL)
-    vals = accData{iEL};
+    vals = rtDataC{iEL};
     [hvi pvi] = ttest(vals(1,:),vals(2,:));
     [hvn pvn] = ttest(vals(1,:),vals(3,:));
     [hni pni] = ttest(vals(2,:),vals(3,:));
