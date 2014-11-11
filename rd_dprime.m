@@ -4,6 +4,10 @@ if nargin < 4 || isempty(ceilopt)
     ceilopt = 'noadjust';
 end
 
+if isempty(fa)
+    fa = nan(size(h));
+end
+
 switch ceilopt
     case 'noadjust'
         if any(h >= 1) | any(fa >= 1) | any(h <= 0) | any(fa <= 0)
@@ -29,8 +33,10 @@ switch option
         dprime = zh - zfa;
         criterion = -0.5*(zh+zfa);
     case '2afc'
-        dprime = (zh - zfa)/sqrt(2);  
-        criterion = -0.5*(zh+zfa);
+%         dprime = (zh - zfa)/sqrt(2); % this is correct for h = p(c) and fa = 1-p(c)
+%         criterion = -0.5*(zh+zfa);
+        dprime = zh*sqrt(2);
+        criterion = nan(size(dprime));
     otherwise
         error('option not recognised! please use ''yesno'' or ''2afc''!');
 end
