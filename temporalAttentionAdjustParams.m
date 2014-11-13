@@ -1,6 +1,6 @@
 function p = temporalAttentionAdjustParams
 
-p.testingLocation = 'CarrascoL1'; % 'CarrascoL1','laptop','desk'
+p.testingLocation = 'laptop'; % 'CarrascoL1','laptop','desk'
 
 switch p.testingLocation
     case {'laptop','desk'}
@@ -24,7 +24,7 @@ end
 p.keyCodes = KbName(p.keyNames);
 p.backgroundColor = 0.5;
 p.goCueColor = 0.75;
-p.nReps = 4;
+p.nReps = 1;
 p.nTrialsPerBlock = 40;
 p.font = 'Verdana';
 p.fontSize = 24;
@@ -33,7 +33,7 @@ p.phLineWidth = 2; % (pixels)
 p.eyeRad = 1.5; % allowed fixation radius (degrees)
 
 % Condition
-p.targetContrasts = [.64]; % [.64 1];
+p.targetContrasts = 1; % [.64 1];
 p.respInterval = [1 2]; % [1=early 2=late]
 p.cueValidity = [1 -1 0]; % [1=valid -1=invalid 0=neutral]
 % p.propValid = 0.67;
@@ -121,7 +121,7 @@ end
 
 % Adjustment
 p.doneKey = KbName('SPACE');
-p.acceptableError = 5;
+p.acceptableError = [5 10]; % [green light (bullseye!), yellow light (almost!)]
 
 
 

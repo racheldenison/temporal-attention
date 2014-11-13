@@ -35,7 +35,7 @@ targetContrastIdx = strcmp(trials_headers,'targetContrast');
 respIntervalIdx = strcmp(trials_headers,'respInterval');
 cueValidityIdx = strcmp(trials_headers,'cueValidity');
 rtIdx = strcmp(trials_headers,'rt');
-responseErrorIdx = strcmp(trials_headers,'responseError');
+responseErrorAbsIdx = strcmp(trials_headers,'responseErrorAbs');
 correctIdx = strcmp(trials_headers,'correct');
 
 %% Clean RT if requested
@@ -141,8 +141,8 @@ end
 
 %% Acc and RT means
 for iRI = 1:numel(p.respInterval)
-    errorMean{iRI} = squeeze(totals.means{iRI}(:,responseErrorIdx,:)); % [validity x contrast]
-    errorSte{iRI} = squeeze(totals.stes{iRI}(:,responseErrorIdx,:));
+    errorMean{iRI} = squeeze(totals.means{iRI}(:,responseErrorAbsIdx,:)); % [validity x contrast]
+    errorSte{iRI} = squeeze(totals.stes{iRI}(:,responseErrorAbsIdx,:));
     
     accMean{iRI} = squeeze(totals.means{iRI}(:,correctIdx,:)); % [validity x contrast]
     accSte{iRI} = squeeze(totals.stes{iRI}(:,correctIdx,:));

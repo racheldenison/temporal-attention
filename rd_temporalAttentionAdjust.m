@@ -260,7 +260,8 @@ phRect = phRect + [-1 -1 1 1]*round(ang2pix(0.25, p.screenSize(1), p.screenRes(1
 % orientation, or low vs. high SF
 trials_headers = {'targetContrast','respInterval','cueValidity',...
     'target1State','target2State','cuedInterval','respTargetState',...
-    'rt','responseKey','response','responseError','correct'};
+    'rt','responseKey','response','responseError','responseErrorAbs',...
+    'correct'};
 
 % make sure column indices match trials headers
 targetContrastIdx = strcmp(trials_headers,'targetContrast');
@@ -274,6 +275,7 @@ rtIdx = strcmp(trials_headers,'rt');
 responseKeyIdx = strcmp(trials_headers,'responseKey');
 responseIdx = strcmp(trials_headers,'response');
 responseErrorIdx = strcmp(trials_headers,'responseError');
+responseErrorAbsIdx = strcmp(trials_headers,'responseErrorAbs');
 correctIdx = strcmp(trials_headers,'correct');
 
 % full factorial design
@@ -744,12 +746,25 @@ while trialCounter <= nTrials
         Eyelink('Message', 'TRIAL_END');
     end
     
+    % Calculate response error
+    respErrorAbs = min(abs(response-rot(respInterval)), abs(response-rot(respInterval)-180));
+    if respErrorAbs == abs(response-rot(respInterval))
+        respError = response-rot(respInterval);
+    elseif respErrorAbs == abs(response-rot(respInterval)-180)
+        respError = response-rot(respInterval)-180;
+    end
+    
+    fprintf('error: %d\tabs error: %d\n', respError, respErrorAbs)
+    
     % Feedback
-    respError = min(abs(response-rot(respInterval)), abs(response-rot(respInterval)-180));
-    if respError < p.acceptableError;
+    if respErrorAbs < p.acceptableError(1);
         correct = 1;
         feedbackText = '+';
         feedbackColor = [0 1 0]*white;
+    elseif respErrorAbs < p.acceptableError(2);
+        correct = 0;
+        feedbackText = '+';
+        feedbackColor = [1 1 0]*white;
     else
         correct = 0;
         feedbackText = '-';
@@ -785,6 +800,7 @@ while trialCounter <= nTrials
     trials(trialIdx,responseIdx) = response;
     trials(trialIdx,correctIdx) = correct;
     trials(trialIdx,responseErrorIdx) = respError;
+    trials(trialIdx,responseErrorAbsIdx) = respErrorAbs;
         
     % Store timing
     timing.timeFix(trialIdx,1) = timeFix;
