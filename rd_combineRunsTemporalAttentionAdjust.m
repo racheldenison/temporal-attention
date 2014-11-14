@@ -1,15 +1,15 @@
 % rd_combineRunsTemporalAttention.m
 
 %% setup
-subject = 'kcTest';
-runs = 1:3;
+subject = 'bl_a1_tc100_soa1000-1250';
+runs = 1:2;
 combinedRun = 9;
 nRuns = numel(runs);
 
 saveData = 1;
 saveFigs = 1;
 
-expName = 'pilot';
+expName = 'E3_adjust';
 % dataDir = 'data';
 % figDir = 'figures';
 dataDir = pathToExpt('data');
