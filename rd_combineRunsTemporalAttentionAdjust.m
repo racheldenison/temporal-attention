@@ -1,7 +1,7 @@
 % rd_combineRunsTemporalAttention.m
 
 %% setup
-subject = 'bl_a1_tc100_soa1000-1250';
+subject = 'rd_a1_tc100_soa1000-1250';
 runs = 1:2;
 combinedRun = 9;
 nRuns = numel(runs);
@@ -34,6 +34,7 @@ for iRun = 1:nRuns
     trialOrder = [trialOrder; data.expt.trialOrder + size(trialOrder,2)];
     
     timing(iRun) = data.expt.timing;
+%     timing = [];
 end
 
 %% make the combined expt

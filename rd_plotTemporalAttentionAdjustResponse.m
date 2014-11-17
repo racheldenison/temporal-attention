@@ -1,7 +1,7 @@
 % rd_plotTemporalAttentionAdjustResponse.m
 
 %% setup
-subject = 'bl_a1_tc100_soa1000-1250';
+subject = 'rd_a1_tc100_soa1000-1250';
 run = 9;
 
 smoothHist = 0;
