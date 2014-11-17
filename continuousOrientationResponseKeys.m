@@ -1,4 +1,4 @@
-function [targetRot rt] = collectContinuousOrientationResponse(window, white, targetTex, targetRect, phRect, p)
+function [targetRot rt startingAngle] = continuousOrientationResponseKeys(window, white, targetTex, targetRect, phRect, p)
 
 % a couple more initializations
 adjustments = [-1 1];
@@ -6,6 +6,7 @@ adjustments = [-1 1];
 % pick a starting orientation at random
 targetRots = randperm(180)-1;
 targetRot = targetRots(1);
+startingAngle = targetRot;
 
 doneKeyPressed = 0;
 timeStart = GetSecs;

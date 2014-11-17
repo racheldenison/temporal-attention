@@ -738,22 +738,19 @@ while trialCounter <= nTrials
     end
     
     % Collect response   
-    [response rt] = continuousOrientationResponseMouse(...
+    [response rt probeStartAngle] = continuousOrientationResponseMouse(...
         window, white, tex0, imRect, phRect, p);
     responseKey = NaN;
+    % store probe start angle
+    trialsPresented.vals(iTrial).probeStartAngle = probeStartAngle;    
 %     fprintf('orientation = %d, response = %d\n', rot(respInterval), response)
-    
+
     if p.eyeTracking
         Eyelink('Message', 'TRIAL_END');
     end
     
     % Calculate response error
-    respErrorAbs = min(abs(response-rot(respInterval)), abs(response-rot(respInterval)-180));
-    if respErrorAbs == abs(response-rot(respInterval))
-        respError = response-rot(respInterval);
-    elseif respErrorAbs == abs(response-rot(respInterval)-180)
-        respError = response-rot(respInterval)-180;
-    end
+    [respError respErrorAbs] = calculateOrientationResponseError(rot(respInterval), response);
     
     fprintf('error: %d\tabs error: %d\n', respError, respErrorAbs)
     

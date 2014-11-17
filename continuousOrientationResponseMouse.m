@@ -1,7 +1,8 @@
-function [angle rt] = continuousOrientationResponseMouse(window, white, targetTex, targetRect, phRect, p)
+function [angle rt startingAngle] = continuousOrientationResponseMouse(window, white, targetTex, targetRect, phRect, p)
 
 % pick a starting orientation at random
 angle = floor(180*rand);
+startingAngle = angle;
 
 % set mouse position and get buttons
 startX = round(targetRect(1) + targetRect(3)/2);
