@@ -1,8 +1,8 @@
 % rd_plotTemporalAttentionAdjustResponse.m
 
 %% setup
-subject = 'rd_a1_tc100_soa1000-1250';
-run = 9;
+subject = 'xx*_a1_tc100_soa1000-1250';
+run = 8;
 
 smoothHist = 0;
 
@@ -67,7 +67,7 @@ for iEL = 1:2
         set(child,'FaceAlpha',.5);
     end
     xlim([-90 90])
-    ylim([0 .5])
+    ylim([0 .25])
     xlabel('error in orientation report')
     ylabel('p(error)')
 end

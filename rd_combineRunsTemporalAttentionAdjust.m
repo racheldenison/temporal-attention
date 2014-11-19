@@ -1,13 +1,13 @@
-% rd_combineRunsTemporalAttention.m
+% rd_combineRunsTemporalAttentionAdjust.m
 
 %% setup
-subject = 'rd_a1_tc100_soa1000-1250';
+subject = 'xx*_a1_tc100_soa1000-1250';
 runs = 1:2;
-combinedRun = 9;
+combinedRun = 7;
 nRuns = numel(runs);
 
 saveData = 1;
-saveFigs = 1;
+saveFigs = 0;
 
 expName = 'E3_adjust';
 % dataDir = 'data';
@@ -33,8 +33,11 @@ for iRun = 1:nRuns
     targetRotations = [targetRotations; data.expt.targetRotations];
     trialOrder = [trialOrder; data.expt.trialOrder + size(trialOrder,2)];
     
-    timing(iRun) = data.expt.timing;
-%     timing = [];
+    if strcmp(subjectID(1:3),'xx*')
+        timing = [];
+    else
+        timing(iRun) = data.expt.timing;
+    end
 end
 
 %% make the combined expt
