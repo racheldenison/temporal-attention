@@ -1,8 +1,9 @@
-% rd_plotTemporalAttentionAdjustResponse.m
+function [xEdges, rate] = rd_plotTemporalAttentionAdjustResponse(subjectID)
 
 %% setup
-subject = 'xx*_a1_tc100_soa1000-1250';
-run = 8;
+% subjectID = 'xx';
+subject = sprintf('%s_a1_tc100_soa1000-1250', subjectID);
+run = 9;
 
 smoothHist = 0;
 
@@ -54,6 +55,7 @@ for iEL = 1:2
     end
 end
 
+plotType = 'area'; % 'area','line'
 colors = {'b','g','r'};
 figure
 for iEL = 1:2
@@ -61,13 +63,21 @@ for iEL = 1:2
     hold on
     for iV = 1:3
         vals = rate{iEL}(iV,:);
-        a1 = area(xEdges, vals, 'FaceColor', colors{iV}, ...
-            'EdgeColor', colors{iV}, 'LineWidth', 1.5);
-        child = get(a1, 'Children');
-        set(child,'FaceAlpha',.5);
+        switch plotType
+            case 'area'
+                a1 = area(xEdges, vals, 'FaceColor', colors{iV}, ...
+                    'EdgeColor', colors{iV}, 'LineWidth', 1.5);
+                child = get(a1, 'Children');
+                set(child,'FaceAlpha',.5);
+            case 'line'
+                p1 = plot(xEdges, vals, 'Color', colors{iV}, ...
+                    'LineWidth', 1);
+            otherwise
+                error('plotType not recognized')
+        end
     end
     xlim([-90 90])
-    ylim([0 .25])
+    ylim([0 .18])
     xlabel('error in orientation report')
     ylabel('p(error)')
 end

@@ -2,7 +2,7 @@
 
 %% setup
 % subject = 'ecPilot_cb_tilt1pt5_tc64-100_soa1000-1250';
-subject = 'ho_cbD6_tilt2pt5_tc64_soa1000-1250';
+subject = 'ho_cbD6_tilt2pt5_tc64_soa1000-1350';
 runs = 1:3;
 combinedRun = 8;
 nRuns = numel(runs);

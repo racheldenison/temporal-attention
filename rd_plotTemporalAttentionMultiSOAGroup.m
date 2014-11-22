@@ -41,6 +41,12 @@ for iEL = 1:numel(accData)
     accDataCueAve{iEL} = squeeze(mean(accData{iEL},1));
 end
 
+%% Cuing effect valid/invalid vs. neutral
+for iEL = 1:numel(accData)
+    accDataCueEffN{iEL}(:,:,1) = squeeze(accData{iEL}(1,:,:) - accData{iEL}(3,:,:));
+    accDataCueEffN{iEL}(:,:,2) = squeeze(accData{iEL}(3,:,:) - accData{iEL}(2,:,:));
+end
+
 %% Group summary stats
 for iEL = 1:numel(accData)
     accMean{iEL} = mean(accData{iEL},3);
@@ -242,13 +248,20 @@ p1 = [];
 p1(1) = plot(t1t2soa, mean(accDataCueEff{1},2),'-','LineWidth',2);
 p1(2) = plot(t1t2soa, mean(accDataCueEff{2},2),'r-','LineWidth',2);
 
-plot(t1t2soa, mean(accDataCueEff{1},2),'o','LineWidth',1,'MarkerSize',10,'MarkerFaceColor','w')
-plot(t1t2soa, mean(accDataCueEff{2},2),'ro','LineWidth',1,'MarkerSize',10,'MarkerFaceColor','w')
+e1(1) = errorbar(t1t2soa, mean(accDataCueEff{1},2), ...
+    std(accDataCueEff{1},0,2)./sqrt(nSubjects),...
+    '.','MarkerSize', 20,'LineWidth', 1);
+e1(2) = errorbar(t1t2soa, mean(accDataCueEff{2},2), ...
+    std(accDataCueEff{1},0,2)./sqrt(nSubjects),...
+    '.r','MarkerSize', 20,'LineWidth', 1);
+
+plot(t1t2soa, mean(accDataCueEff{1},2),'o','LineWidth',1,'MarkerSize',8,'MarkerFaceColor','w')
+plot(t1t2soa, mean(accDataCueEff{2},2),'rs','LineWidth',1,'MarkerSize',8,'MarkerFaceColor','w')
 
 legend(p1, intervalNames)
 xlabel('soa')
 ylabel('cuing effect (accuracy valid-invalid)')
-xlim([100 800])
+xlim(soaLims)
 
 
 fig(9) = figure;
@@ -258,14 +271,49 @@ p1 = [];
 p1(1) = plot(t1t2soa, mean(accDataCueAve{1},2),'-','LineWidth',2);
 p1(2) = plot(t1t2soa, mean(accDataCueAve{2},2),'r-','LineWidth',2);
 
-plot(t1t2soa, mean(accDataCueAve{1},2),'o','LineWidth',1,'MarkerSize',10,'MarkerFaceColor','w')
-plot(t1t2soa, mean(accDataCueAve{2},2),'ro','LineWidth',1,'MarkerSize',10,'MarkerFaceColor','w')
+e1(1) = errorbar(t1t2soa, mean(accDataCueAve{1},2), ...
+    std(accDataCueAve{1},0,2)./sqrt(nSubjects),...
+    '.','MarkerSize', 20,'LineWidth', 1);
+e1(2) = errorbar(t1t2soa, mean(accDataCueAve{2},2), ...
+    std(accDataCueAve{1},0,2)./sqrt(nSubjects),...
+    '.r','MarkerSize', 20,'LineWidth', 1);
+
+plot(t1t2soa, mean(accDataCueAve{1},2),'o','LineWidth',1,'MarkerSize',8,'MarkerFaceColor','w')
+plot(t1t2soa, mean(accDataCueAve{2},2),'rs','LineWidth',1,'MarkerSize',8,'MarkerFaceColor','w')
 
 legend(p1, intervalNames)
 xlabel('soa')
 ylabel('acc average')
-xlim([100 800])
+xlim(soaLims)
 ylim(accLims)
+
+viNames = {'valid - neutral','neutral - invalid'};
+fig(10) = figure;
+for iVI = 1:2
+    subplot(2,1,iVI)
+    hold on
+    plot(soaLims, [0 0], '--k')
+    p1 = [];
+    p1(1,:) = plot(t1t2soa, squeeze(mean(accDataCueEffN{1}(:,:,iVI),2)),'-','LineWidth',2);
+    p1(2,:) = plot(t1t2soa, squeeze(mean(accDataCueEffN{2}(:,:,iVI),2)),'-r','LineWidth',2);
+    
+    e1 = [];
+    e1(1,:) = errorbar(t1t2soa, squeeze(mean(accDataCueEffN{1}(:,:,iVI),2)), ...
+        squeeze(std(accDataCueEffN{1}(:,:,iVI),0,2))./sqrt(nSubjects),...
+        '.','MarkerSize', 20,'LineWidth', 1);
+    e1(2,:) = errorbar(t1t2soa, squeeze(mean(accDataCueEffN{2}(:,:,iVI),2)), ...
+        squeeze(std(accDataCueEffN{1}(:,:,iVI),0,2))./sqrt(nSubjects),...
+        '.r','MarkerSize', 20,'LineWidth', 1);
+    
+    plot(t1t2soa, squeeze(mean(accDataCueEffN{1}(:,:,iVI),2)),'o','LineWidth',1,'MarkerSize',8,'MarkerFaceColor','w')
+    plot(t1t2soa, squeeze(mean(accDataCueEffN{2}(:,:,iVI),2)),'rs','LineWidth',1,'MarkerSize',8,'MarkerFaceColor','w')
+    
+    legend(p1(:,1), intervalNames)
+    xlabel('soa')
+    ylabel('cuing effect (accuracy)')
+    xlim(soaLims)
+    title(viNames{iVI})
+end
 
 %% set figure properties
 for iF = 1:numel(fig)
@@ -276,6 +324,6 @@ end
 
 %% Save figs
 if saveFigs
-    figNames = {'acc','rt','dprime','crit','eff','accCueEffect','accCueAve','accCueEffectOverlay','accCueAveOverlay'};
+    figNames = {'acc','rt','dprime','crit','eff','accCueEffect','accCueAve','accCueEffectOverlay','accCueAveOverlay','accCueEffectNOverlay'};
     rd_saveAllFigs(fig, figNames, figPrefix, [], '-depsc2')
 end

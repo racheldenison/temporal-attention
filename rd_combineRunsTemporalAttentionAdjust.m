@@ -1,13 +1,13 @@
 % rd_combineRunsTemporalAttentionAdjust.m
 
 %% setup
-subject = 'xx*_a1_tc100_soa1000-1250';
-runs = 1:2;
-combinedRun = 7;
+subject = 'bl_a1_tc100_soa1000-1250';
+runs = 1:4;
+combinedRun = 9;
 nRuns = numel(runs);
 
 saveData = 1;
-saveFigs = 0;
+saveFigs = 1;
 
 expName = 'E3_adjust';
 % dataDir = 'data';
