@@ -25,14 +25,6 @@ load(sprintf('%s/%s', dataDir, dataFile.name))
 %% analyze and plot
 errorIdx = strcmp(expt.trials_headers, 'responseError');
 
-% for iEL = 1:2
-%     for iV = 1:3
-%         count = histc(results.totals.all{iV,iEL}(:,errorIdx),edges);
-%         nTrials = size(results.totals.all{iV,iEL},1);
-%         rate{iEL}(iV,:) = count./nTrials;
-%     end
-% end
-
 for iEL = 1:2
     for iV = 1:3
         vals = results.totals.all{iV,iEL}(:,errorIdx);
