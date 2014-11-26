@@ -1,14 +1,17 @@
 % rd_plotTemporalAttentionAdjustResponseGroup.m
 
 %% setup
-subjectIDs = {'bl','rd','id','ec'};
+subjectIDs = {'bl','rd','id','ec','ld'};
+run = 29;
 nSubjects = numel(subjectIDs);
+
+saveFigs = 1;
 
 %% get data
 for iSubject = 1:nSubjects
     subjectID = subjectIDs{iSubject};
     [groupData.error(iSubject,:), groupData.pError(iSubject,:)] = ...
-        rd_plotTemporalAttentionAdjustResponse(subjectID);
+        rd_plotTemporalAttentionAdjustResponse(subjectID, run);
 end
 xEdges = mean(groupData.error,1);
 
@@ -23,11 +26,10 @@ end
 %% overlaid
 plotType = 'area'; % 'area','line'
 colors = {'b','g','r'};
-figure
+fig(1) = figure;
 for iEL = 1:2
     subplot(1,2,iEL)
     hold on
-    plot_vertical_line(0);
     for iV = 1:3
         vals = rate{iEL}(iV,:);
         switch plotType
@@ -47,12 +49,19 @@ for iEL = 1:2
     ylim([0 .18])
     xlabel('error in orientation report')
     ylabel('p(error)')
+    
+    if iEL == 2
+        legend('valid','invalid','neutral')
+        legend('boxoff')
+    end
+    plot_vertical_line(0);
 end
-legend('valid','invalid','neutral')
-legend('boxoff')
+
+rd_supertitle(sprintf('%s ', subjectIDs{:}));
+rd_raiseAxis(gca);
 
 %% separate plots for each validity
-figure
+fig(2) = figure;
 targetNames = {'T1','T2'};
 validityNames = {'valid','invalid','neutral'};
 validityOrder = [1 3 2];
@@ -88,4 +97,12 @@ for iEL = 1:2
     xlabel('error in orientation report')
     ylabel('p(error)')
 end
+rd_supertitle(sprintf('%s ', subjectIDs{:}));
+rd_raiseAxis(gca);
 
+%% save figs
+if saveFigs
+    figNames = {'errorHistOverlay','errorHistSeparate'};
+    figPrefix = sprintf('gE3_N%d_run%02d', nSubjects, run);
+    rd_saveAllFigs(fig, figNames, figPrefix, [], '-depsc2')
+end

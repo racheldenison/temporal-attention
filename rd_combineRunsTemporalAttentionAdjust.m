@@ -1,9 +1,9 @@
 % rd_combineRunsTemporalAttentionAdjust.m
 
 %% setup
-subject = 'ec_a1_tc100_soa1000-1250';
-runs = 1:4;
-combinedRun = 9;
+subject = 'ld_a1_tc100_soa1000-1250';
+runs = 3:4;
+combinedRun = 29;
 nRuns = numel(runs);
 
 saveData = 1;
@@ -32,6 +32,7 @@ for iRun = 1:nRuns
     trials = [trials; data.expt.trials];
     targetRotations = [targetRotations; data.expt.targetRotations];
     trialOrder = [trialOrder; data.expt.trialOrder + size(trialOrder,2)];
+    trialsPresented(iRun) = data.expt.trialsPresented;
     
     if strcmp(subjectID(1:3),'xx*')
         timing = [];
@@ -49,6 +50,7 @@ expt.trialOrder = trialOrder;
 expt.trials_headers = data.expt.trials_headers; % assume all runs identical
 expt.trials = trials;
 expt.targetRotations = targetRotations;
+expt.trialsPresented = trialsPresented;
 
 %% analyze data
 [expt results] = rd_analyzeTemporalAttentionAdjust(expt);
