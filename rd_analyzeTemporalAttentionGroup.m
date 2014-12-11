@@ -69,6 +69,7 @@ end
 for iEL = 1:2 % early/late
     if normalizeData
         accDataC{iEL} = normalizeDC(accDataC{iEL});
+        rtDataC{iEL} = normalizeDC(rtDataC{iEL});
     end
     
     accMeanC(:,iEL) = mean(accDataC{iEL},2);
@@ -310,10 +311,13 @@ rt2 = reshape(rtData{2}', nSubjects*3, 1);
 acc_all = [acc1; acc2];
 rt_all = [rt1; rt2];
 
+%% Collapsing across T1/T2
+accDataCT = (accDataC{1} + accDataC{2})/2;
+
 %% Quick stats
 for iEL = 1:2
     fprintf('T%d\n',iEL)
-    vals = rtDataC{iEL};
+    vals = accDataC{iEL};
     [hvi pvi] = ttest(vals(1,:),vals(2,:));
     [hvn pvn] = ttest(vals(1,:),vals(3,:));
     [hni pni] = ttest(vals(2,:),vals(3,:));
@@ -321,5 +325,16 @@ for iEL = 1:2
     fprintf('valid vs. neutral, p = %1.4f\n', pvn)
     fprintf('neutral vs. invalid, p = %1.4f\n\n', pni)
 end
+
+fprintf('Collapsing across T1 and T2\n')
+vals = accDataCT;
+[hvi pvi] = ttest(vals(1,:),vals(2,:));
+[hvn pvn] = ttest(vals(1,:),vals(3,:));
+[hni pni] = ttest(vals(2,:),vals(3,:));
+fprintf('valid vs. invalid, p = %1.4f\n', pvi)
+fprintf('valid vs. neutral, p = %1.4f\n', pvn)
+fprintf('neutral vs. invalid, p = %1.4f\n\n', pni)
+
+
 
 
