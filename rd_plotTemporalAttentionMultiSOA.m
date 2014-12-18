@@ -64,6 +64,8 @@ for iSOA = 1:numel(soa1)
         rtSte{iEL}(:,iSOA) = results.rtSte{iEL};
         [dprime{iEL}(:,iSOA) crit{iEL}(:,iSOA)] = ...
             rd_dprime(results.accMean{iEL},[],'2afc');
+%         dprime{iEL}(:,iSOA) = zeros(size(rtSte{iEL}(:,iSOA)));
+%         crit{iEL}(:,iSOA) = zeros(size(rtSte{iEL}(:,iSOA)));
     end
     
     %     % calculate dprime
@@ -80,6 +82,7 @@ p = expt.p;
 %% Calculate efficiency
 for iEL = 1:2 % early/late
     eff{iEL} = dprime{iEL}./rtMean{iEL};
+%     eff{iEL}(:,iSOA) = zeros(size(rtSte{iEL}(:,iSOA)));
 end
 
 %% Plot figs
