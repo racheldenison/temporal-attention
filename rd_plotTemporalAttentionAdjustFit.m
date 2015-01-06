@@ -5,13 +5,14 @@
 
 %% group i/o
 subjectIDs = {'bl','rd','id','ec','ld'};
-run = 9;
+run = 19;
 nSubjects = numel(subjectIDs);
 
 saveFigs = 0;
 
 % load the fit results from all subjects
-load data/adjust_workspace_20141225.mat
+% load data/adjust_workspace_20141225.mat
+load data/adjust_workspace_run19_20150106.mat
 
 %% get data and plot data and fits
 for iSubject = 1:nSubjects
@@ -29,7 +30,7 @@ for iSubject = 1:nSubjects
     
     %% load data
     dataFile = dir(sprintf('%s/%s_run%02d*', dataDir, subject, run));
-    load(sprintf('%s/%s', dataDir, dataFile.name))
+    load(sprintf('%s/%s', dataDir, dataFile(1).name))
     
     % setup
     df = 4;
@@ -109,10 +110,10 @@ rd_raiseAxis(gca);
 residsMean = squeeze(mean(resids,3));
 figure
 hold on
-plot([-100 100], [0 0], '-k');
 plot(xgrid,squeeze(residsMean(:,1,:))')
 plot(xgrid,squeeze(residsMean(:,2,:))')
 plot(xgrid,squeeze(mean(mean(residsMean,1),2))','k','LineWidth',2)
+plot([-100 100], [0 0], '-k');
 legend(validityNames)
 ylabel('p(error) residual mean')
 

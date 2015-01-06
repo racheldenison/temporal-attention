@@ -1,4 +1,4 @@
-function fit = rd_fitTemporalAttentionAdjust(subjectID, run)
+function [fit, err] = rd_fitTemporalAttentionAdjust(subjectID, run, saveData)
 
 % basic fitting
 % data.errors = ?
@@ -11,12 +11,14 @@ function fit = rd_fitTemporalAttentionAdjust(subjectID, run)
 % model comparison
 % MemFit(data, {model1, model2})
 
+if nargin < 3
+    saveData = 0;
+end
+
 %% setup
 % subjectID = 'rd';
 subject = sprintf('%s_a1_tc100_soa1000-1250', subjectID);
 % run = 9;
-
-saveFigs = 0;
 
 expName = 'E3_adjust';
 % dataDir = 'data';
@@ -32,6 +34,7 @@ load(sprintf('%s/%s', dataDir, dataFile.name))
 
 %% specify model
 model = Orientation(WithBias(StandardMixtureModel), [1,3]);
+modelName = 'mixtureWithBias';
 
 %% get errors and fit model
 errorIdx = strcmp(expt.trials_headers, 'responseError');
@@ -45,7 +48,15 @@ for iEL = 1:2
         errors = results.totals.all{iV,iEL}(:,errorIdx);
         
         fit(iV,iEL) = MemFit(errors, model, 'Verbosity', 0);
+        
+        err{iV,iEL} = errors;
     end
+end
+
+%% save data
+if saveData
+    fileName = sprintf('%s_run%02d_%s.mat', subject, run, modelName);
+    save(sprintf('%s/%s',dataDir,fileName),'fit','err','model')
 end
 
 
