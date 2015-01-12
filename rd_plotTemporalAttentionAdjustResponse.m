@@ -19,10 +19,11 @@ figDir = sprintf('%s/%s/%s', figDir, expName, subject(1:2));
 
 binSize = 4;
 edges = -90:binSize:90;
+binCenters = edges(1:end-1) + binSize/2;
 
 %% load data
 dataFile = dir(sprintf('%s/%s_run%02d*', dataDir, subject, run));
-load(sprintf('%s/%s', dataDir, dataFile.name))
+load(sprintf('%s/%s', dataDir, dataFile(1).name))
 
 %% analyze and plot
 errorIdx = strcmp(expt.trials_headers, 'responseError');
@@ -33,6 +34,8 @@ for iEL = 1:2
         nTrials = size(vals,1);
         
         if smoothHist
+            % n.b. counts not recentered to bin centers, and rate not
+            % adjusted for bin size -- best not to use at this stage
             counts = nan(binSize*2, (edges(end)+binSize) - (edges(1)-binSize));
             for iCount = 1:binSize*2+1
                 count = histc(vals, edges-binSize+iCount-1);
@@ -43,8 +46,11 @@ for iEL = 1:2
             xEdges = edges(1):edges(end);
         else
             count = histc(results.totals.all{iV,iEL}(:,errorIdx),edges);
-            rate{iEL}(iV,:) = count./nTrials;
-            xEdges = edges;
+            count(end-1) = count(end-1) + count(end); % merge last bin with previous
+            count(end) = [];
+%             rate{iEL}(iV,:) = count./nTrials;
+            rate{iEL}(iV,:) = count./sum(count*binSize);
+            xEdges = binCenters;
         end
     end
 end
@@ -72,7 +78,7 @@ for iEL = 1:2
         end
     end
     xlim([-90 90])
-    ylim([0 .25])
+    ylim([0 .08])
     xlabel('error in orientation report')
     ylabel('p(error)')
 end
@@ -106,7 +112,7 @@ for iEL = 1:2
                 error('plotType not recognized')
         end
         xlim([-90 90])
-        ylim([0 .25])
+        ylim([0 .08])
         if iEL==2
             legend(a1, validityNames{v})
             legend('boxoff')
