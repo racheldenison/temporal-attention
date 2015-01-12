@@ -36,7 +36,8 @@ for iSubject = 1:nSubjects
     
     % setup
     df = 4;
-    xgrid = -90:df:90;
+    xEdges = -90:df:90;
+    xgrid = xEdges(1:end-1) + df/2; % bin centers
     errorIdx = strcmp(expt.trials_headers, 'responseError');
     
     fit = indivResults(iSubject).fit;
@@ -48,7 +49,9 @@ for iSubject = 1:nSubjects
         for iV = 1:3
             % get errors for this condition
             errors = results.totals.all{iV,iEL}(:,errorIdx);
-            n = histc(errors, xgrid);
+            n = histc(errors, xEdges);
+            n(end-1) = n(end-1) + n(end); % last element of n contains the count of values exaclty equal to xEdges(end), so just combine it with the previous bin
+            n(end) = [];
             
             % get fit parameters for this condition
             p = fit(iV,iEL).posteriorMean;
@@ -87,7 +90,7 @@ for iSubject = 1:nSubjects
             title(sprintf('%s %s', targetNames{iEL}, validityNames{iV}))
         end
     end
-    rd_supertitle(subjectID);
+    rd_supertitle(sprintf('%s, run %d', subjectID, run));
     if saveFigs
         print(gcf, '-depsc2', ...
             sprintf('%s/%s_run%02d_TemporalAttentionAdjust_fit', figDir, subject, run))
