@@ -5,14 +5,16 @@
 
 %% group i/o
 subjectIDs = {'bl','rd','id','ec','ld'};
-run = 19;
+run = 29;
 nSubjects = numel(subjectIDs);
 
-saveFigs = 0;
+saveFigs = 1;
+
+groupFigTitle = [sprintf('%s ',subjectIDs{:}) sprintf('(N=%d), run %d', nSubjects, run)];
 
 % load the fit results from all subjects
 % load data/adjust_workspace_20141225.mat
-load data/adjust_workspace_run19_20150106.mat
+load(sprintf('data/adjust_workspace_run%02d_20150106.mat', run))
 
 %% get data and plot data and fits
 for iSubject = 1:nSubjects
@@ -86,12 +88,17 @@ for iSubject = 1:nSubjects
         end
     end
     rd_supertitle(subjectID);
+    if saveFigs
+        print(gcf, '-depsc2', ...
+            sprintf('%s/%s_run%02d_TemporalAttentionAdjust_fit', figDir, subject, run))
+    end
 end
 
 %% plot average residuals
 validityOrder = [1 3 2];
 ylims = [-0.02 0.02];
-figure
+figNames{1} = 'residsByCond';
+f(1) = figure;
 for iV = 1:3
     for iEL = 1:2
         subplot(3,2,(validityOrder(iV)-1)*2+iEL)
@@ -101,14 +108,18 @@ for iV = 1:3
         plot(xgrid, mean(squeeze(resids(iV,iEL,:,:))), 'k', 'LineWidth', 2)
         ylim(ylims)
         title(sprintf('%s %s', targetNames{iEL}, validityNames{iV}))
+        if iV==3 && iEL==1
+            ylabel('residuals (data-model)');
+        end
     end
 end
-rd_supertitle('residuals (data-model)');
+rd_supertitle(groupFigTitle);
 rd_raiseAxis(gca);
 
 % all conditions on same plot
 residsMean = squeeze(mean(resids,3));
-figure
+figNames{2} = 'residsAllConds';
+f(2) = figure;
 hold on
 plot(xgrid,squeeze(residsMean(:,1,:))')
 plot(xgrid,squeeze(residsMean(:,2,:))')
@@ -116,6 +127,8 @@ plot(xgrid,squeeze(mean(mean(residsMean,1),2))','k','LineWidth',2)
 plot([-100 100], [0 0], '-k');
 legend(validityNames)
 ylabel('p(error) residual mean')
+rd_supertitle(groupFigTitle);
+rd_raiseAxis(gca);
 
 
 %% param summary
@@ -137,7 +150,8 @@ ylims.g = [0 0.3];
 ylims.sd = [0 30];
 for iField = 1:numel(fieldNames)
     fieldName = fieldNames{iField};
-    figure
+    figNames{2+iField} = [fieldName 'Indiv'];
+    f(2+iField) = figure;
     for iEL = 1:2
         subplot(1,2,iEL)
         bar(squeeze(paramsData.(fieldName)(validityOrder,iEL,:))')
@@ -150,6 +164,8 @@ for iField = 1:numel(fieldNames)
         end
         title(targetNames{iEL})
     end
+    rd_supertitle(groupFigTitle);
+    rd_raiseAxis(gca);
 end
 
 % group
@@ -158,7 +174,8 @@ ylims.g = [0 0.16];
 ylims.sd = [0 25];
 for iField = 1:numel(fieldNames)
     fieldName = fieldNames{iField};
-    figure
+    figNames{5+iField} = [fieldName 'Group'];
+    f(5+iField) = figure;
     for iEL = 1:2
         subplot(1,2,iEL)
         hold on
@@ -171,8 +188,16 @@ for iField = 1:numel(fieldNames)
         set(gca,'XTickLabel', validityNames(validityOrder))
         title(targetNames{iEL})
     end
+    rd_supertitle(groupFigTitle);
+    rd_raiseAxis(gca);
 end
 
+%% save figures
+if saveFigs
+    groupFigPrefix = sprintf('gE3_N%d_run%02d', nSubjects, run);
+    rd_saveAllFigs(f, figNames, groupFigPrefix, [], '-depsc2');
+end
+    
 
 
 

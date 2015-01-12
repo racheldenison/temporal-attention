@@ -2,7 +2,7 @@
 
 %% setup
 subjectIDs = {'bl','rd','id','ec','ld'};
-run = 19;
+run = 9;
 nSubjects = numel(subjectIDs);
 
 saveIndivData = 1;
