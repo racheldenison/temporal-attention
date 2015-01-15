@@ -369,9 +369,15 @@ end
 
 % repeat trials matrix according to nReps of all conditions
 trials = repmat(trials, p.nReps, 1);
-targetRotations = repmat(targetRotations, p.nReps, 1);
 targetPhases = repmat(targetPhases, p.nReps, 1);
 nTrials = size(trials,1);
+
+% repeat target rotations, or set to be completely random
+if strcmp(p.rotateTarget, 'random')
+    targetRotations = floor(180*rand(nTrials,2));
+else
+    targetRotations = repmat(targetRotations, p.nReps, 1);
+end
 
 % show trials and blocks
 fprintf('\n%s\n\n%d trials, %1.2f blocks\n\n', datestr(now), nTrials, nTrials/p.nTrialsPerBlock)
