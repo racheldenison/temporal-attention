@@ -4,17 +4,20 @@
 % @(data,g,sd)((1-g).*vonmisespdf(data.errors(:),0,deg2k(sd))+(g).*1/360)
 
 %% group i/o
-subjectIDs = {'bl','rd','id','ec','ld'};
-run = 29;
+subjectIDs = {'bl','rd','id','ec','ld','en'};
+% subjectIDs = {'en'};
+run = 9;
 nSubjects = numel(subjectIDs);
 
-saveFigs = 1;
+saveFigs = 0;
 
 groupFigTitle = [sprintf('%s ',subjectIDs{:}) sprintf('(N=%d), run %d', nSubjects, run)];
 
 % load the fit results from all subjects
 % load data/adjust_workspace_20141225.mat
-load(sprintf('data/adjust_workspace_run%02d_20150106.mat', run))
+% load(sprintf('data/adjust_workspace_run%02d_20150106.mat', run))
+
+modelName = 'mixtureWithBias';
 
 %% get data and plot data and fits
 for iSubject = 1:nSubjects
@@ -31,16 +34,18 @@ for iSubject = 1:nSubjects
     figDir = sprintf('%s/%s/%s', figDir, expName, subject(1:2));
     
     %% load data
-    dataFile = dir(sprintf('%s/%s_run%02d*', dataDir, subject, run));
-    load(sprintf('%s/%s', dataDir, dataFile(1).name))
+%     dataFile = dir(sprintf('%s/%s_run%02d*', dataDir, subject, run));
+%     load(sprintf('%s/%s', dataDir, dataFile(1).name))
+    dataFile = dir(sprintf('%s/%s_run%02d_%s.mat', dataDir, subject, run, modelName));
+    load(sprintf('%s/%s', dataDir, dataFile.name))
     
     % setup
     df = 4;
     xEdges = -90:df:90;
     xgrid = xEdges(1:end-1) + df/2; % bin centers
-    errorIdx = strcmp(expt.trials_headers, 'responseError');
+%     errorIdx = strcmp(expt.trials_headers, 'responseError');
     
-    fit = indivResults(iSubject).fit;
+%     fit = indivResults(iSubject).fit;
     
     % get and plot data and model pdfs
     targetNames = {'T1','T2'};
@@ -48,7 +53,8 @@ for iSubject = 1:nSubjects
     for iEL = 1:2
         for iV = 1:3
             % get errors for this condition
-            errors = results.totals.all{iV,iEL}(:,errorIdx);
+%             errors = results.totals.all{iV,iEL}(:,errorIdx);
+            errors = err{iV,iEL};
             n = histc(errors, xEdges);
             n(end-1) = n(end-1) + n(end); % last element of n contains the count of values exaclty equal to xEdges(end), so just combine it with the previous bin
             n(end) = [];
@@ -194,6 +200,27 @@ for iField = 1:numel(fieldNames)
     rd_supertitle(groupFigTitle);
     rd_raiseAxis(gca);
 end
+
+% absolute value of mu
+absMu = abs(paramsData.mu);
+absMuMean = mean(absMu,3);
+absMuSte = std(absMu,0,3)./sqrt(nSubjects);
+figure
+for iEL = 1:2
+    subplot(1,2,iEL)
+    hold on
+    b1 = bar(1:3, absMuMean(validityOrder,iEL),'FaceColor',[.5 .5 .5]);
+    p1 = errorbar(1:3, absMuMean(validityOrder,iEL)', ...
+        absMuSte(validityOrder,iEL)','k','LineStyle','none');
+    ylim([-1 5])
+    ylabel('abs(mu)')
+    set(gca,'XTick',1:3)
+    set(gca,'XTickLabel', validityNames(validityOrder))
+    title(targetNames{iEL})
+end
+rd_supertitle(groupFigTitle);
+rd_raiseAxis(gca);
+
 
 %% save figures
 if saveFigs

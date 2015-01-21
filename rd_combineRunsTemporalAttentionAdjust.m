@@ -1,7 +1,7 @@
 % rd_combineRunsTemporalAttentionAdjust.m
 
 %% setup
-subject = 'ld_a1_tc100_soa1000-1250';
+subject = 'en_a1_tc100_soa1000-1250';
 runs = 3:4;
 combinedRun = 29;
 nRuns = numel(runs);
