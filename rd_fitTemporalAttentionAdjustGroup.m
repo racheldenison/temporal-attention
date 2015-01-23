@@ -2,7 +2,7 @@
 
 %% setup
 % subjectIDs = {'bl','rd','id','ec','ld'};
-subjectIDs = {'en'};
+subjectIDs = {'sj'};
 run = 29;
 nSubjects = numel(subjectIDs);
 

@@ -4,9 +4,9 @@
 % @(data,g,sd)((1-g).*vonmisespdf(data.errors(:),0,deg2k(sd))+(g).*1/360)
 
 %% group i/o
-subjectIDs = {'bl','rd','id','ec','ld','en'};
+subjectIDs = {'bl','rd','id','ec','ld','en','sj'};
 % subjectIDs = {'en'};
-run = 9;
+run = 29;
 nSubjects = numel(subjectIDs);
 
 saveFigs = 0;
