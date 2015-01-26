@@ -1,11 +1,11 @@
 % rd_plotTemporalAttentionAdjustResponseGroup.m
 
 %% setup
-subjectIDs = {'bl','rd','id','ec','ld'};
-run = 29;
+subjectIDs = {'bl','rd','id','ec','ld','en','sj'};
+run = 9;
 nSubjects = numel(subjectIDs);
 
-saveFigs = 1;
+saveFigs = 0;
 
 %% get data
 for iSubject = 1:nSubjects
@@ -46,7 +46,7 @@ for iEL = 1:2
         end
     end
     xlim([-90 90])
-    ylim([0 .18])
+    ylim([0 .08])
     xlabel('error in orientation report')
     ylabel('p(error)')
     
@@ -85,7 +85,7 @@ for iEL = 1:2
                 error('plotType not recognized')
         end
         xlim([-90 90])
-        ylim([0 .18])
+        ylim([0 .08])
         if iEL==2
             legend(a1, validityNames{v})
             legend('boxoff')
