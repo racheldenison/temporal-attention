@@ -97,6 +97,11 @@ end
 %     w0(i,1) = targetRotations(i,trials(i,2))==90;
 % end
 
+% % same (or different) orientation (CW or CCW) for the two targets
+% targetStates(:,1) = trials(:,strcmp(trials_headers, 'target1State'));
+% targetStates(:,2) = trials(:,strcmp(trials_headers, 'target2State'));
+% w0 = targetStates(:,1)==targetStates(:,2);
+
 %% Analyze data
 switch steOption
     case 'trial'

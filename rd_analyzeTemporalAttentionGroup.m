@@ -38,6 +38,12 @@ for iSubject = 1:nSubjects
         load(sprintf('%s/%s', dataDir, dataFile.name))
     end
     
+%     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%     %%% if you want to reanalyze, do it here %%%
+%     T1T2Axis = 'same';
+%     [expt results] = rd_analyzeTemporalAttention(expt, 0, 0, 0, 0, T1T2Axis, 0);
+%     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
     % read out the accuracy and rt
     for iEL = 1:2 % early/late
         accData{iEL}(:,iSubject) = results.accMean{iEL}(:,contrastIdx);
