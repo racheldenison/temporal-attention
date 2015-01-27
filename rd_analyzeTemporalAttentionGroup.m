@@ -4,7 +4,7 @@ exptName = 'cb';
 subjectInits = {'rd','ld','id','bl','ad','vp','ma','ty','zw','ec'};
 tilt = '*';
 contrast = '*'; % '64'; % 
-contrastIdx = 2; % only plot one contrast at a time
+contrastIdx = 1; % only plot one contrast at a time
 soa1 = 1000;
 soa2 = 1250;
 
