@@ -1,9 +1,9 @@
 % rd_combineRunsTemporalAttentionAdjust.m
 
 %% setup
-subject = 'sj_a1_tc100_soa1000-1250';
-runs = 3:4;
-combinedRun = 29;
+subject = 'ml_a1_tc100_soa1000-1250';
+runs = 1:4;
+combinedRun = 9;
 nRuns = numel(runs);
 
 saveData = 1;
