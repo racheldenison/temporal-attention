@@ -18,7 +18,7 @@ figDir = sprintf('%s/%s/%s', figDir, expName, subject(1:2));
 
 %% load data
 dataFile = dir(sprintf('%s/%s_run%02d*', dataDir, subject, run));
-load(sprintf('%s/%s', dataDir, dataFile.name))
+load(sprintf('%s/%s', dataDir, dataFile(1).name))
 
 %% get trials info
 p = expt.p;

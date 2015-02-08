@@ -33,12 +33,14 @@ dataFile = dir(sprintf('%s/%s_run%02d*', dataDir, subject, run));
 load(sprintf('%s/%s', dataDir, dataFile(1).name))
 
 %% specify model
-modelName = 'mixtureNoBias';
+modelName = 'variablePrecision';
 switch modelName
     case 'mixtureWithBias'
         model = Orientation(WithBias(StandardMixtureModel), [1,3]); % mu, sd
     case 'mixtureNoBias'
         model = Orientation(StandardMixtureModel, 2); % sd
+    case 'variablePrecision'
+        model = Orientation(VariablePrecisionModel, [2,3]); % mnSTD, stdSTD
     otherwise
         error('modelName not recognized')
 end
