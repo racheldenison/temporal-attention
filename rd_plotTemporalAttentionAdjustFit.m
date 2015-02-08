@@ -89,6 +89,7 @@ for iSubject = 1:nSubjects
             
             % store residuals
             resids(iV,iEL,iSubject,:) = resid;
+            residsShift(iV,iEL,iSubject,:) = circshift(resid,[0 round(mu/df)]);
             
             % also generate smooth model pdf for plotting
             x = -90:90;
