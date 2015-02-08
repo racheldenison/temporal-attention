@@ -30,11 +30,18 @@ figDir = sprintf('%s/%s/%s', figDir, expName, subject(1:2));
 
 %% load data
 dataFile = dir(sprintf('%s/%s_run%02d*', dataDir, subject, run));
-load(sprintf('%s/%s', dataDir, dataFile.name))
+load(sprintf('%s/%s', dataDir, dataFile(1).name))
 
 %% specify model
-model = Orientation(WithBias(StandardMixtureModel), [1,3]);
-modelName = 'mixtureWithBias';
+modelName = 'mixtureNoBias';
+switch modelName
+    case 'mixtureWithBias'
+        model = Orientation(WithBias(StandardMixtureModel), [1,3]); % mu, sd
+    case 'mixtureNoBias'
+        model = Orientation(StandardMixtureModel, 2); % sd
+    otherwise
+        error('modelName not recognized')
+end
 
 %% get errors and fit model
 errorIdx = strcmp(expt.trials_headers, 'responseError');

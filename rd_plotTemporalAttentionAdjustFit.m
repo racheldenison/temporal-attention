@@ -4,11 +4,12 @@
 % @(data,g,sd)((1-g).*vonmisespdf(data.errors(:),0,deg2k(sd))+(g).*1/360)
 
 %% group i/o
-subjectIDs = {'bl','rd','id','ec','ld','en','sj','ml'};
-% subjectIDs = {'ml'};
-run = 29;
+subjectIDs = {'bl','rd','id','ec','ld','en','sj','ml','ca','jl'};
+% subjectIDs = {'jl'};
+run = 9;
 nSubjects = numel(subjectIDs);
 
+plotDistributions = 0;
 saveFigs = 0;
 
 groupFigTitle = [sprintf('%s ',subjectIDs{:}) sprintf('(N=%d), run %d', nSubjects, run)];
@@ -17,7 +18,7 @@ groupFigTitle = [sprintf('%s ',subjectIDs{:}) sprintf('(N=%d), run %d', nSubject
 % load data/adjust_workspace_20141225.mat
 % load(sprintf('data/adjust_workspace_run%02d_20150106.mat', run))
 
-modelName = 'mixtureWithBias';
+modelName = 'mixtureWithBias'; % 'mixtureWithBias','mixtureNoBias'
 
 %% get data and plot data and fits
 for iSubject = 1:nSubjects
@@ -61,9 +62,18 @@ for iSubject = 1:nSubjects
             
             % get fit parameters for this condition
             p = fit(iV,iEL).posteriorMean;
-            mu = p(1);
-            g = p(2);
-            sd = p(3);
+            switch modelName
+                case 'mixtureWithBias'
+                    mu = p(1);
+                    g = p(2);
+                    sd = p(3);
+                case 'mixtureNoBias'
+                    mu = 0;
+                    g = p(1);
+                    sd = p(2);
+                otherwise
+                    error('modelName not recognized')
+            end
             
             % store fit parameters
             paramsData.mu(iV,iEL,iSubject) = mu;
@@ -83,23 +93,25 @@ for iSubject = 1:nSubjects
             x = -90:90;
             y = (1-g).*vonmisespdf(x,mu,deg2k(sd))+(g).*1/180;
             
-            ylims = [-0.02 0.06];
-            validityOrder = [1 3 2];
-            figure(iSubject)
-            subplot(3,2,(validityOrder(iV)-1)*2+iEL)
-            hold on
-            plot(xgrid,pdfData)
-            plot(x,y,'r','LineWidth',1.5)
-            %         plot(xgrid,pdfModel,'.r')
-            plot(xgrid, resid, 'g')
-            ylim(ylims)
-            title(sprintf('%s %s', targetNames{iEL}, validityNames{iV}))
+            if plotDistributions
+                ylims = [-0.02 0.06];
+                validityOrder = [1 3 2];
+                figure(iSubject)
+                subplot(3,2,(validityOrder(iV)-1)*2+iEL)
+                hold on
+                plot(xgrid,pdfData)
+                plot(x,y,'r','LineWidth',1.5)
+                %         plot(xgrid,pdfModel,'.r')
+                plot(xgrid, resid, 'g')
+                ylim(ylims)
+                title(sprintf('%s %s', targetNames{iEL}, validityNames{iV}))
+            end
         end
     end
     rd_supertitle(sprintf('%s, run %d', subjectID, run));
     if saveFigs
         print(gcf, '-depsc2', ...
-            sprintf('%s/%s_run%02d_TemporalAttentionAdjust_fit', figDir, subject, run))
+            sprintf('%s/%s_run%02d_TemporalAttentionAdjust_fit_%s', figDir, subject, run, modelName))
     end
 end
 
@@ -166,6 +178,7 @@ for iField = 1:numel(fieldNames)
         bar(squeeze(paramsData.(fieldName)(validityOrder,iEL,:))')
         set(gca,'XTickLabel',subjectIDs)
         colormap(flag(3))
+        xlim([0 nSubjects+1])
         ylim(ylims.(fieldName))
         if iEL==1
             ylabel(fieldName)
@@ -224,7 +237,7 @@ rd_raiseAxis(gca);
 
 %% save figures
 if saveFigs
-    groupFigPrefix = sprintf('gE3_N%d_run%02d', nSubjects, run);
+    groupFigPrefix = sprintf('gE3_N%d_run%02d_%s', nSubjects, run, modelName);
     rd_saveAllFigs(f, figNames, groupFigPrefix, [], '-depsc2');
 end
     

@@ -5,7 +5,7 @@ function [xEdges, rate] = rd_plotTemporalAttentionAdjustResponse(subjectID, run)
 subject = sprintf('%s_a1_tc100_soa1000-1250', subjectID);
 % run = 9;
 
-saveFigs = 1;
+saveFigs = 0;
 
 smoothHist = 0;
 
