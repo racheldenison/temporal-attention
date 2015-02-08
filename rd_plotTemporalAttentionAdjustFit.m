@@ -76,6 +76,7 @@ for iSubject = 1:nSubjects
             end
             
             % store fit parameters
+            paramsData.absMu(iV,iEL,iSubject) = abs(mu);
             paramsData.mu(iV,iEL,iSubject) = mu;
             paramsData.g(iV,iEL,iSubject) = g;
             paramsData.sd(iV,iEL,iSubject) = sd;
@@ -108,10 +109,12 @@ for iSubject = 1:nSubjects
             end
         end
     end
-    rd_supertitle(sprintf('%s, run %d', subjectID, run));
-    if saveFigs
-        print(gcf, '-depsc2', ...
-            sprintf('%s/%s_run%02d_TemporalAttentionAdjust_fit_%s', figDir, subject, run, modelName))
+    if plotDistributions
+        rd_supertitle(sprintf('%s, run %d', subjectID, run));
+        if saveFigs
+            print(gcf, '-depsc2', ...
+                sprintf('%s/%s_run%02d_TemporalAttentionAdjust_fit_%s', figDir, subject, run, modelName))
+        end
     end
 end
 
@@ -166,13 +169,14 @@ fieldNames = fields(paramsMean);
 
 % indiv subjects
 ylims = [];
+ylims.absMu = [-1 8];
 ylims.mu = [-8 8];
 ylims.g = [0 0.3];
 ylims.sd = [0 30];
 for iField = 1:numel(fieldNames)
     fieldName = fieldNames{iField};
-    figNames{2+iField} = [fieldName 'Indiv'];
-    f(2+iField) = figure;
+    figNames{end+1} = [fieldName 'Indiv'];
+    f(end+1) = figure;
     for iEL = 1:2
         subplot(1,2,iEL)
         bar(squeeze(paramsData.(fieldName)(validityOrder,iEL,:))')
@@ -191,13 +195,14 @@ for iField = 1:numel(fieldNames)
 end
 
 % group
+ylims.absMu = [-1 4];
 ylims.mu = [-4 4];
 ylims.g = [0 0.16];
 ylims.sd = [0 25];
 for iField = 1:numel(fieldNames)
     fieldName = fieldNames{iField};
-    figNames{5+iField} = [fieldName 'Group'];
-    f(5+iField) = figure;
+    figNames{end+1} = [fieldName 'Group'];
+    f(end+1) = figure;
     for iEL = 1:2
         subplot(1,2,iEL)
         hold on
@@ -213,27 +218,6 @@ for iField = 1:numel(fieldNames)
     rd_supertitle(groupFigTitle);
     rd_raiseAxis(gca);
 end
-
-% absolute value of mu
-absMu = abs(paramsData.mu);
-absMuMean = mean(absMu,3);
-absMuSte = std(absMu,0,3)./sqrt(nSubjects);
-figure
-for iEL = 1:2
-    subplot(1,2,iEL)
-    hold on
-    b1 = bar(1:3, absMuMean(validityOrder,iEL),'FaceColor',[.5 .5 .5]);
-    p1 = errorbar(1:3, absMuMean(validityOrder,iEL)', ...
-        absMuSte(validityOrder,iEL)','k','LineStyle','none');
-    ylim([-1 5])
-    ylabel('abs(mu)')
-    set(gca,'XTick',1:3)
-    set(gca,'XTickLabel', validityNames(validityOrder))
-    title(targetNames{iEL})
-end
-rd_supertitle(groupFigTitle);
-rd_raiseAxis(gca);
-
 
 %% save figures
 if saveFigs
