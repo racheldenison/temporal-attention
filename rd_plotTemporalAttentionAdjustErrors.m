@@ -1,12 +1,14 @@
-function [errors, targetOrients, nonTargetOrients, targetOrientDiff, probeOrients, probeOrientDiff] = ...
-    rd_plotTemporalAttentionAdjustErrors(subjectID)
+function [errors, targetOrients, nonTargetOrients, targetOrientDiff, probeOrients, probeOrientDiff, responses] = ...
+    rd_plotTemporalAttentionAdjustErrors(subjectID, run, plotFigs)
 
 %% setup
 % subjectID = 'rd';
 subject = sprintf('%s_a1_tc100_soa1000-1250', subjectID);
-run = 9;
+% run = 9;
 
-plotFigs = 1;
+if nargin<3
+    plotFigs = 1;
+end
 
 expName = 'E3_adjust';
 % dataDir = 'data';
@@ -31,14 +33,15 @@ targetContrastIdx = strcmp(trials_headers,'targetContrast');
 respIntervalIdx = strcmp(trials_headers,'respInterval');
 cueValidityIdx = strcmp(trials_headers,'cueValidity');
 responseErrorIdx = strcmp(trials_headers,'responseError');
+responseIdx = strcmp(trials_headers,'response');
 
 %% get probe orientations in the order of trials
 if isfield(expt.trialsPresented(1).vals(1),'probeStartAngle')
     analyzeProbe = 1;
 else
-analyzeProbe = 0;
-probeOrients = NaN;
-probeOrientDiff = NaN;
+    analyzeProbe = 0;
+    probeOrients = NaN;
+    probeOrientDiff = NaN;
 end
 
 if analyzeProbe
@@ -87,6 +90,7 @@ for iRI = 1:numel(p.respInterval)
         targetOrients{iCV,iRI} = rotations(:,targetIdx);
         nonTargetOrients{iCV,iRI} = rotations(:,3-targetIdx);
         errors{iCV,iRI} = totals.all{iCV,iRI}(:,responseErrorIdx);
+        responses{iCV,iRI} = totals.all{iCV,iRI}(:,responseIdx);
         
         tod = nonTargetOrients{iCV,iRI} - targetOrients{iCV,iRI};
         

@@ -2,7 +2,7 @@
 %
 % organize fit data for group stats
 
-load data/adjust_fit_group_stats_run09_N10_20150216.mat
+load data/adjust_fit_group_stats_run19_N10_20150216.mat
 
 nSubjects = numel(subjectIDs);
 

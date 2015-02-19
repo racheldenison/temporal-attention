@@ -10,7 +10,7 @@ run = 9;
 nSubjects = numel(subjectIDs);
 
 plotDistributions = 0;
-saveFigs = 0;
+saveFigs = 1;
 
 groupFigTitle = [sprintf('%s ',subjectIDs{:}) sprintf('(N=%d), run %d', nSubjects, run)];
 
@@ -223,7 +223,7 @@ end
 %% save figures
 if saveFigs
     groupFigPrefix = sprintf('gE3_N%d_run%02d_%s', nSubjects, run, modelName);
-    rd_saveAllFigs(f, figNames, groupFigPrefix, [], '-depsc2');
+    rd_saveAllFigs(f, figNames, groupFigPrefix, [], '-depsc2'); %-depsc2, -dpng
 end
     
 

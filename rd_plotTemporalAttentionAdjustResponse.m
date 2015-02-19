@@ -21,16 +21,27 @@ binSize = 4;
 edges = -90:binSize:90;
 binCenters = edges(1:end-1) + binSize/2;
 
+analyzeNonTarget = 0;
+
 %% load data
 dataFile = dir(sprintf('%s/%s_run%02d*', dataDir, subject, run));
 load(sprintf('%s/%s', dataDir, dataFile(1).name))
+
+%% get non-target errors if requested
+if analyzeNonTarget
+    nonTargetErrors = getAdjustNonTargetErrors(subjectID, run);
+end
 
 %% analyze and plot
 errorIdx = strcmp(expt.trials_headers, 'responseError');
 
 for iEL = 1:2
     for iV = 1:3
-        vals = results.totals.all{iV,iEL}(:,errorIdx);
+        if analyzeNonTarget
+            vals = nonTargetErrors{iV,iEL};
+        else
+            vals = results.totals.all{iV,iEL}(:,errorIdx);
+        end
         nTrials = size(vals,1);
         
         if smoothHist
@@ -45,7 +56,7 @@ for iEL = 1:2
             rate{iEL}(iV,:) = rate0(binSize+1:end-binSize);
             xEdges = edges(1):edges(end);
         else
-            count = histc(results.totals.all{iV,iEL}(:,errorIdx),edges);
+            count = histc(vals, edges);
             count(end-1) = count(end-1) + count(end); % merge last bin with previous
             count(end) = [];
 %             rate{iEL}(iV,:) = count./nTrials;
@@ -129,7 +140,11 @@ rd_raiseAxis(gca);
 
 %% save figs
 if saveFigs
-    figNames = {'errorHistOverlay','errorHistSeparate'};
+    if analyzeNonTarget
+        figNames = {'errorHistOverlay_nonTarget','errorHistSeparate_nonTarget'};
+    else
+        figNames = {'errorHistOverlay','errorHistSeparate'};
+    end
     figPrefix = sprintf('%s_run%02d_TemporalAttentionAdjust', subject, run);
     rd_saveAllFigs(fig, figNames, figPrefix, figDir, '-depsc2')
 end

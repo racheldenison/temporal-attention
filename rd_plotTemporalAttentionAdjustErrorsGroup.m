@@ -4,6 +4,9 @@
 subjectIDs = {'bl','rd','id','ec','ld','en','sj','ml','ca','jl'};
 nSubjects = numel(subjectIDs);
 
+run = 9;
+plotIndivFigs = 0;
+
 analyzeProbe = 0;
 
 %% get data
@@ -15,7 +18,7 @@ for iSubject = 1:nSubjects
         groupData0(iSubject).targetOrientDiff, ...
         groupData0(iSubject).probeOrients, ...
         groupData0(iSubject).probeOrientDiff] = ...
-            rd_plotTemporalAttentionAdjustErrors(subjectID);
+            rd_plotTemporalAttentionAdjustErrors(subjectID, run, plotIndivFigs);
 end
 
 if analyzeProbe==0
@@ -158,6 +161,32 @@ xlabel('target orientation')
 rd_supertitle(sprintf('%s ', subjectIDs{:}));
 rd_raiseAxis(gca);
 
+% flip flip
+figure
+for iRI = 1:2
+    subplot(2,1,iRI)
+    hold on
+    for iCV = 1:3
+        to = groupData.targetOrients{iCV,iRI};
+        e = groupData.errors{iCV,iRI};
+        w = to>90;
+        targetOrientsFF{iCV,iRI} = to;
+        targetOrientsFF{iCV,iRI}(w) = 180 - to(w);
+        errorsFF{iCV,iRI} = e;
+        errorsFF{iCV,iRI}(w) = -e(w);
+        
+        eff = errorsFF{iCV,iRI}(:);
+        toff = targetOrientsFF{iCV,iRI}(:);
+        
+        plot(toff, eff, '.', 'Color', colors{iCV})
+    end
+    plot([0 90], [0 0], 'k', 'LineWidth', 2)
+    xlim([0 90])
+    xlabel('flipflip target orientation')
+    ylabel('flipflip error')
+end
+
+
 % non-target orientation
 figure
 for iRI = 1:2
@@ -204,6 +233,51 @@ end
 xlabel('non-target - target orientation difference')
 rd_supertitle(sprintf('%s ', subjectIDs{:}));
 rd_raiseAxis(gca);
+
+% flip flip
+binEdgesFF = -90:10:0;
+effVar = [];
+figure
+for iRI = 1:2
+    subplot(2,1,iRI)
+    hold on
+    for iCV = 1:3
+        tod = groupData.targetOrientDiff{iCV,iRI};
+        e = groupData.errors{iCV,iRI};
+        w = tod>0;
+        targetOrientDiffFF{iCV,iRI} = tod;
+        targetOrientDiffFF{iCV,iRI}(w) = -tod(w);
+        errorsFF{iCV,iRI} = e;
+        errorsFF{iCV,iRI}(w) = -e(w);
+        
+        eff = errorsFF{iCV,iRI}(:);
+        todff = targetOrientDiffFF{iCV,iRI}(:);
+        
+        plot(todff, abs(eff), '.', 'Color', colors{iCV})
+        
+        % bin
+        for iBin = 1:numel(binEdgesFF)-1
+            edges = binEdgesFF(iBin:iBin+1);
+            effVar(iBin,iCV,iRI) = var(eff(todff>edges(1) & todff<=edges(2)));
+        end
+    end
+    plot([-90 0], [0 0], 'k', 'LineWidth', 2)
+    xlim([-90 0])
+    xlabel('flipflip non-target - target orientation difference')
+    ylabel('flipflip error')
+end
+
+figure
+for iRI = 1:2
+    subplot(1,2,iRI)
+    plot(effVar(:,:,iRI))
+    xlabel('flipflip non-target - target bin')
+    ylabel('error variance')
+    title(targetNames{iRI})
+end
+legend('valid','invalid','neutral')
+
+
 
 % target x non-target orientation
 validityNames = {'valid','invalid','neutral'};
