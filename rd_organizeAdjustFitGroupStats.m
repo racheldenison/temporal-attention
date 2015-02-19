@@ -2,6 +2,7 @@
 %
 % organize fit data for group stats
 
+%% setup
 load data/adjust_fit_group_stats_run19_N10_20150216.mat
 
 nSubjects = numel(subjectIDs);
@@ -15,6 +16,7 @@ nVal = size(paramsData.sd,1);
 nTarg = size(paramsData.sd,2);
 nSub = size(paramsData.sd,3);
 
+%% make table
 table_headers = [{'subject','T1T2','validity'}, measures'];
 idx = 1;
 for iSub = 1:nSub
@@ -31,4 +33,22 @@ for iSub = 1:nSub
     end
 end
 
+%% simple t-tests
+for iM = 1:numel(measures)
+    m = measures{iM};
+    fprintf('\n\n%s', m)
+    for iTarg = 1:nTarg
+        dataV = squeeze(paramsData.(m)(1,iTarg,:));
+        dataI = squeeze(paramsData.(m)(2,iTarg,:));
+        dataN = squeeze(paramsData.(m)(3,iTarg,:));
+        [hVI pVI] = ttest(dataV,dataI);
+        [hVN pVN] = ttest(dataV,dataN);
+        [hNI pNI] = ttest(dataN,dataI);
+        fprintf('\nT%d',iTarg)
+        fprintf('\nvalid vs. invalid: p = %1.5f', pVI)
+        fprintf('\nvalid vs. neutral: p = %1.5f', pVN)
+        fprintf('\nneutral vs. invalid: p = %1.5f\n', pNI)
+    end
+end
+            
             
