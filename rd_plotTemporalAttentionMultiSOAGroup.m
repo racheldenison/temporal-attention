@@ -71,6 +71,7 @@ dpLims = [-0.5 2.7];
 critLims = [-1 1];
 effLims = [0 3.5];
 accDiffLims = [-0.15 0.25];
+accCueEffLims = [-0.3 0.35];
 soaLims = [t1t2soa(1)-100 t1t2soa(end)+100];
 colors = get(0,'DefaultAxesColorOrder');
 axTitle = '';
@@ -262,6 +263,7 @@ legend(p1, intervalNames)
 xlabel('soa')
 ylabel('cuing effect (accuracy valid-invalid)')
 xlim(soaLims)
+ylim(accCueEffLims)
 
 
 fig(9) = figure;
@@ -323,6 +325,7 @@ for iF = 1:numel(fig)
 end
 
 %% Save figs
+% figPrefix = [figPrefix '_sameAxDiffOrient'];
 if saveFigs
     figNames = {'acc','rt','dprime','crit','eff','accCueEffect','accCueAve','accCueEffectOverlay','accCueAveOverlay','accCueEffectNOverlay'};
     rd_saveAllFigs(fig, figNames, figPrefix, [], '-depsc2')

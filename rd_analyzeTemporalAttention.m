@@ -22,6 +22,8 @@ end
 steOption = 'trial'; % 'trial','set'
 fprintf('\nStandard error by %s\n\n', steOption)
 
+plotFigs = 1;
+
 %% Read out variables from expt
 subjectID = expt.subjectID;
 p = expt.p;
@@ -167,6 +169,7 @@ if saveData
 end
 
 %% Plot figs
+if plotFigs
 intervalNames = {'early','late'};
 accLims = [0.2 1];
 rtLims = [0.2 1.6];
@@ -226,6 +229,7 @@ for iRI = 1:numel(p.respInterval)
     rd_supertitle(subjectID);
     rd_raiseAxis(gca);
     rd_supertitle(axTitle);
+end
 end
 
 %% Save figs

@@ -48,6 +48,12 @@ for iSOA = 1:numel(soa1)
         load(sprintf('%s/%s', dataDir, dataFile.name))
     end
     
+%     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%     %%% if you want to reanalyze, do it here %%%
+%     T1T2Axis = 'same';
+%     [expt results] = rd_analyzeTemporalAttention(expt, 0, 0, 0, 0, T1T2Axis, 0);
+%     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
     % read out the target timings
     soas(iSOA,:) = expt.p.soas;
     
