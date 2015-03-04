@@ -10,7 +10,7 @@ run = 9;
 nSubjects = numel(subjectIDs);
 
 plotDistributions = 0;
-saveFigs = 1;
+saveFigs = 0;
 
 groupFigTitle = [sprintf('%s ',subjectIDs{:}) sprintf('(N=%d), run %d', nSubjects, run)];
 
@@ -18,7 +18,7 @@ groupFigTitle = [sprintf('%s ',subjectIDs{:}) sprintf('(N=%d), run %d', nSubject
 % load data/adjust_workspace_20141225.mat
 % load(sprintf('data/adjust_workspace_run%02d_20150106.mat', run))
 
-modelName = 'mixtureWithBias'; % 'mixtureWithBias','mixtureNoBias'
+modelName = 'mixtureNoBias'; % 'mixtureWithBias','mixtureNoBias'
 
 %% get data and plot data and fits
 for iSubject = 1:nSubjects
