@@ -91,6 +91,7 @@ end
 [window rect] = Screen('OpenWindow', screenNumber);
 % [window rect] = Screen('OpenWindow', screenNumber, [], [0 0 800 600]);
 white = WhiteIndex(window);  % Retrieves the CLUT color code for white.
+black = BlackIndex(window);
 [cx cy] = RectCenter(rect);
 Screen('TextSize', window, p.fontSize);
 Screen('TextColor', window, white);
@@ -132,7 +133,8 @@ end
 imPos = round(ang2pix(p.imPos, p.screenSize(1), p.screenRes(1), p.viewDist, 'radial')); % from screen center
 targetSize = round(ang2pix(p.targetSize, p.screenSize(1), p.screenRes(1), p.viewDist, 'central'));
 exoSize = round(ang2pix(p.exoSize, p.screenSize(1), p.screenRes(1), p.viewDist, 'central'));
-exoVPos = round(ang2pix(p.exoVPos, p.screenSize(1), p.screenRes(1), p.viewDist, 'radial')); % from target center
+% exoVPos = round(ang2pix(p.exoVPos, p.screenSize(1), p.screenRes(1), p.viewDist, 'radial')); % from target center
+exoPos = round(ang2pix(p.exoPos, p.screenSize(1), p.screenRes(1), p.viewDist, 'central')); % from target center
 pixelsPerDegree = round(ang2pix(1, p.screenSize(1), p.screenRes(1), p.viewDist, 'central'));
 
 % Make target gratings
@@ -229,10 +231,10 @@ end
 
 % Make exo cue
 % exoIm = zeros(exoSize);
-[x y] = meshgrid(-exoSize(1)/2:exoSize(1)/2, -exoSize(2)/2:exoSize(2)/2);
-exoIm = double(x.^2 + y.^2 < (exoSize(1)/2)^2);
-exoIm(exoIm==0) = 0.5;
-exoIm(exoIm==1) = 0;
+% [x y] = meshgrid(-exoSize(1)/2:exoSize(1)/2, -exoSize(2)/2:exoSize(2)/2);
+% exoIm = double(x.^2 + y.^2 < (exoSize(1)/2)^2);
+% exoIm(exoIm==0) = 0.5;
+% exoIm(exoIm==1) = 0;
 
 %% Make textures
 for iP = 1:numel(p.targetPhases)
@@ -251,14 +253,14 @@ else
     maskTexs = Screen('MakeTexture', window, mask*white);
 end
 
-exoTex = Screen('MakeTexture', window, exoIm*white);
+% exoTex = Screen('MakeTexture', window, exoIm*white);
 
 % Make the rects for placing the images
 imSize = size(target{1,1},1);
 imRect = CenterRectOnPoint([0 0 imSize imSize], cx+imPos(1), cy+imPos(2));
 phRect = imRect + [-1 -1 1 1]*p.phLineWidth;
 phRect = phRect + [-1 -1 1 1]*round(ang2pix(0.25, p.screenSize(1), p.screenRes(1), p.viewDist, 'central'));; % expand placeholders by this many pixels so that they are not obscured by image rotations
-exoRect = CenterRectOnPoint([0 0 exoSize(2) exoSize(1)], cx+imPos(1), cy+imPos(2)-exoVPos);
+% exoRect = CenterRectOnPoint([0 0 exoSize(2) exoSize(1)], cx+imPos(1), cy+imPos(2)-exoVPos);
 
 %% Generate trials
 % Construct trials matrix
@@ -589,7 +591,9 @@ while trialCounter <= nTrials
     if any(cuedInterval==1)
         DrawFormattedText(window, 'x', 'center', 'center', white);
         drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
-        Screen('DrawTexture', window, exoTex, [], exoRect);
+%         Screen('DrawTexture', window, exoTex, [], exoRect);
+        Screen('DrawDots', window, exoPos, exoSize, p.exoColor, [cx+imPos(1) cy+imPos(2)], 2);
+%         Screen(window, 'FrameOval', p.exoColor, imRect, p.exoLineWidth)
         timeExo1 = Screen('Flip', window, timeCue + p.soas(1) - p.exoSOA - slack);
         
         % blank
@@ -675,7 +679,9 @@ while trialCounter <= nTrials
     if any(cuedInterval==2)
         DrawFormattedText(window, 'x', 'center', 'center', white);
         drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
-        Screen('DrawTexture', window, exoTex, [], exoRect);
+%         Screen('DrawTexture', window, exoTex, [], exoRect);
+        Screen('DrawDots', window, exoPos, exoSize, p.exoColor, [cx+imPos(1) cy+imPos(2)], 2);
+%         Screen(window, 'FrameOval', p.exoColor, imRect, p.exoLineWidth)
         timeExo2 = Screen('Flip', window, timeCue + p.soas(2) - p.exoSOA - slack);
         
         % blank

@@ -70,8 +70,13 @@ p.triangleBlurProp = 0.3;
 p.triHWRatio = 1; % should be >= 1 so that targetSize corresponds to triangle width
 p.extraOblTilt = [-5 5];
 p.tiltJitter = 1;
-p.exoSize = [0.3 0.3];
-p.exoVPos = 2.5; % vertical offset of exo cue from target center
+% p.exoSize = [0.3 0.3];
+p.exoSize = 0.3;
+% p.exoVPos = 2.5; % 2.5; % vertical offset of exo cue from target center
+p.exoPos = [2.3; -2.3]./sqrt(2);
+% p.exoPos = [2.3 2.3 -2.3 -2.3; -2.3 2.3 -2.3 2.3]./sqrt(2);
+p.exoColor = [0 0 0];
+p.exoLineWidth = 2; % if circle around target
 
 % Staircase (implemented only for targetOrientation for now)
 p.staircase = 0;
