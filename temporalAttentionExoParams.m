@@ -1,6 +1,6 @@
 function p = temporalAttentionExoParams
 
-p.testingLocation = 'laptop'; % 'CarrascoL1','laptop','desk'
+p.testingLocation = 'CarrascoL1'; % 'CarrascoL1','laptop','desk'
 
 switch p.testingLocation
     case {'laptop','desk'}
@@ -16,7 +16,7 @@ switch p.testingLocation
         p.screenSize = [40 30];
         p.screenRes = [1024 768];
         p.viewDist = 56;
-        p.eyeTracking = 1; 
+        p.eyeTracking = 0; 
     otherwise
         error('Testing location not found in temporalAttentionParams.')
 end     
@@ -27,13 +27,13 @@ p.goCueColor = 0.75;
 p.nReps = 1;
 p.nTrialsPerBlock = 64;
 p.font = 'Verdana';
-p.fontSize = 24;
+p.fontSize = 24; % 24
 p.showPlaceholders = 1;
 p.phLineWidth = 2; % (pixels)
 p.eyeRad = 1.5; % allowed fixation radius (degrees)
 
 % Condition
-p.targetContrasts = [.64]; % [.64 1];
+p.targetContrasts = [.08 .64]; % [.64 1];
 p.respInterval = [1 2]; % [1=early 2=late]
 p.cueValidity = [1 -1 2 0]; % [1=valid -1=invalid 2=neutral(both) 0=neutral(none)]
 % p.propValid = 0.67;
@@ -62,7 +62,7 @@ p.imPos = [4 4];
 p.imSize = [4 4]; % this is the size of the image container that holds the stim
 p.targetSize = 0.5; % 0.5 sigma of gaussian / 1.5 side length of T/L / 1.5 width of triangle
 p.spatialFrequency = 4; % 4
-p.targetOrientation = [-1.5 1.5]; % eg. [-10 10]
+p.targetOrientation = [-2 2]; % eg. [-10 10]
 p.targetPhases = 0; % eg. 0, or [0 pi/2 pi 3*pi/2]
 p.TL = [0 0.5]; % [offset-for-T(=0) offset-for-L]
 p.TLLineWidth = 5; % (pixels)
@@ -71,11 +71,11 @@ p.triHWRatio = 1; % should be >= 1 so that targetSize corresponds to triangle wi
 p.extraOblTilt = [-5 5];
 p.tiltJitter = 1;
 % p.exoSize = [0.3 0.3];
-p.exoSize = 0.3;
+p.exoSize = 0.25;
 % p.exoVPos = 2.5; % 2.5; % vertical offset of exo cue from target center
-p.exoPos = [2.3; -2.3]./sqrt(2);
+p.exoPos = [2.8; 2.8]./sqrt(2);
 % p.exoPos = [2.3 2.3 -2.3 -2.3; -2.3 2.3 -2.3 2.3]./sqrt(2);
-p.exoColor = [0 0 0];
+p.exoColor = [1 1 1];
 p.exoLineWidth = 2; % if circle around target
 
 % Staircase (implemented only for targetOrientation for now)

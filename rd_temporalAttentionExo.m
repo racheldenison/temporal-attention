@@ -433,7 +433,7 @@ end
 % Show fixation and wait for a button press
 Screen('FillRect', window, white*p.backgroundColor);
 DrawFormattedText(window, 'x', 'center', 'center', white);
-drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
+drawPlaceholdersRotated(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
 Screen('Flip', window);
 KbWait(devNum);
 
@@ -544,7 +544,7 @@ while trialCounter <= nTrials
     
     % Present fixation
     DrawFormattedText(window, 'x', 'center', 'center', white);
-    drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
+    drawPlaceholdersRotated(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
     timeFix = Screen('Flip', window);
     
     % Check fixation hold
@@ -554,7 +554,7 @@ while trialCounter <= nTrials
         if driftCorrected
             % restart trial
             DrawFormattedText(window, 'x', 'center', 'center', white);
-            drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
+            drawPlaceholdersRotated(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
             timeFix = Screen('Flip', window);
         end
     end
@@ -590,16 +590,16 @@ while trialCounter <= nTrials
     % exo cue 1
     if any(cuedInterval==1)
         DrawFormattedText(window, 'x', 'center', 'center', white);
-        drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
+        drawPlaceholdersRotated(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
 %         Screen('DrawTexture', window, exoTex, [], exoRect);
-        Screen('DrawDots', window, exoPos, exoSize, p.exoColor, [cx+imPos(1) cy+imPos(2)], 2);
-%         Screen(window, 'FrameOval', p.exoColor, imRect, p.exoLineWidth)
+        Screen('DrawDots', window, exoPos, exoSize, p.exoColor*white, [cx+imPos(1) cy+imPos(2)], 2);
+%         Screen(window, 'FrameOval', p.exoColor*white, imRect, p.exoLineWidth)
         timeExo1 = Screen('Flip', window, timeCue + p.soas(1) - p.exoSOA - slack);
         
         % blank
         Screen('FillRect', window, white*p.backgroundColor);
         DrawFormattedText(window, 'x', 'center', 'center', white);
-        drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
+        drawPlaceholdersRotated(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
         timeExoBlank1 = Screen('Flip', window, timeExo1 + p.exoDur - slack);
     else
         timeExo1 = NaN;
@@ -609,14 +609,14 @@ while trialCounter <= nTrials
     % mask 1 - forward mask
     if p.forwardMask && ~strcmp(p.maskType,'none')
         DrawFormattedText(window, 'x', 'center', 'center', white);
-        drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
+        drawPlaceholdersRotated(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
         Screen('DrawTexture', window, maskTex, [], imRect);
         timeMask1f = Screen('Flip', window, timeCue + p.soas(1) - p.forwardMaskSOA - slack);
         
         % blank
         Screen('FillRect', window, white*p.backgroundColor);
         DrawFormattedText(window, 'x', 'center', 'center', white);
-        drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
+        drawPlaceholdersRotated(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
         timeMaskBlank1f = Screen('Flip', window, timeMask1f + p.maskDur - slack);
     else
         timeMask1f = NaN;
@@ -625,7 +625,7 @@ while trialCounter <= nTrials
     
     % target 1
     DrawFormattedText(window, 'x', 'center', 'center', white);
-    drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
+    drawPlaceholdersRotated(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
     Screen('DrawTexture', window, tex1, [], imRect, rot(1));
     timeIm1 = Screen('Flip', window, timeCue + p.soas(1) - slack);
     if p.eyeTracking
@@ -636,7 +636,7 @@ while trialCounter <= nTrials
     if p.maskSOA > p.targetDur
         Screen('FillRect', window, white*p.backgroundColor);
         DrawFormattedText(window, 'x', 'center', 'center', white);
-        drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
+        drawPlaceholdersRotated(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
         timeBlank1 = Screen('Flip', window, timeIm1 + p.targetDur - slack);
     else
         timeBlank1 = NaN;
@@ -645,14 +645,14 @@ while trialCounter <= nTrials
     % mask 1 - backward mask
     if ~strcmp(p.maskType,'none')
         DrawFormattedText(window, 'x', 'center', 'center', white);
-        drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
+        drawPlaceholdersRotated(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
         Screen('DrawTexture', window, maskTex, [], imRect);
         timeMask1 = Screen('Flip', window, timeIm1 + p.maskSOA - slack);
         
         % blank
         Screen('FillRect', window, white*p.backgroundColor);
         DrawFormattedText(window, 'x', 'center', 'center', white);
-        drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
+        drawPlaceholdersRotated(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
         timeMaskBlank1 = Screen('Flip', window, timeMask1 + p.maskDur - slack);
     else
         timeMask1 = NaN;
@@ -678,16 +678,16 @@ while trialCounter <= nTrials
     % exo cue 2
     if any(cuedInterval==2)
         DrawFormattedText(window, 'x', 'center', 'center', white);
-        drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
+        drawPlaceholdersRotated(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
 %         Screen('DrawTexture', window, exoTex, [], exoRect);
-        Screen('DrawDots', window, exoPos, exoSize, p.exoColor, [cx+imPos(1) cy+imPos(2)], 2);
-%         Screen(window, 'FrameOval', p.exoColor, imRect, p.exoLineWidth)
+        Screen('DrawDots', window, exoPos, exoSize, p.exoColor*white, [cx+imPos(1) cy+imPos(2)], 2);
+%         Screen(window, 'FrameOval', p.exoColor*white, imRect, p.exoLineWidth)
         timeExo2 = Screen('Flip', window, timeCue + p.soas(2) - p.exoSOA - slack);
         
         % blank
         Screen('FillRect', window, white*p.backgroundColor);
         DrawFormattedText(window, 'x', 'center', 'center', white);
-        drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
+        drawPlaceholdersRotated(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
         timeExoBlank2 = Screen('Flip', window, timeExo2 + p.exoDur - slack);
     else
         timeExo2 = NaN;
@@ -699,14 +699,14 @@ while trialCounter <= nTrials
     % *after* the end of the T1 backward mask
     if p.forwardMask && (timeCue + p.soas(2) - p.forwardMaskSOA) > (timeMask1 + p.maskDur) && ~strcmp(p.maskType,'none')
         DrawFormattedText(window, 'x', 'center', 'center', white);
-        drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
+        drawPlaceholdersRotated(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
         Screen('DrawTexture', window, maskTex, [], imRect);
         timeMask2f = Screen('Flip', window, timeCue + p.soas(2) - p.forwardMaskSOA - slack);
         
         % blank
         Screen('FillRect', window, white*p.backgroundColor);
         DrawFormattedText(window, 'x', 'center', 'center', white);
-        drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
+        drawPlaceholdersRotated(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
         timeMaskBlank2f = Screen('Flip', window, timeMask2f + p.maskDur - slack);
     else
         timeMask2f = NaN;
@@ -715,7 +715,7 @@ while trialCounter <= nTrials
     
     % target 2
     DrawFormattedText(window, 'x', 'center', 'center', white);
-    drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
+    drawPlaceholdersRotated(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
     Screen('DrawTexture', window, tex2, [], imRect, rot(2));
     timeIm2 = Screen('Flip', window, timeCue + p.soas(2) - slack);
     if p.eyeTracking
@@ -726,7 +726,7 @@ while trialCounter <= nTrials
     if p.maskSOA > p.targetDur
         Screen('FillRect', window, white*p.backgroundColor);
         DrawFormattedText(window, 'x', 'center', 'center', white);
-        drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
+        drawPlaceholdersRotated(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
         timeBlank2 = Screen('Flip', window, timeIm2 + p.targetDur - slack);
     else
         timeBlank2 = NaN;
@@ -735,14 +735,14 @@ while trialCounter <= nTrials
     % mask 2 - backward mask
     if ~strcmp(p.maskType,'none')
         DrawFormattedText(window, 'x', 'center', 'center', white);
-        drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
+        drawPlaceholdersRotated(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
         Screen('DrawTexture', window, maskTex, [], imRect);
         timeMask2 = Screen('Flip', window, timeIm2 + p.maskSOA - slack);
         
         % blank
         Screen('FillRect', window, white*p.backgroundColor);
         DrawFormattedText(window, 'x', 'center', 'center', white);
-        drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
+        drawPlaceholdersRotated(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
         timeMaskBlank2 = Screen('Flip', window, timeMask2 + p.maskDur - slack);
     else
         timeMask2 = NaN;
@@ -774,7 +774,7 @@ while trialCounter <= nTrials
     if p.respGoSOA > 0
         Screen('FillRect', window, white*p.backgroundColor);
         DrawFormattedText(window, 'x', 'center', 'center', white*p.goCueColor);
-        drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
+        drawPlaceholdersRotated(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
         timeGoCue = Screen('Flip', window, timeRespCue + p.respGoSOA - slack);
     else
         timeGoCue = timeRespCue;
@@ -808,7 +808,7 @@ while trialCounter <= nTrials
     end
     
     DrawFormattedText(window, feedbackText, 'center', 'center', feedbackColor);
-    drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
+    drawPlaceholdersRotated(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
     timeFeedback = Screen('Flip', window);
     
     % Adjust staircase level
