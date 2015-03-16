@@ -33,7 +33,7 @@ p.phLineWidth = 2; % (pixels)
 p.eyeRad = 1.5; % allowed fixation radius (degrees)
 
 % Condition
-p.targetContrasts = [.16 1]; % [.64 1];
+p.targetContrasts = .64; % [.64 1];
 p.respInterval = [1 2]; % [1=early 2=late]
 p.cueValidity = [1 -1 2 0]; % [1=valid -1=invalid 2=neutral(both) 0=neutral(none)]
 % p.propValid = 0.67;
@@ -73,9 +73,9 @@ p.tiltJitter = 1;
 % p.exoSize = [0.3 0.3];
 p.exoSize = 0.2;
 % p.exoVPos = 2.5; % 2.5; % vertical offset of exo cue from target center
-p.exoPos = [2.8; 2.8]./sqrt(2);
-% p.exoPos = [2.3 2.3 -2.3 -2.3; -2.3 2.3 -2.3 2.3]./sqrt(2);
-p.exoColor = [1 1 1]*0.7;
+% p.exoPos = [2.5; 2.5]./sqrt(2); % 2.8
+p.exoPos = [2.5 -2.5; 2.5 -2.5]./sqrt(2);
+p.exoColor = [1 1 1];
 p.exoLineWidth = 2; % if circle around target
 
 % Staircase (implemented only for targetOrientation for now)
