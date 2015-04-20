@@ -4,7 +4,7 @@
 % DO NOT clear all
 % run this program
 
-load TEMP.mat
+load('data/TEMP.mat')
 
 % eyeDataDir = 'eyedata';
 % eyeFile = 'testeyefile.edf';

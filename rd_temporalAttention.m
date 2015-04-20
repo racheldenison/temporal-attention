@@ -1,4 +1,4 @@
-function results = rd_temporalAttention(subjectID)
+function results = rd_temporalAttention(subjectID, varargin)
 
 %% Setup
 if nargin==0
@@ -10,9 +10,19 @@ saveFigs = 1;
 plotTimingFigs = 1;
 saveTimingFigs = 1;
 
-% workspaceFile = [pathToExpt('data') '/pilot/ad/adPilot_cb_tc64-100_soa1000-1250_run01_WORKSPACE.mat'];
-% workspaceFile = 'data/adPilot_cb_tc64-100_soa1000-1250_run01_WORKSPACE.mat';
-workspaceFile = [];
+if nargin==1
+    workspaceFile = [];
+elseif nargin==2
+    workspaceOption = varargin{1};
+    if ischar(workspaceOption) && strcmp(workspaceOption,'w')
+        % workspaceFile = [pathToExpt('data') '/pilot/ad/adPilot_cb_tc64-100_soa1000-1250_run01_WORKSPACE.mat'];
+        workspaceFile = sprintf('data/%s_WORKSPACE.mat', subjectID);
+    else
+        error('to load from workspace file, input "w" as second argument')
+    end
+else
+    error('wrong number of input arguments')
+end
 
 p = temporalAttentionParams;
 

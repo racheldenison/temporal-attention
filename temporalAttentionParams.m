@@ -39,12 +39,12 @@ p.cueValidity = [1 -1 0]; % [1=valid -1=invalid 0=neutral]
 % p.propValid = 0.67;
 % p.cueValidityFactor = generatePropFactor(p.propValid);
 p.cueValidityFactor = [1 1 1 2 3]; % eg. [1 1 2 3] is 50% valid, 25% invalid, 25% neutral
-% p.cueValidityFactor = 1;
+%p.cueValidityFactor = 1;
 p.propValid = nnz(p.cueValidityFactor==1)./nnz(p.cueValidityFactor<3);
 p.propNeutral = nnz(p.cueValidityFactor==3)./numel(p.cueValidityFactor);
 
 % Timing
-p.soas = [1000 1800]/1000; % [short long]
+p.soas = [1000 1100]/1000; % [short long]
 p.preCueDur = 0.75; % time between fixation onset and cue
 p.cueDur = 0.2;
 p.targetDur = 3/100; % 30 ms / 33 ms
