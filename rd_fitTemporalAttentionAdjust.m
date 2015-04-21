@@ -33,7 +33,7 @@ dataFile = dir(sprintf('%s/%s_run%02d*', dataDir, subject, run));
 load(sprintf('%s/%s', dataDir, dataFile(1).name))
 
 %% specify model
-modelName = 'variablePrecision';
+modelName = 'mixtureWithBias';
 switch modelName
     case 'mixtureWithBias'
         model = Orientation(WithBias(StandardMixtureModel), [1,3]); % mu, sd

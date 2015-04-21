@@ -4,7 +4,8 @@
 
 %% setup
 % load data/adjust_fit_group_stats_run19_N10_20150216.mat
-load data/adjust_fit_group_stats_mixtureNoBias_run09_N10_20150303.mat
+% load data/adjust_fit_group_stats_mixtureNoBias_run09_N10_20150303.mat
+load data/adjust_fit_group_stats_mixtureNoBias_run09_N12_20150407.mat
 % paramsData paramsMean paramsSte run subjectIDs
 
 nSubjects = numel(subjectIDs);

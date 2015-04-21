@@ -1,11 +1,11 @@
 % rd_plotTemporalAttentionAdjustResponseGroup.m
 
 %% setup
-subjectIDs = {'bl','rd','id','ec','ld','en','sj','ml','ca','jl'};
-run = 29;
+subjectIDs = {'bl','rd','id','ec','ld','en','sj','ml','ca','jl','ew','jx'};
+run = 9;
 nSubjects = numel(subjectIDs);
 
-saveFigs = 0;
+saveFigs = 1;
 
 %% get data
 for iSubject = 1:nSubjects

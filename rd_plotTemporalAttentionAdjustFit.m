@@ -4,8 +4,8 @@
 % @(data,g,sd)((1-g).*vonmisespdf(data.errors(:),0,deg2k(sd))+(g).*1/360)
 
 %% group i/o
-subjectIDs = {'bl','rd','id','ec','ld','en','sj','ml','ca','jl'};
-% subjectIDs = {'jl'};
+subjectIDs = {'bl','rd','id','ec','ld','en','sj','ml','ca','jl','ew','jx'};
+% subjectIDs = {'ew'};
 run = 9;
 nSubjects = numel(subjectIDs);
 
@@ -18,7 +18,7 @@ groupFigTitle = [sprintf('%s ',subjectIDs{:}) sprintf('(N=%d), run %d', nSubject
 % load data/adjust_workspace_20141225.mat
 % load(sprintf('data/adjust_workspace_run%02d_20150106.mat', run))
 
-modelName = 'mixtureNoBias'; % 'mixtureWithBias','mixtureNoBias'
+modelName = 'mixtureWithBias'; % 'mixtureWithBias','mixtureNoBias'
 
 %% get data and plot data and fits
 for iSubject = 1:nSubjects
