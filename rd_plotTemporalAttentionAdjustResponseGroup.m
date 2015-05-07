@@ -5,7 +5,7 @@ subjectIDs = {'bl','rd','id','ec','ld','en','sj','ml','ca','jl','ew','jx'};
 run = 9;
 nSubjects = numel(subjectIDs);
 
-saveFigs = 1;
+saveFigs = 0;
 
 %% get data
 for iSubject = 1:nSubjects

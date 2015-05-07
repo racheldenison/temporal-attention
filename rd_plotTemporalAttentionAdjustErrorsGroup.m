@@ -1,7 +1,7 @@
 % rd_plotTemporalAttentionAdjustErrorsGroup.m
 
 %% setup
-subjectIDs = {'bl','rd','id','ec','ld','en','sj','ml','ca','jl'};
+subjectIDs = {'bl','rd','id','ec','ld','en','sj','ml','ca','jl','ew','jx'};
 nSubjects = numel(subjectIDs);
 
 run = 9;

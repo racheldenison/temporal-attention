@@ -110,6 +110,10 @@ for iRI = 1:numel(p.respInterval)
     end
 end
 
+%% sort by x-axis value
+vals = targetOrientDiff{1,1};
+[valsSorted idx] = sort(vals);
+
 %% plot figs
 if plotFigs
     targetNames = {'T1','T2'};

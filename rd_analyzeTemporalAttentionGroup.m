@@ -10,7 +10,7 @@ soa2 = 1250;
 
 run = 9;
 
-normalizeData = 0;
+normalizeData = 1;
 
 saveFigs = 0;
 
@@ -72,16 +72,41 @@ for iEL = 1:2 % early/late
 end
 
 % average across contrasts
-for iEL = 1:2 % early/late
-    if normalizeData
-        accDataC{iEL} = normalizeDC(accDataC{iEL});
-        rtDataC{iEL} = normalizeDC(rtDataC{iEL});
-    end
+if normalizeData
+    % use the Morey 2008 correction
+    a = cat(3, accDataC{1}, accDataC{2});
+    b = normalizeDC(shiftdim(a,2));
+    c = shiftdim(b,1);
+    accDataC{1} = c(:,:,1);
+    accDataC{2} = c(:,:,2);
     
-    accMeanC(:,iEL) = mean(accDataC{iEL},2);
-    accSteC(:,iEL) = std(accDataC{iEL},0,2)./sqrt(nSubjects);
-    rtMeanC(:,iEL) = mean(rtDataC{iEL},2);
-    rtSteC(:,iEL) = std(rtDataC{iEL},0,2)./sqrt(nSubjects);
+    a = cat(3, rtDataC{1}, rtDataC{2});
+    b = normalizeDC(shiftdim(a,2));
+    c = shiftdim(b,1);
+    rtDataC{1} = c(:,:,1);
+    rtDataC{2} = c(:,:,2);
+    
+    [fixed1 fixed2 N] = size(b);
+    M = fixed1*fixed2;
+    morey = M/(M-1);
+    
+    for iEL = 1:2
+        accMeanC(:,iEL) = mean(accDataC{iEL},2);
+        accSteC(:,iEL) = sqrt(morey*var(accDataC{iEL},0,2)./(nSubjects));
+        rtMeanC(:,iEL) = mean(rtDataC{iEL},2);
+        rtSteC(:,iEL) = sqrt(morey*var(rtDataC{iEL},0,2)./(nSubjects));
+    end
+else
+    for iEL = 1:2 % early/late
+        %     if normalizeData
+        %         accDataC{iEL} = normalizeDC(accDataC{iEL});
+        %         rtDataC{iEL} = normalizeDC(rtDataC{iEL});
+        %     end
+        accMeanC(:,iEL) = mean(accDataC{iEL},2);
+        accSteC(:,iEL) = std(accDataC{iEL},0,2)./sqrt(nSubjects);
+        rtMeanC(:,iEL) = mean(rtDataC{iEL},2);
+        rtSteC(:,iEL) = std(rtDataC{iEL},0,2)./sqrt(nSubjects);
+    end
 end
 
 % all contrasts separately
@@ -324,22 +349,22 @@ accDataCT = (accDataC{1} + accDataC{2})/2;
 for iEL = 1:2
     fprintf('T%d\n',iEL)
     vals = accDataC{iEL};
-    [hvi pvi] = ttest(vals(1,:),vals(2,:));
-    [hvn pvn] = ttest(vals(1,:),vals(3,:));
-    [hni pni] = ttest(vals(2,:),vals(3,:));
-    fprintf('valid vs. invalid, p = %1.4f\n', pvi)
-    fprintf('valid vs. neutral, p = %1.4f\n', pvn)
-    fprintf('neutral vs. invalid, p = %1.4f\n\n', pni)
+    [hvi pvi cvi svi] = ttest(vals(1,:),vals(2,:));
+    [hvn pvn cvn svn] = ttest(vals(1,:),vals(3,:));
+    [hni pni cni sni] = ttest(vals(2,:),vals(3,:));
+    fprintf('valid vs. invalid, t(%d) = %1.3f, p = %1.4f\n', svi.df, svi.tstat, pvi)
+    fprintf('valid vs. neutral, t(%d) = %1.3f, p = %1.4f\n', svn.df, svn.tstat, pvn)
+    fprintf('neutral vs. invalid, t(%d) = %1.3f, p = %1.4f\n\n', sni.df, sni.tstat, pni)
 end
 
 fprintf('Collapsing across T1 and T2\n')
 vals = accDataCT;
-[hvi pvi] = ttest(vals(1,:),vals(2,:));
-[hvn pvn] = ttest(vals(1,:),vals(3,:));
-[hni pni] = ttest(vals(2,:),vals(3,:));
-fprintf('valid vs. invalid, p = %1.4f\n', pvi)
-fprintf('valid vs. neutral, p = %1.4f\n', pvn)
-fprintf('neutral vs. invalid, p = %1.4f\n\n', pni)
+[hvi pvi cvi svi] = ttest(vals(1,:),vals(2,:));
+[hvn pvn cvn svn] = ttest(vals(1,:),vals(3,:));
+[hni pni cni sni] = ttest(vals(2,:),vals(3,:));
+fprintf('valid vs. invalid, t(%d) = %1.3f, p = %1.4f\n', svi.df, svi.tstat, pvi)
+fprintf('valid vs. neutral, t(%d) = %1.3f, p = %1.4f\n', svn.df, svn.tstat, pvn)
+fprintf('neutral vs. invalid, t(%d) = %1.3f, p = %1.4f\n\n', sni.df, sni.tstat, pni)
 
 
 
