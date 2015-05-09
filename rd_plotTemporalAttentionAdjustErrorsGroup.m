@@ -17,7 +17,9 @@ for iSubject = 1:nSubjects
         groupData0(iSubject).nonTargetOrients, ...
         groupData0(iSubject).targetOrientDiff, ...
         groupData0(iSubject).probeOrients, ...
-        groupData0(iSubject).probeOrientDiff] = ...
+        groupData0(iSubject).probeOrientDiff, ...
+        groupData0(iSubject).responses, ...
+        groupData0(iSubject).targetOrientDiffSmooth] = ...
             rd_plotTemporalAttentionAdjustErrors(subjectID, run, plotIndivFigs);
 end
 
@@ -33,8 +35,13 @@ for iSubject = 1:nSubjects
         for iRI = 1:2
             for iCV = 1:3
                 fName = fNames{iF};
-                groupData.(fName){iCV,iRI}(:,iSubject) = ...
-                    groupData0(iSubject).(fName){iCV,iRI};
+                switch fName
+                    case 'targetOrientDiffSmooth'
+                        groupData.(fName)(:,:,:,iSubject) = groupData0(iSubject).(fName);
+                    otherwise
+                        groupData.(fName){iCV,iRI}(:,iSubject) = ...
+                            groupData0(iSubject).(fName){iCV,iRI};
+                end
             end
         end
     end
@@ -120,6 +127,13 @@ end
 allErrorByTNTO = (errorByTNTO{1,1} + errorByTNTO{1,2}).*0.6 + ...
     (errorByTNTO{2,1} + errorByTNTO{2,2}).*0.2 + ...
     (errorByTNTO{3,1} + errorByTNTO{3,2}).*0.2;
+
+%% smoothed data
+groupMean.targetOrientDiffSmooth = nanmean(groupData.targetOrientDiffSmooth, 4);
+groupSte.targetOrientDiffSmooth = nanstd(groupData.targetOrientDiffSmooth, 0, 4)./sqrt(nSubjects);
+
+winSize = 29; % check in rd_plotTemporalAttentionAdjustErrors.m
+steps = -90+floor(winSize/2):90-floor(winSize/2);
 
 %% plot figures
 targetNames = {'T1','T2'};
@@ -364,3 +378,32 @@ if analyzeProbe
     rd_supertitle(sprintf('%s ', subjectIDs{:}));
     rd_raiseAxis(gca);
 end
+
+% smoothed difference between target and non-target orientation
+colors = {'b','g','r'};
+figure
+for iRI = 1:2
+    subplot(2,1,iRI)
+    hold on
+    for iCV = 1:3
+        shadedErrorBar(steps, ...
+            groupMean.targetOrientDiffSmooth(:,iRI,iCV), ...
+            groupSte.targetOrientDiffSmooth(:,iRI,iCV), ...
+            colors{iCV},1)
+    end
+    plot([-90 90],[0 0],'k')
+    xlim([steps(1) steps(end)])
+    ylim([-15 15])
+    ylabel(sprintf('error (sliding window average, size=%d)', winSize))
+    if iRI==1
+%         legend('valid','invalid','neutral')
+    end
+end
+xlabel('non-target - target orientation difference')
+rd_supertitle(sprintf('%s ', subjectIDs{:}));
+rd_raiseAxis(gca);
+
+%% Set figure properties
+% set font size of titles, axis labels, and legends
+% set(findall(gcf,'type','text'),'FontSize',14)
+
