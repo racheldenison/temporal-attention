@@ -1,9 +1,10 @@
 % rd_fitTemporalAttentionAdjustGroup.m
 
 %% setup
-% subjectIDs = {'bl','rd','id','ec','ld','en','sj','ml','ca','jl'};
-subjectIDs = {'jx'};
-run = 29;
+% subjectIDs = {'bl','rd','id','ec','ld','en','sj','ml','ca','jl','ew','jx'};
+subjectIDs = {'en','ew','jx'};
+% subjectIDs = {'ew','jx'};
+run = 9;
 nSubjects = numel(subjectIDs);
 
 saveIndivData = 1;

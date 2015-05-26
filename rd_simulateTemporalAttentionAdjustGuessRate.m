@@ -26,8 +26,8 @@ for iN = 1:numel(ns)
             
             fit = MemFit(errors, model, 'Verbosity', 0);
             
-            gHat(iSim,iG) = fit.posteriorMean(1);
-            sdHat(iSim,iG) = fit.posteriorMean(2);
+            gHat(iSim,iG) = fit.maxPosterior(1); % posteriorMean
+            sdHat(iSim,iG) = fit.maxPosterior(2);
         end
     end
     results(iN).gHat = gHat;

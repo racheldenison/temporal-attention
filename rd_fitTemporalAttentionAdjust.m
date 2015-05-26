@@ -33,7 +33,7 @@ dataFile = dir(sprintf('%s/%s_run%02d*', dataDir, subject, run));
 load(sprintf('%s/%s', dataDir, dataFile(1).name))
 
 %% specify model
-modelName = 'mixtureWithBias';
+modelName = 'swapWithBias';
 switch modelName
     case 'mixtureWithBias'
         model = Orientation(WithBias(StandardMixtureModel), [1,3]); % mu, sd
@@ -41,6 +41,10 @@ switch modelName
         model = Orientation(StandardMixtureModel, 2); % sd
     case 'variablePrecision'
         model = Orientation(VariablePrecisionModel, [2,3]); % mnSTD, stdSTD
+    case 'swapNoBias'
+        model = Orientation(SwapModel,3); % sd
+    case 'swapWithBias'
+        model = Orientation(WithBias(SwapModel), [1 4]); % mu, sd
     otherwise
         error('modelName not recognized')
 end
@@ -55,8 +59,15 @@ for iEL = 1:2
     for iV = 1:3
         fprintf('\n%s', validityNames{iV})
         errors = results.totals.all{iV,iEL}(:,errorIdx);
+        data.errors = errors';
         
-        fit(iV,iEL) = MemFit(errors, model, 'Verbosity', 0);
+        if ~isempty(strfind(modelName, 'swap'))
+            [e, to, nto] = ...
+                rd_plotTemporalAttentionAdjustErrors(subjectID, run, 0);
+            data.distractors = nto{iV,iEL}';
+        end
+        
+        fit(iV,iEL) = MemFit(data, model, 'Verbosity', 0);
         
         err{iV,iEL} = errors;
     end

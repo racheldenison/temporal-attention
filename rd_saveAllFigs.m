@@ -34,5 +34,6 @@ end
 
 for iF = 1:numel(f)
     figFile = sprintf('%s/%s%s', figDir, prefix, figNames{iF});
-    print(f(iF), fileType, '-r0', figFile)
+%     print(f(iF), fileType, '-r0', figFile)
+    export_fig(figFile, fileType, f(iF));
 end
