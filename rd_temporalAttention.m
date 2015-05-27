@@ -555,7 +555,7 @@ while trialCounter <= nTrials
             timeFix = Screen('Flip', window);
         end
     end
-    
+
     % Present cue
     PsychPortAudio('FillBuffer', pahandle, cueTone);
     timeCue = PsychPortAudio('Start', pahandle, [], timeFix + p.preCueDur, 1);
