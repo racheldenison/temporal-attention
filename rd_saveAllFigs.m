@@ -21,7 +21,7 @@ if nargin < 4 || isempty(figDir)
     figDir = 'figures';
 end
 if nargin < 5 || isempty(fileType)
-    fileType = '-dpng';
+    fileType = '-png';
 end
 
 if isempty(f)
@@ -33,7 +33,8 @@ if numel(f)~=numel(figNames)
 end
 
 for iF = 1:numel(f)
+    turnwhite(iF)
     figFile = sprintf('%s/%s%s', figDir, prefix, figNames{iF});
 %     print(f(iF), fileType, '-r0', figFile)
-    export_fig(figFile, fileType, f(iF));
+    export_fig(figFile, fileType, f(iF) ,'-m2');
 end
