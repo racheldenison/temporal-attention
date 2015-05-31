@@ -1,23 +1,32 @@
 function cost = rd_DoGCost(p, xdata, ydata)
 
-% p is a vector: [mu sd amp b]
+% p is a vector: [amp sd mu b]
 
-% mu = p(1);
-% sd = p(2);
-% amp = p(3);
-% b = p(4);
-
-sd = p(1);
-amp = p(2);
-
-mu = 0;
-b = 0;
+switch numel(p)
+    case 1
+        amp = p(1);
+        sd = 44;
+        mu = 0;
+        b = 0;
+    case 2
+        amp = p(1);
+        sd = p(2);
+        mu = 0;
+        b = 0;
+    case 4
+        amp = p(1);
+        sd = p(2);
+        mu = p(3);
+        b = p(4);
+    otherwise
+        error('p has wrong number of elements')
+end
 
 xgrid = -90:90;
 
 for i=1:length(xdata)
     f = DoG(mu, sd, amp, b, xgrid);
-    error(i) = ydata(i) - f(xgrid==xdata(i));
+    err(i) = ydata(i) - f(xgrid==xdata(i));
 end
 
-cost = sum(error.^2);
+cost = sum(err.^2);
