@@ -48,6 +48,33 @@ for iSubject = 1:nSubjects
 end
 
 %% descriptive statistics
+% test circ stats
+% sd = 100;
+% theta = vonmisesrnd(0, deg2k(sd), [10000 1]);
+% figure
+% hist(theta)
+% [ang_rad sd_rad] = circ_std(theta/180*pi);
+% sd_est = sd_rad*180/pi;
+% mean_est = circ_mean(theta/180*pi)*180/pi;
+% fprintf('sd: %.2f, mean: %.2f\n', sd_est, mean_est)
+
+descripData = []; 
+for iRI = 1:2
+    for iCV = 1:3
+        theta = groupData.errors{iCV,iRI};
+        [ang_rad sd_rad] = circ_std(theta/180*pi);
+        descripData.sd(:,iCV,iRI) = sd_rad*180/pi;
+        descripData.mean(:,iCV,iRI) = circ_mean(theta/180*pi)*180/pi;
+    end
+end
+descripData.absMean = abs(descripData.mean);
+
+fieldNames = fields(descripData);
+for iField = 1:numel(fieldNames)
+    fieldName = fieldNames{iField};
+    descripMean.(fieldName) = squeeze(mean(descripData.(fieldName),1));
+    descripSte.(fieldName) = squeeze(std(descripData.(fieldName),0,1))./sqrt(nSubjects);
+end
 
 %% points analyses
 % calculate mean errors for each x-axis value
@@ -139,6 +166,7 @@ winSize = 29; % check in rd_plotTemporalAttentionAdjustErrors.m
 steps = -90+floor(winSize/2):90-floor(winSize/2);
 
 %% plot figures
+% setup plots
 targetNames = {'T1','T2'};
 colors = {'b','g','r'};
 errorLims = [-100 100];
@@ -150,6 +178,85 @@ smoothSize = 10; % 5
 b = (1/smoothSize)*ones(1,smoothSize);
 a = 1;
 
+validityNames = {'valid','invalid','neutral'};
+validityOrder = [1 3 2];
+fieldNames = fields(descripMean);
+
+groupFigTitle = [sprintf('%s ',subjectIDs{:}) sprintf('(N=%d), run %d', nSubjects, run)];
+f = [];
+
+%% descriptive stats
+% indiv subjects
+ylims = [];
+ylims.absMean = [-1 8];
+ylims.mean = [-8 8];
+ylims.sd = [0 30];
+for iField = 1:numel(fieldNames)
+    fieldName = fieldNames{iField};
+%     figNames{end+1} = [fieldName 'Indiv'];
+    f(end+1) = figure;
+    for iRI = 1:2
+        subplot(1,2,iRI)
+        bar(descripData.(fieldName)(:,validityOrder,iRI))
+        set(gca,'XTickLabel',subjectIDs)
+        colormap(flag(3))
+        xlim([0 nSubjects+1])
+        ylim(ylims.(fieldName))
+        if iEL==1
+            ylabel(fieldName)
+            legend(validityNames(validityOrder))
+        end
+        title(targetNames{iRI})
+    end
+    rd_supertitle(groupFigTitle);
+    rd_raiseAxis(gca);
+end
+
+% scatter
+fieldName = 'absMean';
+conds = [1 3];
+f(end+1) = figure;
+for iRI = 1:2
+    subplot(1,2,iRI)
+    plot(descripData.(fieldName)(:,conds(1),iRI),descripData.(fieldName)(:,conds(2),iRI),'.')
+    hold on
+    plot(ylims.(fieldName),ylims.(fieldName),'k')
+    xlim(ylims.(fieldName))
+    ylim(ylims.(fieldName))
+    axis square
+    title(targetNames{iRI})
+    if iRI==1
+        xlabel(sprintf('%s %s', validityNames{conds(1)}, fieldName))
+        ylabel(sprintf('%s %s', validityNames{conds(2)}, fieldName))
+    end
+end
+
+% group
+ylims.absMu = [-1 4];
+ylims.mu = [-4 4];
+ylims.sd = [0 25];
+for iField = 1:numel(fieldNames)
+    fieldName = fieldNames{iField};
+%     figNames{end+1} = [fieldName 'Group'];
+    f(end+1) = figure;
+    for iRI = 1:2
+        subplot(1,2,iRI)
+        hold on
+        b1 = bar(1:3, descripMean.(fieldName)(validityOrder,iRI),'FaceColor',[.5 .5 .5]);
+        p1 = errorbar(1:3, descripMean.(fieldName)(validityOrder,iRI)', ...
+            descripSte.(fieldName)(validityOrder,iRI)','k','LineStyle','none');
+        ylim(ylims.(fieldName))
+        ylabel(fieldName)
+        set(gca,'XTick',1:3)
+        set(gca,'XTickLabel', validityNames(validityOrder))
+        title(targetNames{iRI})
+    end
+    rd_supertitle(groupFigTitle);
+    rd_raiseAxis(gca);
+end
+
+
+%% dots
 % target orientation
 figure
 for iRI = 1:2
