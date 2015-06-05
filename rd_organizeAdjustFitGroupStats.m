@@ -12,6 +12,8 @@ load data/adjust_fit_group_stats_mixtureNoBiasMaxPosterior_run09_N12_20150512.ma
 % load data/adjust_fit_group_stats_swapWithBiasMaxPosterior_run09_N12_20150516.mat
 
 % load data/adjust_fit_group_stats_mixtureNoBiasMaxPosterior_run19_N12_20150513.mat
+% load data/adjust_fit_group_stats_swapNoBiasMaxPosterior_run19_N12_20150601.mat
+% load data/adjust_fit_group_stats_mixtureWithBiasMaxPosterior_run19_N12_20150601.mat
 % paramsData paramsMean paramsSte run subjectIDs
 
 nSubjects = numel(subjectIDs);

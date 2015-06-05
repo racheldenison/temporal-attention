@@ -47,6 +47,9 @@ for iSubject = 1:nSubjects
     end
 end
 
+%% descriptive statistics
+
+%% points analyses
 % calculate mean errors for each x-axis value
 for iRI = 1:2
     for iCV = 1:3

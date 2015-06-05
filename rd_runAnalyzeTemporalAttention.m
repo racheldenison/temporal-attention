@@ -1,6 +1,6 @@
 % rd_runAnalyzeTemporalAttention.m
 
-subject = 'dg_cbD10_tilt*_tc16-64_soa1000-1800';
+subject = 'sl_cbD10_tilt*_tc16-64_soa1000-1800';
 % subject = 'maPilot_cb_tilt5_soa1000-1250';
 run = 8;
 
@@ -10,7 +10,7 @@ saveData = 1;
 saveFigs = 1;
 plotTimingFigs = 0;
 saveTimingFigs = 0;
-cleanRT = 1;
+cleanRT = 0;
 
 expName = 'E4_contrast_cbD10'; % 'E0_cb'
 % dataDir = 'data';

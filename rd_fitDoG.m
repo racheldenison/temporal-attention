@@ -4,7 +4,7 @@
 subjectIDs = {'bl','rd','id','ec','ld','en','sj','ml','ca','jl','ew','jx'};
 nSubjects = numel(subjectIDs);
 
-run = 9;
+run = 19;
 plotFigs = 1;
 plotIndivFigs = 0;
 

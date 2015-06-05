@@ -4,7 +4,7 @@
 
 %% setup
 % see rd_organizeAdjustFitGroupStats.m
-load data/adjust_fit_group_stats_mixtureNoBiasMaxPosterior_run09_N12_20150512.mat
+load data/adjust_fit_group_stats_swapWithBiasMaxPosterior_run09_N12_20150516.mat
 
 nSubjects = numel(subjectIDs);
 

@@ -2,14 +2,14 @@
 
 %% Setup
 % subjectInits = {'rd','vp','hl','ho'};
-subjectInits = {'dg','sl'};
+subjectInits = {'dg','sl','mr','ly'};
 nSubjects = numel(subjectInits);
 groupStr = sprintf('N=%d', nSubjects);
 
 expName = 'E4'; % 'E2'
 figPrefix = sprintf('g%s_N%d', expName, nSubjects);
 
-normalizeData = 1;
+normalizeData = 0;
 saveFigs = 0;
 
 %% Get indiv subject data
