@@ -1,4 +1,4 @@
-function [fit, err] = rd_fitTemporalAttentionAdjust(subjectID, run, saveData)
+function [fit, err] = rd_fitTemporalAttentionAdjust(subjectID, run, saveData, bootRun)
 
 % basic fitting
 % data.errors = ?
@@ -11,8 +11,17 @@ function [fit, err] = rd_fitTemporalAttentionAdjust(subjectID, run, saveData)
 % model comparison
 % MemFit(data, {model1, model2})
 
+if nargin < 4
+   bootRun = 0; 
+end
 if nargin < 3
     saveData = 0;
+end
+
+if bootRun > 0
+    resample = 1;
+else
+    resample = 0;
 end
 
 %% setup
@@ -33,7 +42,7 @@ dataFile = dir(sprintf('%s/%s_run%02d*', dataDir, subject, run));
 load(sprintf('%s/%s', dataDir, dataFile(1).name))
 
 %% specify model
-modelName = 'swapNoBias';
+modelName = 'mixtureNoBias';
 switch modelName
     case 'mixtureWithBias'
         model = Orientation(WithBias(StandardMixtureModel), [1,3]); % mu, sd
@@ -59,6 +68,13 @@ for iEL = 1:2
     for iV = 1:3
         fprintf('\n%s', validityNames{iV})
         errors = results.totals.all{iV,iEL}(:,errorIdx);
+        
+        if resample
+            n = numel(errors);
+            bootsam = ceil(n*rand(n,1));
+            errors = errors(bootsam);
+        end
+        
         data.errors = errors';
         
         if ~isempty(strfind(modelName, 'swap'))
@@ -74,9 +90,20 @@ for iEL = 1:2
 end
 
 %% save data
+if resample
+    bootExt = sprintf('_boot%04d', bootRun);
+    saveDir = sprintf('%s/bootstrap/%s', dataDir, modelName);
+else
+    bootExt = '';
+    saveDir = dataDir;
+end
+
 if saveData
-    fileName = sprintf('%s_run%02d_%s.mat', subject, run, modelName);
-    save(sprintf('%s/%s',dataDir,fileName),'fit','err','model')
+    if ~exist(saveDir,'dir')
+        mkdir(saveDir)
+    end
+    fileName = sprintf('%s_run%02d_%s%s.mat', subject, run, modelName, bootExt);
+    save(sprintf('%s/%s',saveDir,fileName),'fit','err','model')
 end
 
 

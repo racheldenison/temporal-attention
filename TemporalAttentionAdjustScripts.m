@@ -3,7 +3,8 @@
 % combine runs
 rd_combineRunsTemporalAttentionAdjust
 
-% errors sequence (does not depend on fit)
+% response & errors sequence (does not depend on fit)
+rd_plotTemporalAttentionAdjustResponseGroup
 rd_plotTemporalAttentionAdjustErrorsGroup
 rd_plotTemporalAttentionAdjustBigErrors
 rd_fitDOG

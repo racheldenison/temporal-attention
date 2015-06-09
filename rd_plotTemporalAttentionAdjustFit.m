@@ -18,7 +18,7 @@ groupFigTitle = [sprintf('%s ',subjectIDs{:}) sprintf('(N=%d), run %d', nSubject
 % load data/adjust_workspace_20141225.mat
 % load(sprintf('data/adjust_workspace_run%02d_20150106.mat', run))
 
-modelName = 'mixtureWithBias'; % 'mixtureWithBias','mixtureNoBias','swapNoBias', 'swapWithBias'
+modelName = 'mixtureNoBias'; % 'mixtureWithBias','mixtureNoBias','swapNoBias', 'swapWithBias'
 
 %% get data and plot data and fits
 for iSubject = 1:nSubjects
