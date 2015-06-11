@@ -9,7 +9,7 @@ switch p.testingLocation
         p.screenSize = [9 13]; % (in)
         p.screenRes = [900 1440];
         p.viewDist = 21; % (in)
-        p.eyeTracking = 1;
+        p.eyeTracking = 0;
     case 'CarrascoL1'
         p.keyNames = {'1!','2@'};
         p.refRate = 1/100;
@@ -30,7 +30,7 @@ p.font = 'Verdana';
 p.fontSize = 24;
 p.showPlaceholders = 1;
 p.phLineWidth = 2; % (pixels)
-p.eyeRad = 1.5; % allowed fixation radius (degrees)
+p.eyeRad = 1.5; % allowed fixation radius (degrees)    
 
 % Condition
 p.targetContrasts = [.16 .64]; % [.64 1];
@@ -39,7 +39,7 @@ p.cueValidity = [1 -1 0]; % [1=valid -1=invalid 0=neutral]
 % p.propValid = 0.67;
 % p.cueValidityFactor = generatePropFactor(p.propValid);
 p.cueValidityFactor = [1 1 1 2 3]; % eg. [1 1 2 3] is 50% valid, 25% invalid, 25% neutral
-%p.cueValidityFactor = 1;
+% p.cueValidityFactor = 1;
 p.propValid = nnz(p.cueValidityFactor==1)./nnz(p.cueValidityFactor<3);
 p.propNeutral = nnz(p.cueValidityFactor==3)./numel(p.cueValidityFactor);
 
@@ -60,7 +60,7 @@ p.imPos = [4 4];
 p.imSize = [4 4]; % this is the size of the image container that holds the stim
 p.targetSize = 0.5; % 0.5 sigma of gaussian / 1.5 side length of T/L / 1.5 width of triangle
 p.spatialFrequency = 4; % 4
-p.targetOrientation = [-2.0 2.0]; % eg. [-10 10]
+p.targetOrientation = [-3.5 3.5]; % eg. [-10 10]
 p.targetPhases = 0; % eg. 0, or [0 pi/2 pi 3*pi/2]
 p.TL = [0 0.5]; % [offset-for-T(=0) offset-for-L]
 p.TLLineWidth = 5; % (pixels)
@@ -71,7 +71,7 @@ p.tiltJitter = 1;
 
 % Staircase (implemented only for targetOrientation for now)
 p.staircase = 0;
-p.stairs = [.5 1 1.5 2 3 4 6 8 12];
+p.stairs = [.5 1 1.5 2 3 4 6 8 12]; % 12
 if p.staircase
     p.targetOrientation = [0 0];
     fprintf('\nStaircase is ON\n')

@@ -73,8 +73,8 @@ p.tiltJitter = 1;
 % p.exoSize = [0.3 0.3];
 p.exoSize = 0.2;
 % p.exoVPos = 2.5; % 2.5; % vertical offset of exo cue from target center
-% p.exoPos = [2.5; 2.5]./sqrt(2); % 2.8
-p.exoPos = [2.5 -2.5; 2.5 -2.5]./sqrt(2);
+p.exoPos = [2.5; 2.5]./sqrt(2); % 2.8
+% p.exoPos = [2.5 -2.5; 2.5 -2.5]./sqrt(2);
 p.exoColor = [1 1 1];
 p.exoLineWidth = 2; % if circle around target
 
