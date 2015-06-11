@@ -8,6 +8,8 @@
 
 load data/TEMP.mat
 
+clear window pahandle targetTex
+
 workspaceFile = sprintf('data/%s_WORKSPACE.mat', subjectID);
 
 save(workspaceFile)
