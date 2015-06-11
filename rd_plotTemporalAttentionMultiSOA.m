@@ -1,31 +1,32 @@
 function [accMean rtMean t1t2soa p dprime crit eff] = rd_plotTemporalAttentionMultiSOA(subjectInit)
 
 % subjectInit = 'vp';
-exptName = 'cbD6'; % 'cbD6'
+exptName = 'cbD10'; % 'cbD6'
 tilt = '*';
-contrast = 64;
+contrast = 16; % plot one contrast at a time
 
-soa1 = [1000 1000 1000 1000 1000 1000 1000 1000 1000 1000];
-soa2 = [1100 1150 1200 1250 1300 1350 1400 1450 1500 1800];
+% soa1 = [1000 1000 1000 1000 1000 1000 1000 1000 1000 1000];
+% soa2 = [1100 1150 1200 1250 1300 1350 1400 1450 1500 1800];
 % soa1 = [1000 1000 1000 1000 1000 1000 1000 1000 1000];
 % soa2 = [1100 1150 1200 1250 1300 1400 1450 1500 1800];
-% soa1 = [1000 1000 1000];
-% soa2 = [1100 1250 1800];
+soa1 = [1000 1000 1000];
+soa2 = [1100 1300 1800];
 t1t2soa = soa2 - soa1;
 run = 8;
 
 plotFigs = 0;
 
 cleanRT = 0;
+doDprime = 0;
 
-expName = 'E2_SOA_cbD6';
+expName = 'E4_contrast_cbD10'; % 'E2_SOA_cbD6'
 dataDir = pathToExpt('data');
 dataDir = sprintf('%s/%s/%s', dataDir, expName, subjectInit(1:2));
 
 % subjectID = sprintf('%s_%s_tilt%s_tc%d', ...
 %     subjectInit, exptName, tilt, contrast);
-subjectID = sprintf('%s_%s*tc%d', ...
-    subjectInit, exptName, contrast);
+subjectID = sprintf('%s_%s*', ...
+    subjectInit, exptName);
 
 if cleanRT
     rtStr = '_RTx';
@@ -54,6 +55,12 @@ for iSOA = 1:numel(soa1)
 %     [expt results] = rd_analyzeTemporalAttention(expt, 0, 0, 0, 0, T1T2Axis, 0);
 %     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
+    % select target contrast
+    tcIdx = find(expt.p.targetContrasts==contrast/100);
+    if isempty(tcIdx)
+        error('requested target contrast not found')
+    end
+
     % read out the target timings
     soas(iSOA,:) = expt.p.soas;
     
@@ -64,14 +71,18 @@ for iSOA = 1:numel(soa1)
     
     % read out the accuracy and rt
     for iEL = 1:2 % early/late
-        accMean{iEL}(:,iSOA) = results.accMean{iEL};
-        accSte{iEL}(:,iSOA) = results.accSte{iEL};
-        rtMean{iEL}(:,iSOA) = results.rtMean{iEL};
-        rtSte{iEL}(:,iSOA) = results.rtSte{iEL};
-        [dprime{iEL}(:,iSOA) crit{iEL}(:,iSOA)] = ...
-            rd_dprime(results.accMean{iEL},[],'2afc');
-%         dprime{iEL}(:,iSOA) = zeros(size(rtSte{iEL}(:,iSOA)));
-%         crit{iEL}(:,iSOA) = zeros(size(rtSte{iEL}(:,iSOA)));
+        accMean{iEL}(:,iSOA) = results.accMean{iEL}(:,tcIdx);
+        accSte{iEL}(:,iSOA) = results.accSte{iEL}(:,tcIdx);
+        rtMean{iEL}(:,iSOA) = results.rtMean{iEL}(:,tcIdx);
+        rtSte{iEL}(:,iSOA) = results.rtSte{iEL}(:,tcIdx);
+        
+        if doDprime
+            [dprime{iEL}(:,iSOA) crit{iEL}(:,iSOA)] = ...
+                rd_dprime(results.accMean{iEL}(:,tcIdx),[],'2afc');
+        else
+            dprime{iEL}(:,iSOA) = zeros(size(rtSte{iEL}(:,iSOA)));
+            crit{iEL}(:,iSOA) = zeros(size(rtSte{iEL}(:,iSOA)));
+        end
     end
     
     %     % calculate dprime
@@ -87,15 +98,23 @@ p = expt.p;
 
 %% Calculate efficiency
 for iEL = 1:2 % early/late
-    eff{iEL} = dprime{iEL}./rtMean{iEL};
-%     eff{iEL}(:,iSOA) = zeros(size(rtSte{iEL}(:,iSOA)));
+    if doDprime
+        eff{iEL} = dprime{iEL}./rtMean{iEL};
+    else
+        eff{iEL}(:,iSOA) = zeros(size(rtSte{iEL}(:,iSOA)));
+    end
 end
 
 %% Plot figs
 if plotFigs
     intervalNames = {'early','late'};
     accLims = [0.2 1];
-    rtLims = [0.2 1.6];
+    switch exptName
+        case 'cbD10'
+            rtLims = [0.8 2.2];
+        otherwise
+            rtLims = [0.2 1.6];
+    end
     dpLims = [-0.5 2.7];
     critLims = [-1 1];
     effLims = [-0.5 8];

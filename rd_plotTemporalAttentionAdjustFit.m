@@ -4,9 +4,9 @@
 % @(data,g,sd)((1-g).*vonmisespdf(data.errors(:),0,deg2k(sd))+(g).*1/360)
 
 %% group i/o
-subjectIDs = {'bl','rd','id','ec','ld','en','sj','ml','ca','jl'};
-% subjectIDs = {'jl'};
-run = 9;
+subjectIDs = {'bl','rd','id','ec','ld','en','sj','ml','ca','jl','ew','jx'};
+% subjectIDs = {'ew'};
+run = 19;
 nSubjects = numel(subjectIDs);
 
 plotDistributions = 0;
@@ -18,7 +18,7 @@ groupFigTitle = [sprintf('%s ',subjectIDs{:}) sprintf('(N=%d), run %d', nSubject
 % load data/adjust_workspace_20141225.mat
 % load(sprintf('data/adjust_workspace_run%02d_20150106.mat', run))
 
-modelName = 'mixtureNoBias'; % 'mixtureWithBias','mixtureNoBias'
+modelName = 'mixtureNoBias'; % 'mixtureWithBias','mixtureNoBias','swapNoBias', 'swapWithBias'
 
 %% get data and plot data and fits
 for iSubject = 1:nSubjects
@@ -61,7 +61,7 @@ for iSubject = 1:nSubjects
             n(end) = [];
             
             % get fit parameters for this condition
-            p = fit(iV,iEL).posteriorMean;
+            p = fit(iV,iEL).maxPosterior; % posteriorMean
             switch modelName
                 case 'mixtureWithBias'
                     mu = p(1);
@@ -71,6 +71,16 @@ for iSubject = 1:nSubjects
                     mu = 0;
                     g = p(1);
                     sd = p(2);
+                case 'swapNoBias'
+                    mu = 0;
+                    g = p(1);
+                    B = p(2);
+                    sd = p(3);
+                case 'swapWithBias'
+                    mu = p(1);
+                    g = p(2);
+                    B = p(3);
+                    sd = p(4);
                 otherwise
                     error('modelName not recognized')
             end
@@ -80,6 +90,9 @@ for iSubject = 1:nSubjects
             paramsData.mu(iV,iEL,iSubject) = mu;
             paramsData.g(iV,iEL,iSubject) = g;
             paramsData.sd(iV,iEL,iSubject) = sd;
+            if exist('B','var')
+                paramsData.B(iV,iEL,iSubject) = B;
+            end
             
             % generate data and model pdfs (and find residuals) using a common
             % x-axis
@@ -174,6 +187,7 @@ ylims.absMu = [-1 8];
 ylims.mu = [-8 8];
 ylims.g = [0 0.3];
 ylims.sd = [0 30];
+ylims.B = [0 0.06];
 for iField = 1:numel(fieldNames)
     fieldName = fieldNames{iField};
     figNames{end+1} = [fieldName 'Indiv'];
@@ -200,6 +214,7 @@ ylims.absMu = [-1 4];
 ylims.mu = [-4 4];
 ylims.g = [0 0.16];
 ylims.sd = [0 25];
+ylims.B = [0 0.06];
 for iField = 1:numel(fieldNames)
     fieldName = fieldNames{iField};
     figNames{end+1} = [fieldName 'Group'];
@@ -222,8 +237,9 @@ end
 
 %% save figures
 if saveFigs
-    groupFigPrefix = sprintf('gE3_N%d_run%02d_%s', nSubjects, run, modelName);
-    rd_saveAllFigs(f, figNames, groupFigPrefix, [], '-depsc2'); %-depsc2, -dpng
+    turnallwhite
+    groupFigPrefix = sprintf('gE3_N%d_run%02d_%sMAP', nSubjects, run, modelName);
+    rd_saveAllFigs(f, figNames, groupFigPrefix, [], '-pdf'); %-depsc2, -dpng
 end
     
 

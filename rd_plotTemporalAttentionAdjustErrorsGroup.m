@@ -1,7 +1,7 @@
 % rd_plotTemporalAttentionAdjustErrorsGroup.m
 
 %% setup
-subjectIDs = {'bl','rd','id','ec','ld','en','sj','ml','ca','jl'};
+subjectIDs = {'bl','rd','id','ec','ld','en','sj','ml','ca','jl','ew','jx'};
 nSubjects = numel(subjectIDs);
 
 run = 9;
@@ -17,7 +17,9 @@ for iSubject = 1:nSubjects
         groupData0(iSubject).nonTargetOrients, ...
         groupData0(iSubject).targetOrientDiff, ...
         groupData0(iSubject).probeOrients, ...
-        groupData0(iSubject).probeOrientDiff] = ...
+        groupData0(iSubject).probeOrientDiff, ...
+        groupData0(iSubject).responses, ...
+        groupData0(iSubject).targetOrientDiffSmooth] = ...
             rd_plotTemporalAttentionAdjustErrors(subjectID, run, plotIndivFigs);
 end
 
@@ -33,13 +35,48 @@ for iSubject = 1:nSubjects
         for iRI = 1:2
             for iCV = 1:3
                 fName = fNames{iF};
-                groupData.(fName){iCV,iRI}(:,iSubject) = ...
-                    groupData0(iSubject).(fName){iCV,iRI};
+                switch fName
+                    case 'targetOrientDiffSmooth'
+                        groupData.(fName)(:,:,:,iSubject) = groupData0(iSubject).(fName);
+                    otherwise
+                        groupData.(fName){iCV,iRI}(:,iSubject) = ...
+                            groupData0(iSubject).(fName){iCV,iRI};
+                end
             end
         end
     end
 end
 
+%% descriptive statistics
+% test circ stats
+% sd = 100;
+% theta = vonmisesrnd(0, deg2k(sd), [10000 1]);
+% figure
+% hist(theta)
+% [ang_rad sd_rad] = circ_std(theta/180*pi);
+% sd_est = sd_rad*180/pi;
+% mean_est = circ_mean(theta/180*pi)*180/pi;
+% fprintf('sd: %.2f, mean: %.2f\n', sd_est, mean_est)
+
+descripData = []; 
+for iRI = 1:2
+    for iCV = 1:3
+        theta = groupData.errors{iCV,iRI};
+        [ang_rad sd_rad] = circ_std(theta/180*pi);
+        descripData.sd(:,iCV,iRI) = sd_rad*180/pi;
+        descripData.mean(:,iCV,iRI) = circ_mean(theta/180*pi)*180/pi;
+    end
+end
+descripData.absMean = abs(descripData.mean);
+
+fieldNames = fields(descripData);
+for iField = 1:numel(fieldNames)
+    fieldName = fieldNames{iField};
+    descripMean.(fieldName) = squeeze(mean(descripData.(fieldName),1));
+    descripSte.(fieldName) = squeeze(std(descripData.(fieldName),0,1))./sqrt(nSubjects);
+end
+
+%% points analyses
 % calculate mean errors for each x-axis value
 for iRI = 1:2
     for iCV = 1:3
@@ -121,7 +158,15 @@ allErrorByTNTO = (errorByTNTO{1,1} + errorByTNTO{1,2}).*0.6 + ...
     (errorByTNTO{2,1} + errorByTNTO{2,2}).*0.2 + ...
     (errorByTNTO{3,1} + errorByTNTO{3,2}).*0.2;
 
+%% smoothed data
+groupMean.targetOrientDiffSmooth = nanmean(groupData.targetOrientDiffSmooth, 4);
+groupSte.targetOrientDiffSmooth = nanstd(groupData.targetOrientDiffSmooth, 0, 4)./sqrt(nSubjects);
+
+winSize = 29; % check in rd_plotTemporalAttentionAdjustErrors.m
+steps = -90+floor(winSize/2):90-floor(winSize/2);
+
 %% plot figures
+% setup plots
 targetNames = {'T1','T2'};
 colors = {'b','g','r'};
 errorLims = [-100 100];
@@ -133,6 +178,85 @@ smoothSize = 10; % 5
 b = (1/smoothSize)*ones(1,smoothSize);
 a = 1;
 
+validityNames = {'valid','invalid','neutral'};
+validityOrder = [1 3 2];
+fieldNames = fields(descripMean);
+
+groupFigTitle = [sprintf('%s ',subjectIDs{:}) sprintf('(N=%d), run %d', nSubjects, run)];
+f = [];
+
+%% descriptive stats
+% indiv subjects
+ylims = [];
+ylims.absMean = [-1 8];
+ylims.mean = [-8 8];
+ylims.sd = [0 30];
+for iField = 1:numel(fieldNames)
+    fieldName = fieldNames{iField};
+%     figNames{end+1} = [fieldName 'Indiv'];
+    f(end+1) = figure;
+    for iRI = 1:2
+        subplot(1,2,iRI)
+        bar(descripData.(fieldName)(:,validityOrder,iRI))
+        set(gca,'XTickLabel',subjectIDs)
+        colormap(flag(3))
+        xlim([0 nSubjects+1])
+        ylim(ylims.(fieldName))
+        if iEL==1
+            ylabel(fieldName)
+            legend(validityNames(validityOrder))
+        end
+        title(targetNames{iRI})
+    end
+    rd_supertitle(groupFigTitle);
+    rd_raiseAxis(gca);
+end
+
+% scatter
+fieldName = 'absMean';
+conds = [1 3];
+f(end+1) = figure;
+for iRI = 1:2
+    subplot(1,2,iRI)
+    plot(descripData.(fieldName)(:,conds(1),iRI),descripData.(fieldName)(:,conds(2),iRI),'.')
+    hold on
+    plot(ylims.(fieldName),ylims.(fieldName),'k')
+    xlim(ylims.(fieldName))
+    ylim(ylims.(fieldName))
+    axis square
+    title(targetNames{iRI})
+    if iRI==1
+        xlabel(sprintf('%s %s', validityNames{conds(1)}, fieldName))
+        ylabel(sprintf('%s %s', validityNames{conds(2)}, fieldName))
+    end
+end
+
+% group
+ylims.absMu = [-1 4];
+ylims.mu = [-4 4];
+ylims.sd = [0 25];
+for iField = 1:numel(fieldNames)
+    fieldName = fieldNames{iField};
+%     figNames{end+1} = [fieldName 'Group'];
+    f(end+1) = figure;
+    for iRI = 1:2
+        subplot(1,2,iRI)
+        hold on
+        b1 = bar(1:3, descripMean.(fieldName)(validityOrder,iRI),'FaceColor',[.5 .5 .5]);
+        p1 = errorbar(1:3, descripMean.(fieldName)(validityOrder,iRI)', ...
+            descripSte.(fieldName)(validityOrder,iRI)','k','LineStyle','none');
+        ylim(ylims.(fieldName))
+        ylabel(fieldName)
+        set(gca,'XTick',1:3)
+        set(gca,'XTickLabel', validityNames(validityOrder))
+        title(targetNames{iRI})
+    end
+    rd_supertitle(groupFigTitle);
+    rd_raiseAxis(gca);
+end
+
+
+%% dots
 % target orientation
 figure
 for iRI = 1:2
@@ -185,6 +309,7 @@ for iRI = 1:2
     xlabel('flipflip target orientation')
     ylabel('flipflip error')
 end
+toErrorsFF = errorsFF;
 
 
 % non-target orientation
@@ -266,6 +391,7 @@ for iRI = 1:2
     xlabel('flipflip non-target - target orientation difference')
     ylabel('flipflip error')
 end
+todErrorsFF = errorsFF;
 
 figure
 for iRI = 1:2
@@ -364,3 +490,152 @@ if analyzeProbe
     rd_supertitle(sprintf('%s ', subjectIDs{:}));
     rd_raiseAxis(gca);
 end
+
+% smoothed difference between target and non-target orientation
+colors = {'b','g','r'};
+figure
+for iRI = 1:2
+    subplot(2,1,iRI)
+    hold on
+    for iCV = 1:3
+        shadedErrorBar(steps, ...
+            groupMean.targetOrientDiffSmooth(:,iRI,iCV), ...
+            groupSte.targetOrientDiffSmooth(:,iRI,iCV), ...
+            colors{iCV},1)
+    end
+    plot([-90 90],[0 0],'k')
+    xlim([steps(1) steps(end)])
+    ylim([-15 15])
+    ylabel(sprintf('error (sliding window average, size=%d)', winSize))
+    if iRI==1
+%         legend('valid','invalid','neutral')
+    end
+end
+xlabel('non-target - target orientation difference')
+rd_supertitle(sprintf('%s ', subjectIDs{:}));
+rd_raiseAxis(gca);
+
+%% Fit lines to data - target orientation
+xgridFF = 0:90;
+for iSubject = 1:nSubjects
+    figure
+    hold on
+    for iRI = 1:2
+        for iCV = 1:3
+            eFF = toErrorsFF{iCV,iRI}(:,iSubject);
+            toFF = targetOrientsFF{iCV,iRI}(:,iSubject);
+            
+            p = polyfit(toFF, eFF, 1);
+            
+            subplot(3,2,(validityOrder(iCV)-1)*2 + iRI)
+            hold on
+            plot(toFF,eFF,'.')
+            plot(xgridFF,polyval(p,xgridFF),'r')
+            title(validityNames{iCV})
+            
+            params{iCV,iRI}(iSubject,:) = p;
+        end
+    end
+    rd_supertitle(subjectIDs{iSubject})
+end
+
+for iRI = 1:2
+    for iCV = 1:3
+        paramsMean(iCV,iRI,:) = mean(params{iCV,iRI},1);
+        paramsSte(iCV,iRI,:) = std(params{iCV,iRI},0,1)./sqrt(nSubjects);
+    end
+end
+
+% plot bars
+paramNames = {'slope','intercept'};
+ylims = [-.5 .5; -10 25];
+for iP = 1:numel(p)
+    figure
+    for iRI = 1:2
+        for iCV = 1:3
+            subplot(3,2,(validityOrder(iCV)-1)*2 + iRI)
+            bar(params{iCV,iRI}(:,iP))
+            title(validityNames{iCV})
+            ylim(ylims(iP,:))
+        end
+    end
+    rd_supertitle(paramNames{iP})
+end
+
+for iP = 1:numel(p)
+    figure
+    barweb(paramsMean(validityOrder,:,iP)',paramsSte(validityOrder,:,iP)', ...
+        [], targetNames, [], [], [], gray)
+    legend(validityNames{validityOrder})
+    ylabel(paramNames{iP})
+end
+
+fit.to.params = params;
+fit.to.paramsMean = paramsMean;
+fit.to.paramsSte = paramsSte;
+fit.to.paramNames = paramNames;
+
+%% Fit lines to data
+xgridFF = -90:0;
+for iSubject = 1:nSubjects
+    figure
+    hold on
+    for iRI = 1:2
+        for iCV = 1:3
+            eFF = todErrorsFF{iCV,iRI}(:,iSubject);
+            todFF = targetOrientDiffFF{iCV,iRI}(:,iSubject);
+            
+            p = polyfit(todFF, eFF, 1);
+            
+            subplot(3,2,(validityOrder(iCV)-1)*2 + iRI)
+            hold on
+            plot(todFF,eFF,'.')
+            plot(xgridFF,polyval(p,xgridFF),'r')
+            title(validityNames{iCV})
+            
+            params{iCV,iRI}(iSubject,:) = p;
+        end
+    end
+    rd_supertitle(subjectIDs{iSubject})
+end
+
+for iRI = 1:2
+    for iCV = 1:3
+        paramsMean(iCV,iRI,:) = mean(params{iCV,iRI},1);
+        paramsSte(iCV,iRI,:) = std(params{iCV,iRI},0,1)./sqrt(nSubjects);
+    end
+end
+
+% plot bars
+paramNames = {'slope','intercept'};
+ylims = [-.5 .5; -10 25];
+for iP = 1:numel(p)
+    figure
+    for iRI = 1:2
+        for iCV = 1:3
+            subplot(3,2,(validityOrder(iCV)-1)*2 + iRI)
+            bar(params{iCV,iRI}(:,iP))
+            title(validityNames{iCV})
+            ylim(ylims(iP,:))
+        end
+    end
+    rd_supertitle(paramNames{iP})
+end
+
+for iP = 1:numel(p)
+    figure
+    barweb(paramsMean(validityOrder,:,iP)',paramsSte(validityOrder,:,iP)', ...
+        [], targetNames, [], [], [], gray)
+    legend(validityNames{validityOrder})
+    ylabel(paramNames{iP})
+end
+
+fit.tod.params = params;
+fit.tod.paramsMean = paramsMean;
+fit.tod.paramsSte = paramsSte;
+fit.tod.paramNames = paramNames;
+    
+%% Set figure properties
+% set font size of titles, axis labels, and legends
+% set(findall(gcf,'type','text'),'FontSize',14)
+

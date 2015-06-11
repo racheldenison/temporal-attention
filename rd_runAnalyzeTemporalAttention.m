@@ -1,17 +1,18 @@
 % rd_runAnalyzeTemporalAttention.m
 
-subject = 'maPilot_cb_tilt5_soa1000-1250';
-run = 2;
+subject = 'sl_cbD10_tilt*_tc16-64_soa1000-1800';
+% subject = 'maPilot_cb_tilt5_soa1000-1250';
+run = 8;
 
 subjectID = sprintf('%s_run%02d', subject, run);
 
-saveData = 0;
+saveData = 1;
 saveFigs = 1;
 plotTimingFigs = 0;
 saveTimingFigs = 0;
 cleanRT = 0;
 
-expName = 'E0_cb';
+expName = 'E4_contrast_cbD10'; % 'E0_cb'
 % dataDir = 'data';
 % figDir = 'figures';
 dataDir = pathToExpt('data');
@@ -28,7 +29,7 @@ else
     load(sprintf('%s/%s', dataDir, dataFile.name))
 end
 
-for t1t2 = {'same','diff'} % {'all'} % 
+for t1t2 = {'all'} %{'same','diff'} %  
     [expt results] = rd_analyzeTemporalAttention(expt, 0, 0, 0, 0, t1t2{1}, cleanRT);
     
     % change subjectID for saving if cleaning RT
@@ -46,7 +47,11 @@ for t1t2 = {'same','diff'} % {'all'} %
     
     % save figs
     if saveFigs
-        figNames = {'acc','rt'};
+        if cleanRT
+            figNames = {'cleanRTHist','acc','rt'};
+        else
+            figNames = {'acc','rt'};
+        end
         rd_saveAllFigs([], figNames, [subjectID '_TemporalAttention_T1T2' t1t2{1}], figDir)
         close all % close so as not to interfere with next set of figures
     end 

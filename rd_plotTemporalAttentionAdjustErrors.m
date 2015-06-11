@@ -1,4 +1,4 @@
-function [errors, targetOrients, nonTargetOrients, targetOrientDiff, probeOrients, probeOrientDiff, responses] = ...
+function [errors, targetOrients, nonTargetOrients, targetOrientDiff, probeOrients, probeOrientDiff, responses, targetOrientDiffSmooth] = ...
     rd_plotTemporalAttentionAdjustErrors(subjectID, run, plotFigs)
 
 %% setup
@@ -110,6 +110,21 @@ for iRI = 1:numel(p.respInterval)
     end
 end
 
+%% smooth
+winSize = 29;
+valsRange = [-90 90];
+
+targetOrientDiffSmooth = [];
+for iRI = 1:numel(p.respInterval)
+    for iCV = 1:numel(p.cueValidity)
+        vals = targetOrientDiff{iCV,iRI};
+        err = errors{iCV,iRI};
+        [errSmoothed, steps] = ...
+            rd_slidingWindow(vals, err, winSize, valsRange);
+        targetOrientDiffSmooth(:,iRI,iCV) = errSmoothed;
+    end
+end
+
 %% plot figs
 if plotFigs
     targetNames = {'T1','T2'};
@@ -204,5 +219,17 @@ if plotFigs
         rd_supertitle(sprintf('%s run %d', subjectID, run));
         rd_raiseAxis(gca);
     end
+    
+    % smoothed orientation difference between targets
+    colors = {'b','g','r'};
+    figure
+    hold on
+    for iRI = 1:numel(p.respInterval)
+        for iCV = 1:numel(p.cueValidity)
+            plot(steps, targetOrientDiffSmooth(:,iRI,iCV), colors{iCV})
+        end
+    end
+    plot(valsRange,[0 0],'k')
+    xlim(valsRange)
 end
 

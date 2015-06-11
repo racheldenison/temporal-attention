@@ -42,10 +42,18 @@ correctIdx = strcmp(trials_headers,'correct');
 %% Clean RT if requested
 if cleanRT
     rt0 = trials(:,rtIdx);
-    cutoff = prctile(rt0,95);
+%     cutoff = prctile(rt0,95);
+    q = prctile(rt0,[25 75]);
+    cutoff = q(2)+3*(q(2)-q(1));
+    
     rt = rt0;
     rt(rt0 > cutoff) = NaN;
     trials(:,rtIdx) = rt;
+    
+    correct = trials(:,correctIdx);
+    correct(rt0 > cutoff) = NaN;
+    trials(:,correctIdx) = correct;
+    
     subjectID = [subjectID '_RTx'];
     
     % update expt

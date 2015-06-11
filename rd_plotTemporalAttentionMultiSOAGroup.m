@@ -1,11 +1,12 @@
 % rd_plotTemporalAttentionMultiSOAGroup.m
 
 %% Setup
-subjectInits = {'rd','vp','hl','ho'};
+% subjectInits = {'rd','vp','hl','ho'};
+subjectInits = {'dg','sl','mr','ly'};
 nSubjects = numel(subjectInits);
 groupStr = sprintf('N=%d', nSubjects);
 
-expName = 'E2';
+expName = 'E4'; % 'E2'
 figPrefix = sprintf('g%s_N%d', expName, nSubjects);
 
 normalizeData = 0;

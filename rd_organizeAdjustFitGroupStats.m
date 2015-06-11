@@ -4,7 +4,16 @@
 
 %% setup
 % load data/adjust_fit_group_stats_run19_N10_20150216.mat
-load data/adjust_fit_group_stats_mixtureNoBias_run09_N10_20150303.mat
+% load data/adjust_fit_group_stats_mixtureNoBias_run09_N10_20150303.mat
+% load data/adjust_fit_group_stats_mixtureNoBias_run09_N12_20150407.mat
+% load data/adjust_fit_group_stats_mixtureWithBiasMaxPosterior_run09_N12_20150512.mat
+load data/adjust_fit_group_stats_mixtureNoBiasMaxPosterior_run09_N12_20150512.mat
+% load data/adjust_fit_group_stats_swapNoBiasMaxPosterior_run09_N12_20150512.mat
+% load data/adjust_fit_group_stats_swapWithBiasMaxPosterior_run09_N12_20150516.mat
+
+% load data/adjust_fit_group_stats_mixtureNoBiasMaxPosterior_run19_N12_20150513.mat
+% load data/adjust_fit_group_stats_swapNoBiasMaxPosterior_run19_N12_20150601.mat
+% load data/adjust_fit_group_stats_mixtureWithBiasMaxPosterior_run19_N12_20150601.mat
 % paramsData paramsMean paramsSte run subjectIDs
 
 nSubjects = numel(subjectIDs);
@@ -52,5 +61,5 @@ for iM = 1:numel(measures)
         fprintf('\nneutral vs. invalid: p = %1.5f\n', pNI)
     end
 end
-            
+
             
