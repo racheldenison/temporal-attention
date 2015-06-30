@@ -329,5 +329,5 @@ end
 % figPrefix = [figPrefix '_sameAxDiffOrient'];
 if saveFigs
     figNames = {'acc','rt','dprime','crit','eff','accCueEffect','accCueAve','accCueEffectOverlay','accCueAveOverlay','accCueEffectNOverlay'};
-    rd_saveAllFigs(fig, figNames, figPrefix, [], '-depsc2')
+    rd_saveAllFigs(fig, figNames, figPrefix, [])
 end

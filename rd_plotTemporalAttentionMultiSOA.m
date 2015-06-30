@@ -3,7 +3,7 @@ function [accMean rtMean t1t2soa p dprime crit eff] = rd_plotTemporalAttentionMu
 % subjectInit = 'vp';
 exptName = 'cbD10'; % 'cbD6'
 tilt = '*';
-contrast = 16; % plot one contrast at a time
+contrast = 64; % plot one contrast at a time
 
 % soa1 = [1000 1000 1000 1000 1000 1000 1000 1000 1000 1000];
 % soa2 = [1100 1150 1200 1250 1300 1350 1400 1450 1500 1800];
@@ -51,7 +51,7 @@ for iSOA = 1:numel(soa1)
     
 %     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %     %%% if you want to reanalyze, do it here %%%
-%     T1T2Axis = 'same';
+%     T1T2Axis = 'diff';
 %     [expt results] = rd_analyzeTemporalAttention(expt, 0, 0, 0, 0, T1T2Axis, 0);
 %     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     

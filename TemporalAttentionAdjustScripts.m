@@ -14,4 +14,5 @@ rd_fitTemporalAttentionAdjustGroup
 rd_plotTemporalAttentionAdjustFit 
 rd_organizeAdjustFitGroupStats
 rd_plotTemporalAttentionAdjustParamTradeoffs
+rd_plotTemporalAttentionAdjustFitBootstrap 
 
