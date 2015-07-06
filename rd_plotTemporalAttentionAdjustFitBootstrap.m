@@ -4,8 +4,8 @@
 % @(data,g,sd)((1-g).*vonmisespdf(data.errors(:),0,deg2k(sd))+(g).*1/360)
 
 %% group i/o
-subjectIDs = {'bl','rd','id','ec','ld','en','sj','ml','ca','jl','ew','jx'};
-% subjectIDs = {'ew'};
+% subjectIDs = {'bl','rd','id','ec','ld','en','sj','ml','ca','jl','ew','jx'};
+subjectIDs = {'bl'};
 run = 9;
 nSubjects = numel(subjectIDs);
 
@@ -14,8 +14,8 @@ saveFigs = 0;
 
 groupFigTitle = [sprintf('%s ',subjectIDs{:}) sprintf('(N=%d), run %d', nSubjects, run)];
 
-modelName = 'mixtureNoBias'; % 'mixtureWithBias','mixtureNoBias','swapNoBias', 'swapWithBias'
-bootstraps = 1:100;
+modelName = 'VPK'; % 'mixtureWithBias','mixtureNoBias','swapNoBias', 'swapWithBias'
+bootstraps = 101:150;
 nBoots = numel(bootstraps);
 
 %% get data
@@ -43,39 +43,51 @@ for iSubject = 1:nSubjects
         for iEL = 1:2
             for iV = 1:3
                 % get fit parameters for this condition
-                p = fit(iV,iEL).maxPosterior;
                 switch modelName
-                    case 'mixtureWithBias'
-                        mu = p(1);
-                        g = p(2);
-                        sd = p(3);
-                    case 'mixtureNoBias'
-                        mu = 0;
-                        g = p(1);
-                        sd = p(2);
-                    case 'swapNoBias'
-                        mu = 0;
-                        g = p(1);
-                        B = p(2);
-                        sd = p(3);
-                    case 'swapWithBias'
-                        mu = p(1);
-                        g = p(2);
-                        B = p(3);
-                        sd = p(4);
+                    case {'VP','VPK'}
+                        p = fit(iV,iEL).params;
+                        
+                        J1bar = p(1);
+                        tau = p(3);
+                        kappa_r = p(4);
+                        
+                        paramsData.J1bar(iV,iEL,iSubject,iBoot) = J1bar;
+                        paramsData.tau(iV,iEL,iSubject,iBoot) = tau;
+                        paramsData.kappa_r(iV,iEL,iSubject,iBoot) = kappa_r;
+                    
                     otherwise
-                        error('modelName not recognized')
+                        p = fit(iV,iEL).maxPosterior;
+                        switch modelName
+                            case 'mixtureWithBias'
+                                mu = p(1);
+                                g = p(2);
+                                sd = p(3);
+                            case 'mixtureNoBias'
+                                mu = 0;
+                                g = p(1);
+                                sd = p(2);
+                            case 'swapNoBias'
+                                mu = 0;
+                                g = p(1);
+                                B = p(2);
+                                sd = p(3);
+                            case 'swapWithBias'
+                                mu = p(1);
+                                g = p(2);
+                                B = p(3);
+                                sd = p(4);
+                            otherwise
+                                error('modelName not recognized')
+                        end
+                        % store fit parameters
+                        paramsData.absMu(iV,iEL,iSubject,iBoot) = abs(mu);
+                        paramsData.mu(iV,iEL,iSubject,iBoot) = mu;
+                        paramsData.g(iV,iEL,iSubject,iBoot) = g;
+                        paramsData.sd(iV,iEL,iSubject,iBoot) = sd;
+                        if exist('B','var')
+                            paramsData.B(iV,iEL,iSubject,iBoot) = B;
+                        end
                 end
-                
-                % store fit parameters
-                paramsData.absMu(iV,iEL,iSubject,iBoot) = abs(mu);
-                paramsData.mu(iV,iEL,iSubject,iBoot) = mu;
-                paramsData.g(iV,iEL,iSubject,iBoot) = g;
-                paramsData.sd(iV,iEL,iSubject,iBoot) = sd;
-                if exist('B','var')
-                    paramsData.B(iV,iEL,iSubject,iBoot) = B;
-                end
-                
             end
         end
     end
@@ -115,17 +127,22 @@ f = [];
 %% bootstrapped parameter distributions
 xlims.g = [-0.1 1];
 edges.g = 0:.01:1;
+useEdges = 0;
 
-fieldName = 'g';
+fieldName = 'kappa_r'; % 'g'
 for iSubject = 1:nSubjects
     figure
     for iEL = 1:2
         for iCV = 1:3
             vals = squeeze(paramsData.(fieldName)(iCV,iEL,iSubject,:));
             subplot(3,2,2*(validityOrder(iCV)-1)+iEL)
-            n = histc(vals, edges.(fieldName));
-            bar(edges.(fieldName), n);
-            xlim(xlims.(fieldName))
+            if useEdges
+                n = histc(vals, edges.(fieldName));
+                bar(edges.(fieldName), n);
+                xlim(xlims.(fieldName))
+            else
+                hist(vals,50)
+            end
             title(validityNames{iCV})
         end
     end
@@ -160,7 +177,7 @@ for iField = 1:numel(fieldNames)
         set(gca,'XTickLabel',subjectIDs)
         colormap(flag(3))
         xlim([0 nSubjects+1])
-        ylim(ylims.(fieldName))
+%         ylim(ylims.(fieldName))
         if iEL==1
             ylabel(fieldName)
             legend(validityNames)
@@ -172,25 +189,57 @@ for iField = 1:numel(fieldNames)
 end
 
 %% indiv subjects, param tradeoffs
-xlims = [-32 32];
-ylims = [-.4 .4];
-figure
-for iEL = 1:2
-    subplot(1,2,iEL)
-    hold on
-    errorbar(paramsDiffMedian.sd(iEL,:), paramsDiffMedian.g(iEL,:), ...
-        paramsDiffConfInt.g(iEL,:,1), paramsDiffConfInt.g(iEL,:,2), '.r');
-    herrorbar(paramsDiffMedian.sd(iEL,:), paramsDiffMedian.g(iEL,:), ...
-        paramsDiffConfInt.sd(iEL,:,1), paramsDiffConfInt.sd(iEL,:,2), '.');
-    plot(paramsDiffMedian.sd(iEL,:), paramsDiffMedian.g(iEL,:), '.k')
-    xlim(xlims)
-    ylim(ylims)
-    vline(0,'k')
-    plot(xlims,[0 0],'k')
-    axis square
-    xlabel('standard deviation (invalid-valid)')
-    ylabel('guess rate (invalid-valid)')
-    title(targetNames{iEL})
+switch modelName
+    case {'VP','VPK'}
+        p1 = 'J1bar';
+        p2 = 'tau';
+    otherwise
+        p1 = 'sd';
+        p2 = 'g';
+        
+        xlims = [-32 32];
+        ylims = [-.4 .4];
+end
+
+nDims = nnz(size(paramsDiffMedian.(p1))>1);
+if nDims==2
+    figure
+    for iEL = 1:2
+        subplot(1,2,iEL)
+        hold on
+        errorbar(paramsDiffMedian.(p1)(iEL,:), paramsDiffMedian.(p2)(iEL,:), ...
+            paramsDiffConfInt.(p2)(iEL,:,1), paramsDiffConfInt.(p2)(iEL,:,2), '.r');
+        herrorbar(paramsDiffMedian.(p1)(iEL,:), paramsDiffMedian.(p2)(iEL,:), ...
+            paramsDiffConfInt.(p1)(iEL,:,1), paramsDiffConfInt.(p1)(iEL,:,2), '.');
+        plot(paramsDiffMedian.(p1)(iEL,:), paramsDiffMedian.(p2)(iEL,:), '.k')
+        xlim(xlims)
+        ylim(ylims)
+        vline(0,'k')
+        plot(xlims,[0 0],'k')
+        axis square
+        xlabel('standard deviation (invalid-valid)')
+        ylabel('guess rate (invalid-valid)')
+        title(targetNames{iEL})
+    end
+else
+    figure
+    for iEL = 1:2
+        subplot(1,2,iEL)
+        hold on
+        errorbar(paramsDiffMedian.(p1)(iEL), paramsDiffMedian.(p2)(iEL), ...
+            paramsDiffConfInt.(p2)(iEL,1), paramsDiffConfInt.(p2)(iEL,2), '.r');
+        herrorbar(paramsDiffMedian.(p1)(iEL), paramsDiffMedian.(p2)(iEL), ...
+            paramsDiffConfInt.(p1)(iEL,1), paramsDiffConfInt.(p1)(iEL,2), '.');
+        plot(paramsDiffMedian.(p1)(iEL), paramsDiffMedian.(p2)(iEL), '.k')
+        %     xlim(xlims)
+        %     ylim(ylims)
+        vline(0,'k')
+        %     plot(xlims,[0 0],'k')
+        axis square
+        xlabel('standard deviation (invalid-valid)')
+        ylabel('guess rate (invalid-valid)')
+        title(targetNames{iEL})
+    end
 end
 
 %% group

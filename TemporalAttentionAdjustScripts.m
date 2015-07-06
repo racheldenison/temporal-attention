@@ -16,3 +16,8 @@ rd_organizeAdjustFitGroupStats
 rd_plotTemporalAttentionAdjustParamTradeoffs
 rd_plotTemporalAttentionAdjustFitBootstrap 
 
+% variable precision fit sequence
+rd_fitTemporalAttentionAdjustVP
+rd_fitTemporalAttentionAdjustVPGroup
+rd_plotTemporalAttentionAdjustFitVP
+rd_plotTemporalAttentionAdjustFitBootstrap
