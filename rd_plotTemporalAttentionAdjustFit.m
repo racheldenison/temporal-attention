@@ -5,11 +5,11 @@
 
 %% group i/o
 subjectIDs = {'bl','rd','id','ec','ld','en','sj','ml','ca','jl','ew','jx'};
-% subjectIDs = {'ew'};
-run = 19;
+% subjectIDs = {'bl'};
+run = 9;
 nSubjects = numel(subjectIDs);
 
-plotDistributions = 0;
+plotDistributions = 1;
 saveFigs = 0;
 
 groupFigTitle = [sprintf('%s ',subjectIDs{:}) sprintf('(N=%d), run %d', nSubjects, run)];
@@ -18,7 +18,7 @@ groupFigTitle = [sprintf('%s ',subjectIDs{:}) sprintf('(N=%d), run %d', nSubject
 % load data/adjust_workspace_20141225.mat
 % load(sprintf('data/adjust_workspace_run%02d_20150106.mat', run))
 
-modelName = 'mixtureNoBias'; % 'mixtureWithBias','mixtureNoBias','swapNoBias', 'swapWithBias'
+modelName = 'variablePrecisionGammaSD'; % 'mixtureWithBias','mixtureNoBias','swapNoBias', 'swapWithBias'
 
 %% get data and plot data and fits
 for iSubject = 1:nSubjects
@@ -81,32 +81,69 @@ for iSubject = 1:nSubjects
                     g = p(2);
                     B = p(3);
                     sd = p(4);
+                case 'variablePrecision'
+                    g = p(1);
+                    mnSTD = p(2);
+                    sdSTD = p(3);
+                case 'variablePrecisionGammaSD'
+                    g = p(1);
+                    modeSTD = p(2);
+                    sdSTD = p(3);
                 otherwise
                     error('modelName not recognized')
             end
             
             % store fit parameters
-            paramsData.absMu(iV,iEL,iSubject) = abs(mu);
-            paramsData.mu(iV,iEL,iSubject) = mu;
-            paramsData.g(iV,iEL,iSubject) = g;
-            paramsData.sd(iV,iEL,iSubject) = sd;
-            if exist('B','var')
-                paramsData.B(iV,iEL,iSubject) = B;
+            switch modelName
+                case 'variablePrecision'
+                    paramsData.g(iV,iEL,iSubject) = g;
+                    paramsData.mnSTD(iV,iEL,iSubject) = mnSTD;
+                    paramsData.sdSTD(iV,iEL,iSubject) = sdSTD;
+                case 'variablePrecisionGammaSD'
+                    paramsData.g(iV,iEL,iSubject) = g;
+                    paramsData.modeSTD(iV,iEL,iSubject) = modeSTD;
+                    paramsData.sdSTD(iV,iEL,iSubject) = sdSTD;
+                otherwise
+                    paramsData.absMu(iV,iEL,iSubject) = abs(mu);
+                    paramsData.mu(iV,iEL,iSubject) = mu;
+                    paramsData.g(iV,iEL,iSubject) = g;
+                    paramsData.sd(iV,iEL,iSubject) = sd;
+                    if exist('B','var')
+                        paramsData.B(iV,iEL,iSubject) = B;
+                    end
             end
             
             % generate data and model pdfs (and find residuals) using a common
             % x-axis
+            switch modelName
+                case {'variablePrecision','variablePrecisionGammaSD'}
+                        paramsAsCell = num2cell(p);
+                        model = GetModelPdfForPlot(model);
+                        p1 = model.pdfForPlot(xgrid, [], paramsAsCell{:});
+                        pdfModel = (p1/sum(p1*df))';
+                otherwise
+                    pdfModel = (1-g).*vonmisespdf(xgrid,mu,deg2k(sd))+(g).*1/180;
+            end
             pdfData = (n/sum(n*df))';
-            pdfModel = (1-g).*vonmisespdf(xgrid,mu,deg2k(sd))+(g).*1/180;
             resid = pdfData - pdfModel;
             
             % store residuals
             resids(iV,iEL,iSubject,:) = resid;
-            residsShift(iV,iEL,iSubject,:) = circshift(resid,[0 round(mu/df)]);
+            if exist('mu','var')
+                residsShift(iV,iEL,iSubject,:) = circshift(resid,[0 round(mu/df)]);
+            else
+                residsShift = resids;
+            end
             
             % also generate smooth model pdf for plotting
             x = -90:90;
-            y = (1-g).*vonmisespdf(x,mu,deg2k(sd))+(g).*1/180;
+            switch modelName
+                case {'variablePrecision','variablePrecisionGammaSD'}
+                    y1 = model.pdfForPlot(x, [], paramsAsCell{:});
+                    y = y1/sum(y1);
+                otherwise
+                    y = (1-g).*vonmisespdf(x,mu,deg2k(sd))+(g).*1/180;
+            end
             
             if plotDistributions
                 ylims = [-0.02 0.06];
@@ -198,7 +235,7 @@ for iField = 1:numel(fieldNames)
         set(gca,'XTickLabel',subjectIDs)
         colormap(flag(3))
         xlim([0 nSubjects+1])
-        ylim(ylims.(fieldName))
+%         ylim(ylims.(fieldName))
         if iEL==1
             ylabel(fieldName)
             legend(validityNames(validityOrder))
@@ -225,7 +262,7 @@ for iField = 1:numel(fieldNames)
         b1 = bar(1:3, paramsMean.(fieldName)(validityOrder,iEL),'FaceColor',[.5 .5 .5]);
         p1 = errorbar(1:3, paramsMean.(fieldName)(validityOrder,iEL)', ...
             paramsSte.(fieldName)(validityOrder,iEL)','k','LineStyle','none');
-        ylim(ylims.(fieldName))
+%         ylim(ylims.(fieldName))
         ylabel(fieldName)
         set(gca,'XTick',1:3)
         set(gca,'XTickLabel', validityNames(validityOrder))

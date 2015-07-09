@@ -2,7 +2,7 @@
 
 %% Setup
 % subjectInits = {'rd','vp','hl','ho'};
-subjectInits = {'dg','sl','mr','ly'};
+subjectInits = {'dg','sl','mr','ly','pv','ek'};
 nSubjects = numel(subjectInits);
 groupStr = sprintf('N=%d', nSubjects);
 

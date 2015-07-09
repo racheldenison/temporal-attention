@@ -12,7 +12,7 @@ contrast = 64; % plot one contrast at a time
 soa1 = [1000 1000 1000];
 soa2 = [1100 1300 1800];
 t1t2soa = soa2 - soa1;
-run = 8;
+run = 9;
 
 plotFigs = 0;
 

@@ -17,7 +17,7 @@ nVal = size(paramsData.sd,1);
 nTarg = size(paramsData.sd,2);
 nSub = size(paramsData.sd,3);
 
-%% plot tradeoffs (should not really go in this script)
+%% plot tradeoffs
 sdT1 = squeeze(paramsData.sd(:,1,:));
 sdT2 = squeeze(paramsData.sd(:,2,:));
 gT1 = squeeze(paramsData.g(:,1,:));

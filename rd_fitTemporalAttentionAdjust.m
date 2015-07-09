@@ -42,18 +42,20 @@ dataFile = dir(sprintf('%s/%s_run%02d*', dataDir, subject, run));
 load(sprintf('%s/%s', dataDir, dataFile(1).name))
 
 %% specify model
-modelName = 'mixtureNoBias';
+modelName = 'variablePrecisionGammaSD';
 switch modelName
     case 'mixtureWithBias'
         model = Orientation(WithBias(StandardMixtureModel), [1,3]); % mu, sd
     case 'mixtureNoBias'
         model = Orientation(StandardMixtureModel, 2); % sd
-    case 'variablePrecision'
-        model = Orientation(VariablePrecisionModel, [2,3]); % mnSTD, stdSTD
     case 'swapNoBias'
         model = Orientation(SwapModel,3); % sd
     case 'swapWithBias'
         model = Orientation(WithBias(SwapModel), [1 4]); % mu, sd
+    case 'variablePrecision'
+        model = Orientation(VariablePrecisionModel, [2,3]); % mnSTD, stdSTD
+    case 'variablePrecisionGammaSD'
+        model = Orientation(VariablePrecisionModel('HigherOrderDist','GammaSD'), [2,3]); % modeSTD, sdSTD
     otherwise
         error('modelName not recognized')
 end
@@ -84,8 +86,11 @@ for iEL = 1:2
         end
         
         fit(iV,iEL) = MemFit(data, model, 'Verbosity', 0);
-        
+%         fit(iV,iEL).mle = MLE(data, model);
+
         err{iV,iEL} = errors;
+
+%         PlotModelFit(model, fit(iV,iEL).mle, data, 'NewFigure', true);
     end
 end
 
