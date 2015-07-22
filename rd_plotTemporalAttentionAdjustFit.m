@@ -14,11 +14,7 @@ saveFigs = 0;
 
 groupFigTitle = [sprintf('%s ',subjectIDs{:}) sprintf('(N=%d), run %d', nSubjects, run)];
 
-% load the fit results from all subjects
-% load data/adjust_workspace_20141225.mat
-% load(sprintf('data/adjust_workspace_run%02d_20150106.mat', run))
-
-modelName = 'variablePrecisionGammaSD'; % 'mixtureWithBias','mixtureNoBias','swapNoBias', 'swapWithBias'
+modelName = 'variablePrecision'; % 'fixedNoBias','mixtureWithBias','mixtureNoBias','swapNoBias', 'swapWithBias', 'variablePrecision', 'variablePrecisionGammaSD', 'variablePrecisionNoGuess'
 
 %% get data and plot data and fits
 for iSubject = 1:nSubjects
@@ -35,8 +31,6 @@ for iSubject = 1:nSubjects
     figDir = sprintf('%s/%s/%s', figDir, expName, subject(1:2));
     
     %% load data
-%     dataFile = dir(sprintf('%s/%s_run%02d*', dataDir, subject, run));
-%     load(sprintf('%s/%s', dataDir, dataFile(1).name))
     dataFile = dir(sprintf('%s/%s_run%02d_%s.mat', dataDir, subject, run, modelName));
     load(sprintf('%s/%s', dataDir, dataFile.name))
     
@@ -44,9 +38,8 @@ for iSubject = 1:nSubjects
     df = 4;
     xEdges = -90:df:90;
     xgrid = xEdges(1:end-1) + df/2; % bin centers
-%     errorIdx = strcmp(expt.trials_headers, 'responseError');
-    
-%     fit = indivResults(iSubject).fit;
+    paramNames = model.paramNames;
+    nParams = numel(paramNames);
     
     % get and plot data and model pdfs
     targetNames = {'T1','T2'};
@@ -54,7 +47,6 @@ for iSubject = 1:nSubjects
     for iEL = 1:2
         for iV = 1:3
             % get errors for this condition
-%             errors = results.totals.all{iV,iEL}(:,errorIdx);
             errors = err{iV,iEL};
             n = histc(errors, xEdges);
             n(end-1) = n(end-1) + n(end); % last element of n contains the count of values exaclty equal to xEdges(end), so just combine it with the previous bin
@@ -62,67 +54,86 @@ for iSubject = 1:nSubjects
             
             % get fit parameters for this condition
             p = fit(iV,iEL).maxPosterior; % posteriorMean
-            switch modelName
-                case 'mixtureWithBias'
-                    mu = p(1);
-                    g = p(2);
-                    sd = p(3);
-                case 'mixtureNoBias'
-                    mu = 0;
-                    g = p(1);
-                    sd = p(2);
-                case 'swapNoBias'
-                    mu = 0;
-                    g = p(1);
-                    B = p(2);
-                    sd = p(3);
-                case 'swapWithBias'
-                    mu = p(1);
-                    g = p(2);
-                    B = p(3);
-                    sd = p(4);
-                case 'variablePrecision'
-                    g = p(1);
-                    mnSTD = p(2);
-                    sdSTD = p(3);
-                case 'variablePrecisionGammaSD'
-                    g = p(1);
-                    modeSTD = p(2);
-                    sdSTD = p(3);
-                otherwise
-                    error('modelName not recognized')
+            
+            for iP = 1:nParams
+                pName = paramNames{iP};
+                paramsData.(pName)(iV,iEL,iSubject) = p(iP);
+                paramsLowerCred.(pName)(iV,iEL,iSubject) = fit(iV,iEL).lowerCredible(iP);
+                paramsUpperCred.(pName)(iV,iEL,iSubject) = fit(iV,iEL).upperCredible(iP);
             end
             
-            % store fit parameters
-            switch modelName
-                case 'variablePrecision'
-                    paramsData.g(iV,iEL,iSubject) = g;
-                    paramsData.mnSTD(iV,iEL,iSubject) = mnSTD;
-                    paramsData.sdSTD(iV,iEL,iSubject) = sdSTD;
-                case 'variablePrecisionGammaSD'
-                    paramsData.g(iV,iEL,iSubject) = g;
-                    paramsData.modeSTD(iV,iEL,iSubject) = modeSTD;
-                    paramsData.sdSTD(iV,iEL,iSubject) = sdSTD;
-                otherwise
-                    paramsData.absMu(iV,iEL,iSubject) = abs(mu);
-                    paramsData.mu(iV,iEL,iSubject) = mu;
-                    paramsData.g(iV,iEL,iSubject) = g;
-                    paramsData.sd(iV,iEL,iSubject) = sd;
-                    if exist('B','var')
-                        paramsData.B(iV,iEL,iSubject) = B;
-                    end
+            mu = p(strcmp(paramNames,'mu'));
+            g = p(strcmp(paramNames,'g'));
+            sd = p(strcmp(paramNames,'sd'));
+            if isempty(mu)
+                mu = 0;
+            else
+                paramsData.absMu(iV,iEL,iSubject) = abs(mu);
             end
+            if isempty(g)
+                g = 0;
+            end
+
+%             switch modelName
+%                 case 'mixtureWithBias'
+%                     mu = p(1);
+%                     g = p(2);
+%                     sd = p(3);
+%                 case 'mixtureNoBias'
+%                     mu = 0;
+%                     g = p(1);
+%                     sd = p(2);
+%                 case 'swapNoBias'
+%                     mu = 0;
+%                     g = p(1);
+%                     B = p(2);
+%                     sd = p(3);
+%                 case 'swapWithBias'
+%                     mu = p(1);
+%                     g = p(2);
+%                     B = p(3);
+%                     sd = p(4);
+%                 case 'variablePrecision'
+%                     g = p(1);
+%                     mnSTD = p(2);
+%                     sdSTD = p(3);
+%                 case 'variablePrecisionGammaSD'
+%                     g = p(1);
+%                     modeSTD = p(2);
+%                     sdSTD = p(3);
+%                 otherwise
+%                     error('modelName not recognized')
+%             end
+%             
+%             % store fit parameters
+%             switch modelName
+%                 case 'variablePrecision'
+%                     paramsData.g(iV,iEL,iSubject) = g;
+%                     paramsData.mnSTD(iV,iEL,iSubject) = mnSTD;
+%                     paramsData.sdSTD(iV,iEL,iSubject) = sdSTD;
+%                 case 'variablePrecisionGammaSD'
+%                     paramsData.g(iV,iEL,iSubject) = g;
+%                     paramsData.modeSTD(iV,iEL,iSubject) = modeSTD;
+%                     paramsData.sdSTD(iV,iEL,iSubject) = sdSTD;
+%                 otherwise
+%                     paramsData.absMu(iV,iEL,iSubject) = abs(mu);
+%                     paramsData.mu(iV,iEL,iSubject) = mu;
+%                     paramsData.g(iV,iEL,iSubject) = g;
+%                     paramsData.sd(iV,iEL,iSubject) = sd;
+%                     if exist('B','var')
+%                         paramsData.B(iV,iEL,iSubject) = B;
+%                     end
+%             end
             
             % generate data and model pdfs (and find residuals) using a common
             % x-axis
-            switch modelName
-                case {'variablePrecision','variablePrecisionGammaSD'}
-                        paramsAsCell = num2cell(p);
-                        model = GetModelPdfForPlot(model);
-                        p1 = model.pdfForPlot(xgrid, [], paramsAsCell{:});
-                        pdfModel = (p1/sum(p1*df))';
-                otherwise
-                    pdfModel = (1-g).*vonmisespdf(xgrid,mu,deg2k(sd))+(g).*1/180;
+            if strfind(modelName,'variablePrecision')
+                paramsAsCell = num2cell(p);
+                model = GetModelPdfForPlot(model);
+                p1 = model.pdfForPlot(xgrid, [], paramsAsCell{:});
+                pdfModel = (p1/sum(p1*df))';
+            else
+                pdfModel = (1-g).*vonmisespdf(xgrid,mu,deg2k(sd))+(g).*1/180;
             end
             pdfData = (n/sum(n*df))';
             resid = pdfData - pdfModel;
@@ -137,12 +148,11 @@ for iSubject = 1:nSubjects
             
             % also generate smooth model pdf for plotting
             x = -90:90;
-            switch modelName
-                case {'variablePrecision','variablePrecisionGammaSD'}
-                    y1 = model.pdfForPlot(x, [], paramsAsCell{:});
-                    y = y1/sum(y1);
-                otherwise
-                    y = (1-g).*vonmisespdf(x,mu,deg2k(sd))+(g).*1/180;
+            if strfind(modelName,'variablePrecision')
+                y1 = model.pdfForPlot(x, [], paramsAsCell{:});
+                y = y1/sum(y1);
+            else
+                y = (1-g).*vonmisespdf(x,mu,deg2k(sd))+(g).*1/180;
             end
             
             if plotDistributions
@@ -216,6 +226,11 @@ end
 
 %% plot fit parameters
 validityOrder = [1 3 2];
+colors = {[1 0 0],[0 0 1],[0 0 0]};
+for iCol = 1:numel(colors)
+    barColors{iCol} = desaturate(colors{iCol}, 0.5);
+end
+barColors{3} = [.5 .5 .5];
 fieldNames = fields(paramsMean);
 
 % indiv subjects
@@ -225,6 +240,10 @@ ylims.mu = [-8 8];
 ylims.g = [0 0.3];
 ylims.sd = [0 30];
 ylims.B = [0 0.06];
+ylims.modeSTD = [0 30];
+ylims.mnSTD = [0 30];
+ylims.sdSTD = [0 20];
+ylims.stdSTD = [0 20];
 for iField = 1:numel(fieldNames)
     fieldName = fieldNames{iField};
     figNames{end+1} = [fieldName 'Indiv'];
@@ -235,10 +254,52 @@ for iField = 1:numel(fieldNames)
         set(gca,'XTickLabel',subjectIDs)
         colormap(flag(3))
         xlim([0 nSubjects+1])
-%         ylim(ylims.(fieldName))
+        ylim(ylims.(fieldName))
         if iEL==1
             ylabel(fieldName)
             legend(validityNames(validityOrder))
+        end
+        title(targetNames{iEL})
+    end
+    rd_supertitle(groupFigTitle);
+    rd_raiseAxis(gca);
+end
+
+% with indiv error bars
+ylimsE = [];
+ylimsE.g = [-0.1 0.7]; % E = with individual error bars
+ylimsE.sd = [0 70];
+ylimsE.modeSTD = [0 80];
+ylimsE.mnSTD = [0 80];
+ylimsE.sdSTD = [-10 60];
+ylimsE.stdSTD = [-10 60];
+offsets = [-.2 0 .2];
+barWidth = 0.15;
+for iField = 1:numel(fieldNames)
+    fieldName = fieldNames{iField};
+    figNames{end+1} = [fieldName 'IndivError'];
+    f(end+1) = figure('Position',[100 100 700 400]);
+    for iEL = 1:2
+        subplot(1,2,iEL)
+        hold on
+%         bar(squeeze(paramsData.(fieldName)(validityOrder,iEL,:))')
+        for iV = 1:3
+            b1(iV) = bar((1:nSubjects)+offsets(iV), squeeze(paramsData.(fieldName)(validityOrder(iV),iEL,:)), ...
+                barWidth, 'FaceColor', barColors{validityOrder(iV)}, 'EdgeColor', 'none');
+            errorbar((1:nSubjects)+offsets(iV), squeeze(paramsData.(fieldName)(validityOrder(iV),iEL,:)), ...
+                squeeze(paramsLowerCred.(fieldName)(validityOrder(iV),iEL,:)), ...
+                squeeze(paramsUpperCred.(fieldName)(validityOrder(iV),iEL,:)), ...
+                'LineStyle','none','color',colors{validityOrder(iV)});
+        end
+        set(gca,'XTick',1:nSubjects)
+        set(gca,'XTickLabel',subjectIDs)
+        colormap(flag(3))
+        xlim([0 nSubjects+1])
+        ylim(ylimsE.(fieldName))
+        if iEL==1
+            ylabel(fieldName)
+            legend(b1, validityNames(validityOrder))
+            legend('boxoff')
         end
         title(targetNames{iEL})
     end
@@ -252,6 +313,10 @@ ylims.mu = [-4 4];
 ylims.g = [0 0.16];
 ylims.sd = [0 25];
 ylims.B = [0 0.06];
+ylims.modeSTD = [0 18];
+ylims.mnSTD = [0 22];
+ylims.sdSTD = [0 6];
+ylims.stdSTD = [0 14];
 for iField = 1:numel(fieldNames)
     fieldName = fieldNames{iField};
     figNames{end+1} = [fieldName 'Group'];
@@ -262,7 +327,7 @@ for iField = 1:numel(fieldNames)
         b1 = bar(1:3, paramsMean.(fieldName)(validityOrder,iEL),'FaceColor',[.5 .5 .5]);
         p1 = errorbar(1:3, paramsMean.(fieldName)(validityOrder,iEL)', ...
             paramsSte.(fieldName)(validityOrder,iEL)','k','LineStyle','none');
-%         ylim(ylims.(fieldName))
+        ylim(ylims.(fieldName))
         ylabel(fieldName)
         set(gca,'XTick',1:3)
         set(gca,'XTickLabel', validityNames(validityOrder))
