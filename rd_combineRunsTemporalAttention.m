@@ -2,9 +2,9 @@
 
 %% setup
 % subject = 'ecPilot_cb_tilt1pt5_tc64-100_soa1000-1250';
-subject = 'ek_cbD10_tilt*_tc16-64_soa1000-1800';
-runs = 1:3;
-combinedRun = 8;
+subject = 'md_cbD10_tilt*_tc16-64_soa1000-1800';
+runs = 2:3;
+combinedRun = 9;
 nRuns = numel(runs);
 
 saveData = 1;

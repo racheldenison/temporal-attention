@@ -1,5 +1,6 @@
 % TemporalAttentionScripts
 
+rd_checkParamsTemporalAttention
 rd_combineRunsTemporalAttention
 
 % to re-run analysis

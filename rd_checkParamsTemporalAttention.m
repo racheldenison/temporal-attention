@@ -2,7 +2,7 @@
 
 %% setup
 % subject = 'ecPilot_cb_tilt1pt5_tc64-100_soa1000-1250';
-subject = 'ek_cbD10_tilt*_tc16-64_soa1000-1300';
+subject = 'md_cbD10_tilt*_tc16-64_soa1000-1300';
 runs = 1:3;
 
 expName = 'E4_contrast_cbD10'; % 'E2_SOA_cbD6', 'E0_cb'
