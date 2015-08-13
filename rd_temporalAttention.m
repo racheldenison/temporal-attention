@@ -71,6 +71,7 @@ end
 devNum = findKeyboardDevNumsAtLocationNYU(p.testingLocation);
 if isempty(devNum)
     error('Could not find Keypad!')
+%     devNum = -1;
 end
 
 %% Sound
@@ -452,6 +453,8 @@ if ~isempty(workspaceFile)
 %     p.forwardMask = 0; % ad only
 %     block = floor(iTrial/p.nTrialsPerBlock); % ad only
 end
+
+% devNum = -1;
 
 % Present trials
 while trialCounter <= nTrials

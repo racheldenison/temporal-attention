@@ -8,7 +8,7 @@
 
 load data/TEMP.mat
 
-clear window pahandle targetTex
+clear window pahandle targetTex devNum
 
 workspaceFile = sprintf('data/%s_WORKSPACE.mat', subjectID);
 
