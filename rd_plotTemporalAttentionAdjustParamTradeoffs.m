@@ -4,7 +4,7 @@
 
 %% setup
 % see rd_organizeAdjustFitGroupStats.m
-load data/adjust_fit_group_stats_swapWithBiasMaxPosterior_run09_N12_20150516.mat
+load data/adjust_fit_group_stats_mixtureNoBiasMaxPosterior_run09_N12_20150512.mat
 
 nSubjects = numel(subjectIDs);
 
@@ -17,7 +17,7 @@ nVal = size(paramsData.sd,1);
 nTarg = size(paramsData.sd,2);
 nSub = size(paramsData.sd,3);
 
-%% plot tradeoffs (should not really go in this script)
+%% plot tradeoffs
 sdT1 = squeeze(paramsData.sd(:,1,:));
 sdT2 = squeeze(paramsData.sd(:,2,:));
 gT1 = squeeze(paramsData.g(:,1,:));
@@ -50,3 +50,14 @@ title('T2')
 
 [rho p] = corr((sdT1(2,:)-sdT1(1,:))', (gT1(2,:)-gT1(1,:))');
 [rho p] = corr((sdT2(2,:)-sdT2(1,:))', (gT2(2,:)-gT2(1,:))');
+
+%% plot shift
+paramsT1{1} = [sdT1(1,:)' gT1(1,:)'];
+paramsT1{2} = [sdT1(2,:)' gT1(2,:)'];
+
+paramsT2{1} = [sdT2(1,:)' gT2(1,:)'];
+paramsT2{2} = [sdT2(2,:)' gT2(2,:)'];
+
+PlotShift(paramsT1{1}, paramsT1{2}, {'sd','g'})
+PlotShift(paramsT2{1}, paramsT2{2}, {'sd','g'})
+

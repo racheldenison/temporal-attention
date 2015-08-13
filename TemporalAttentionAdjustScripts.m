@@ -10,8 +10,17 @@ rd_plotTemporalAttentionAdjustBigErrors
 rd_fitDOG
 
 % mixture model fit sequence
-rd_fitTemporalAttentionAdjustGroup
+rd_fitTemporalAttentionAdjustGroup % fit or compare fits
+rd_fitTemporalAttentionAdjust
 rd_plotTemporalAttentionAdjustFit 
 rd_organizeAdjustFitGroupStats
 rd_plotTemporalAttentionAdjustParamTradeoffs
+rd_plotTemporalAttentionAdjustFitBootstrap 
+rd_compareFitsTemporalAttentionAdjust
+rd_plotTemporalAttentionAdjustCompareFits
 
+% variable precision fit sequence
+rd_fitTemporalAttentionAdjustVP
+rd_fitTemporalAttentionAdjustVPGroup
+rd_plotTemporalAttentionAdjustFitVP
+rd_plotTemporalAttentionAdjustFitBootstrap

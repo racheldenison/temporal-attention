@@ -1,6 +1,6 @@
 % rd_runAnalyzeTemporalAttention.m
 
-subject = 'sl_cbD10_tilt*_tc16-64_soa1000-1800';
+subject = 'ek_cbD10_tilt*_tc16-64_soa1000-1300';
 % subject = 'maPilot_cb_tilt5_soa1000-1250';
 run = 8;
 

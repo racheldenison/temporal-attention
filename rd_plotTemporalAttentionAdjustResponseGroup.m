@@ -18,20 +18,22 @@ xEdges = mean(groupData.error,1);
 for iSubject = 1:nSubjects
     for iEL = 1:2
         groupData.pError2{iEL}(:,:,iSubject) = groupData.pError{iSubject,iEL};
-        rate{iEL} = mean(groupData.pError2{iEL},3);
+        groupMean.rate{iEL} = mean(groupData.pError2{iEL},3);
+        groupSte.rate{iEL} = std(groupData.pError2{iEL},0,3)./sqrt(nSubjects);
     end
 end
 
 %% plot
 %% overlaid
-plotType = 'area'; % 'area','line'
+plotType = 'shadedError'; % 'area','line','shadedError'
 colors = {'b','g','r'};
 fig(1) = figure;
 for iEL = 1:2
     subplot(1,2,iEL)
     hold on
     for iV = 1:3
-        vals = rate{iEL}(iV,:);
+        vals = groupMean.rate{iEL}(iV,:);
+        valsSte = groupSte.rate{iEL}(iV,:);
         switch plotType
             case 'area'
                 a1 = area(xEdges, vals, 'FaceColor', colors{iV}, ...
@@ -41,6 +43,8 @@ for iEL = 1:2
             case 'line'
                 p1 = plot(xEdges, vals, 'Color', colors{iV}, ...
                     'LineWidth', 1);
+            case 'shadedError'
+                p1 = shadedErrorBar(xEdges, vals, valsSte, colors{iV}, 1);
             otherwise
                 error('plotType not recognized')
         end
@@ -71,7 +75,7 @@ for iEL = 1:2
         subplot(3,2,2*(iV-1)+iEL)
         hold on
         plot_vertical_line(0);
-        vals = rate{iEL}(v,:);
+        vals = groupMean.rate{iEL}(v,:);
         switch plotType
             case 'area'
                 a1 = area(xEdges, vals, 'FaceColor', colors{v}, ...

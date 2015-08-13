@@ -51,7 +51,7 @@ for iSOA = 1:numel(soa1)
     
 %     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %     %%% if you want to reanalyze, do it here %%%
-%     T1T2Axis = 'same';
+%     T1T2Axis = 'diff';
 %     [expt results] = rd_analyzeTemporalAttention(expt, 0, 0, 0, 0, T1T2Axis, 0);
 %     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     

@@ -2,7 +2,7 @@
 
 %% Setup
 % subjectInits = {'rd','vp','hl','ho'};
-subjectInits = {'dg','sl','mr','ly'};
+subjectInits = {'dg','sl','mr','ly','pv','ek','gk','md'};
 nSubjects = numel(subjectInits);
 groupStr = sprintf('N=%d', nSubjects);
 
@@ -329,5 +329,5 @@ end
 % figPrefix = [figPrefix '_sameAxDiffOrient'];
 if saveFigs
     figNames = {'acc','rt','dprime','crit','eff','accCueEffect','accCueAve','accCueEffectOverlay','accCueAveOverlay','accCueEffectNOverlay'};
-    rd_saveAllFigs(fig, figNames, figPrefix, [], '-depsc2')
+    rd_saveAllFigs(fig, figNames, figPrefix, [])
 end
