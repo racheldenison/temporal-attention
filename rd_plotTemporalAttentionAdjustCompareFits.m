@@ -11,7 +11,7 @@ saveFigs = 1;
 
 groupFigTitle = [sprintf('%s ',subjectIDs{:}) sprintf('(N=%d), run %d', nSubjects, run)];
 
-modelNames = {'mixtureNoBias','variablePrecision'}; % 'fixedNoBias','mixtureWithBias','mixtureNoBias','swapNoBias', 'swapWithBias', 'variablePrecision', 'variablePrecisionGammaSD'
+modelNames = {'mixtureNoBias','mixtureKurtosis'}; % 'fixedNoBias','mixtureWithBias','mixtureNoBias','swapNoBias', 'swapWithBias', 'variablePrecision', 'variablePrecisionGammaSD'
 
 %% get data
 for iSubject = 1:nSubjects
@@ -38,6 +38,7 @@ for iSubject = 1:nSubjects
     for iM = 1:nMeasures
         measure = measures{iM};
         groupData.(measure)(iSubject,:) = fit.(measure);
+%         groupData.(measure) = real(groupData.(measure));
     end
 end
 

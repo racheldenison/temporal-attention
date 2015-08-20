@@ -42,7 +42,7 @@ dataFile = dir(sprintf('%s/%s_run%02d*', dataDir, subject, run));
 load(sprintf('%s/%s', dataDir, dataFile(1).name))
 
 %% specify model
-modelName = 'variablePrecision';
+modelName = 'mixtureKurtosis';
 switch modelName
     case 'fixedNoBias'
         model = Orientation(NoGuessingModel, 1); % sd
@@ -59,7 +59,9 @@ switch modelName
     case 'variablePrecisionGammaSD'
         model = Orientation(VariablePrecisionModel('HigherOrderDist','GammaSD'), [2,3]); % modeSTD, sdSTD
     case 'variablePrecisionNoGuess'
-        model = Orientation(VariablePrecisionModel('HigherOrderDist','GaussianSDNoGuess'), [1,2]); % mnSTD, stdSTD    
+        model = Orientation(VariablePrecisionModel('HigherOrderDist','GaussianSDNoGuess'), [1,2]); % mnSTD, stdSTD 
+    case 'mixtureKurtosis'
+        model = Orientation(StandardMixtureModelVariableKurtosis, 2); % sd
     otherwise
         error('modelName not recognized')
 end

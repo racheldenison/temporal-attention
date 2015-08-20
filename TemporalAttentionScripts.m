@@ -7,6 +7,9 @@ rd_combineRunsTemporalAttention
 % eg. look at same/diff axis, clean RT
 rd_runAnalyzeTemporalAttention
 
+% group analysis for E0
+rd_analyzeTemporalAttentionGroup
+
 % multi-SOA
 rd_plotTemporalAttentionMultiSOAGroup
 % -> settings in:
