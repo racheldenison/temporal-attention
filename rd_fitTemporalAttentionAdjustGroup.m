@@ -2,7 +2,7 @@
 
 %% setup
 subjectIDs = {'bl','rd','id','ec','ld','en','sj','ml','ca','jl','ew','jx'};
-% subjectIDs = {'sj','ml','ca','jl','ew','jx'};
+% subjectIDs = {'rd'};
 run = 9;
 nSubjects = numel(subjectIDs);
 
@@ -10,7 +10,7 @@ saveIndivData = 1;
 
 bootstraps = 0; % 25:100
 
-analysis = 'compare'; % 'fit' or 'compare'
+analysis = 'fit'; % 'fit' or 'compare'
 
 %% get data
 for iSubject = 1:nSubjects

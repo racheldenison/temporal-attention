@@ -135,7 +135,7 @@ else % lump data from all conditions together
         end
     end
     % fit all data at once
-    fit = MemFit(data, models, 'Verbosity', 1);
+    fit = MemFit(data, models, 'Verbosity', 0);
     err = data.errors;
 end
 
