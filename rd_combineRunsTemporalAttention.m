@@ -1,14 +1,20 @@
-% rd_combineRunsTemporalAttention.m
+function rd_combineRunsTemporalAttention(subject)
 
 %% setup
-% subject = 'ecPilot_cb_tilt1pt5_tc64-100_soa1000-1250';
-subject = 'md_cbD10_tilt*_tc16-64_soa1000-1800';
-runs = 2:3;
-combinedRun = 9;
+if nargin==0
+    % subject = 'ecPilot_cb_tilt1pt5_tc64-100_soa1000-1250';
+    subject = 'dg_cbD10_tilt*_tc16-64_soa1000-1100';
+end
+runs = 1:3;
+combinedRun = 18;
 nRuns = numel(runs);
 
 saveData = 1;
 saveFigs = 1;
+
+excludeFirstBlock = 0;
+nGoodTrialsToExclude = 64;
+startingExcludeTrials = [1 193];
 
 expName = 'E4_contrast_cbD10'; % 'E2_SOA_cbD6', 'E0_cb'
 % dataDir = 'data';
@@ -17,6 +23,10 @@ dataDir = pathToExpt('data');
 figDir = pathToExpt('figures');
 dataDir = sprintf('%s/%s/%s', dataDir, expName, subject(1:2));
 figDir = sprintf('%s/%s/%s', figDir, expName, subject(1:2));
+
+if excludeFirstBlock
+    fprintf('\n\nExcluding first good block of each session!\n\n')
+end
 
 %% initializations
 subjectID = sprintf('%s_run%02d', subject, combinedRun);
@@ -29,6 +39,12 @@ for iRun = 1:nRuns
     run = runs(iRun);
     dataFile = dir(sprintf('%s/%s_run%02d*TemporalAttention*', dataDir, subject, run));
     data = load(sprintf('%s/%s', dataDir, dataFile.name));
+    
+    if excludeFirstBlock && (run==1 || run==2)
+        excludedTrials = rd_temporalAttentionExcludeTrials(data.expt, ...
+            startingExcludeTrials(run), nGoodTrialsToExclude);
+        data.expt.trials(excludedTrials,8:end) = NaN;
+    end
     
     trials = [trials; data.expt.trials];
     targetRotations = [targetRotations; data.expt.targetRotations];
