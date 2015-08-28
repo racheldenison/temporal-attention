@@ -14,7 +14,7 @@ saveFigs = 0;
 
 groupFigTitle = [sprintf('%s ',subjectIDs{:}) sprintf('(N=%d), run %d', nSubjects, run)];
 
-modelName = 'mixtureKurtosis'; % 'fixedNoBias','mixtureWithBias','mixtureNoBias','swapNoBias', 'swapWithBias', 'variablePrecision', 'variablePrecisionGammaSD', 'variablePrecisionNoGuess', 'mixtureKurtosis'
+modelName = 'mixtureNoBias'; % 'fixedNoBias','mixtureWithBias','mixtureNoBias','swapNoBias', 'swapWithBias', 'variablePrecision', 'variablePrecisionGammaSD', 'variablePrecisionNoGuess', 'mixtureKurtosis', 'mixtureKurtosisBySubject'
 
 %% get data and plot data and fits
 for iSubject = 1:nSubjects
@@ -254,7 +254,7 @@ for iField = 1:numel(fieldNames)
         set(gca,'XTickLabel',subjectIDs)
         colormap(flag(3))
         xlim([0 nSubjects+1])
-%         ylim(ylims.(fieldName))
+        ylim(ylims.(fieldName))
         if iEL==1
             ylabel(fieldName)
             legend(validityNames(validityOrder))
@@ -295,7 +295,7 @@ for iField = 1:numel(fieldNames)
         set(gca,'XTickLabel',subjectIDs)
         colormap(flag(3))
         xlim([0 nSubjects+1])
-%         ylim(ylimsE.(fieldName))
+        ylim(ylimsE.(fieldName))
         if iEL==1
             ylabel(fieldName)
             legend(b1, validityNames(validityOrder))
@@ -327,7 +327,7 @@ for iField = 1:numel(fieldNames)
         b1 = bar(1:3, paramsMean.(fieldName)(validityOrder,iEL),'FaceColor',[.5 .5 .5]);
         p1 = errorbar(1:3, paramsMean.(fieldName)(validityOrder,iEL)', ...
             paramsSte.(fieldName)(validityOrder,iEL)','k','LineStyle','none');
-%         ylim(ylims.(fieldName))
+        ylim(ylims.(fieldName))
         ylabel(fieldName)
         set(gca,'XTick',1:3)
         set(gca,'XTickLabel', validityNames(validityOrder))
