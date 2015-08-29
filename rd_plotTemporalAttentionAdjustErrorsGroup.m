@@ -202,7 +202,7 @@ for iField = 1:numel(fieldNames)
         colormap(flag(3))
         xlim([0 nSubjects+1])
         ylim(ylims.(fieldName))
-        if iEL==1
+        if iRI==1
             ylabel(fieldName)
             legend(validityNames(validityOrder))
         end
@@ -384,6 +384,7 @@ for iRI = 1:2
         for iBin = 1:numel(binEdgesFF)-1
             edges = binEdgesFF(iBin:iBin+1);
             effVar(iBin,iCV,iRI) = var(eff(todff>edges(1) & todff<=edges(2)));
+            effMean(iBin,iCV,iRI) = mean(abs(eff(todff>edges(1) & todff<=edges(2))));
         end
     end
     plot([-90 0], [0 0], 'k', 'LineWidth', 2)
@@ -400,6 +401,20 @@ for iRI = 1:2
     xlabel('flipflip non-target - target bin')
     ylabel('error variance')
     title(targetNames{iRI})
+    set(gca,'XTick',1:2:10)
+    set(gca,'XTickLabel',binEdgesFF(1:2:end))
+end
+legend('valid','invalid','neutral')
+
+figure
+for iRI = 1:2
+    subplot(1,2,iRI)
+    plot(effMean(:,:,iRI))
+    xlabel('flipflip non-target - target bin')
+    ylabel('abs error mean')
+    title(targetNames{iRI})
+    set(gca,'XTick',1:2:10)
+    set(gca,'XTickLabel',binEdgesFF(1:2:end))
 end
 legend('valid','invalid','neutral')
 
@@ -575,7 +590,7 @@ fit.to.paramsMean = paramsMean;
 fit.to.paramsSte = paramsSte;
 fit.to.paramNames = paramNames;
 
-%% Fit lines to data
+%% Fit lines to data - orientation difference between targets
 xgridFF = -90:0;
 for iSubject = 1:nSubjects
     figure
@@ -634,6 +649,67 @@ fit.tod.params = params;
 fit.tod.paramsMean = paramsMean;
 fit.tod.paramsSte = paramsSte;
 fit.tod.paramNames = paramNames;
+
+%% Fit lines to data - orientation difference between targets, absolute
+%% value of errors
+xgridFF = -90:0;
+for iSubject = 1:nSubjects
+    figure
+    hold on
+    for iRI = 1:2
+        for iCV = 1:3
+            eFF = abs(todErrorsFF{iCV,iRI}(:,iSubject));
+            todFF = targetOrientDiffFF{iCV,iRI}(:,iSubject);
+            
+            p = polyfit(todFF, eFF, 1);
+            
+            subplot(3,2,(validityOrder(iCV)-1)*2 + iRI)
+            hold on
+            plot(todFF,eFF,'.')
+            plot(xgridFF,polyval(p,xgridFF),'r')
+            title(validityNames{iCV})
+            
+            params{iCV,iRI}(iSubject,:) = p;
+        end
+    end
+    rd_supertitle(subjectIDs{iSubject})
+end
+
+for iRI = 1:2
+    for iCV = 1:3
+        paramsMean(iCV,iRI,:) = mean(params{iCV,iRI},1);
+        paramsSte(iCV,iRI,:) = std(params{iCV,iRI},0,1)./sqrt(nSubjects);
+    end
+end
+
+% plot bars
+paramNames = {'slope','intercept'};
+ylims = [-.5 .5; -10 25];
+for iP = 1:numel(p)
+    figure
+    for iRI = 1:2
+        for iCV = 1:3
+            subplot(3,2,(validityOrder(iCV)-1)*2 + iRI)
+            bar(params{iCV,iRI}(:,iP))
+            title(validityNames{iCV})
+            ylim(ylims(iP,:))
+        end
+    end
+    rd_supertitle(paramNames{iP})
+end
+
+for iP = 1:numel(p)
+    figure
+    barweb(paramsMean(validityOrder,:,iP)',paramsSte(validityOrder,:,iP)', ...
+        [], targetNames, [], [], [], gray)
+    legend(validityNames{validityOrder})
+    ylabel(paramNames{iP})
+end
+
+fit.todAbsError.params = params;
+fit.todAbsError.paramsMean = paramsMean;
+fit.todAbsError.paramsSte = paramsSte;
+fit.todAbsError.paramNames = paramNames;
     
 %% Set figure properties
 % set font size of titles, axis labels, and legends

@@ -6,7 +6,7 @@ subjectInits = {'dg','sl','mr','ly','pv','ek','gk','md'}; % 'ek'
 nSubjects = numel(subjectInits);
 groupStr = sprintf('N=%d', nSubjects);
 
-expName = 'E4'; % 'E2'
+expName = 'E4'; % 'E2','E4'
 figPrefix = sprintf('g%s_N%d', expName, nSubjects);
 
 normalizeData = 0;
