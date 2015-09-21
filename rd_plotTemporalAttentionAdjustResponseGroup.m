@@ -23,9 +23,16 @@ for iSubject = 1:nSubjects
     end
 end
 
+%% evaluate special points (like the peak)
+idx = xEdges==0;
+% idx = xEdges>=-5 & xEdges<=5;
+for iEL = 1:2
+    specialPointsMean(:,:,iEL) = mean(groupData.pError2{iEL}(:,idx,:),2);
+end
+
 %% plot
 %% overlaid
-plotType = 'shadedError'; % 'area','line','shadedError'
+plotType = 'line'; % 'area','line','shadedError'
 colors = {'b','g','r'};
 fig(1) = figure;
 for iEL = 1:2
@@ -36,7 +43,7 @@ for iEL = 1:2
         valsSte = groupSte.rate{iEL}(iV,:);
         switch plotType
             case 'area'
-                a1 = area(xEdges, vals, 'FaceColor', colors{iV}, ...
+                p1 = area(xEdges, vals, 'FaceColor', colors{iV}, ...
                     'EdgeColor', colors{iV}, 'LineWidth', 1.5);
                 child = get(a1, 'Children');
                 set(child,'FaceAlpha',.5);
@@ -76,22 +83,25 @@ for iEL = 1:2
         hold on
         plot_vertical_line(0);
         vals = groupMean.rate{iEL}(v,:);
+        valsSte = groupSte.rate{iEL}(iV,:);
         switch plotType
             case 'area'
-                a1 = area(xEdges, vals, 'FaceColor', colors{v}, ...
+                p1 = area(xEdges, vals, 'FaceColor', colors{v}, ...
                     'EdgeColor', colors{v}, 'LineWidth', 1.5);
                 child = get(a1, 'Children');
                 set(child,'FaceAlpha',.5);
             case 'line'
                 p1 = plot(xEdges, vals, 'Color', colors{v}, ...
                     'LineWidth', 1);
+            case 'shadedError'
+                p1 = shadedErrorBar(xEdges, vals, valsSte, colors{iV}, 1);
             otherwise
                 error('plotType not recognized')
         end
         xlim([-90 90])
         ylim([0 .08])
         if iEL==2
-            legend(a1, validityNames{v})
+            legend(validityNames{v})
             legend('boxoff')
         end
         if iV==1

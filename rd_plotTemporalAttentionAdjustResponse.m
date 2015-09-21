@@ -17,8 +17,10 @@ figDir = pathToExpt('figures');
 dataDir = sprintf('%s/%s/%s', dataDir, expName, subject(1:2));
 figDir = sprintf('%s/%s/%s', figDir, expName, subject(1:2));
 
-binSize = 4;
-edges = -90:binSize:90;
+% binSize = 4;
+% edges = -90:binSize:90;
+binSize = 5;
+edges = -92.5:binSize:92.5;
 binCenters = edges(1:end-1) + binSize/2;
 
 analyzeNonTarget = 0;
