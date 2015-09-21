@@ -1,9 +1,19 @@
-function [accMean rtMean t1t2soa p dprime crit eff] = rd_plotTemporalAttentionMultiSOA(subjectInit)
+function [accMean rtMean t1t2soa p dprime eff] = rd_plotTemporalAttentionMultiSOA(subjectInit, contrast, T1T2Axis, extraSelection, cleanRT)
+
+if nargin < 3
+    T1T2Axis = []; % 'same','diff'
+end
+if nargin < 4
+    extraSelection = []; % e.g. 'sameOrient','diffOrient'
+end
+if nargin < 5
+    cleanRT = 0;
+end
 
 % subjectInit = 'vp';
 exptName = 'cbD10'; % 'cbD6', 'cbD10'
 tilt = '*';
-contrast = 64; % plot one contrast at a time
+% contrast = 16; % plot one contrast at a time
 
 % soa1 = [1000 1000 1000 1000 1000 1000 1000 1000 1000 1000];
 % soa2 = [1100 1150 1200 1250 1300 1350 1400 1450 1500 1800];
@@ -13,13 +23,14 @@ t1t2soa = soa2 - soa1;
 run = 8; % 8 = runs 1-3; 9 = runs 2-3; 18 = runs 1-3 with first good block of each day excluded
 
 plotFigs = 0;
+saveFigs = 0;
 
-cleanRT = 0;
-doDprime = 0;
+doDprime = 1;
 
 expName = 'E4_contrast_cbD10'; % 'E2_SOA_cbD6', 'E4_contrast_cbD10'
 dataDir = pathToExpt('data');
 dataDir = sprintf('%s/%s/%s', dataDir, expName, subjectInit(1:2));
+figDir = sprintf('%s/%s/%s', pathToExpt('figures'), expName, subjectInit(1:2));
 
 % subjectID = sprintf('%s_%s_tilt%s_tc%d', ...
 %     subjectInit, exptName, tilt, contrast);
@@ -47,11 +58,12 @@ for iSOA = 1:numel(soa1)
         load(sprintf('%s/%s', dataDir, dataFile.name))
     end
     
-%     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%     %%% if you want to reanalyze, do it here %%%
-%     T1T2Axis = 'diff';
-%     [expt results] = rd_analyzeTemporalAttention(expt, 0, 0, 0, 0, T1T2Axis, 0);
-%     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%% if you want to reanalyze, do it here %%%
+    if ~isempty(T1T2Axis) || ~isempty(extraSelection)
+        [expt results] = rd_analyzeTemporalAttention(expt, 0, 0, 0, 0, T1T2Axis, 0, extraSelection);
+    end
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     % select target contrast
     tcIdx = find(expt.p.targetContrasts==contrast/100);
@@ -75,21 +87,12 @@ for iSOA = 1:numel(soa1)
         rtSte{iEL}(:,iSOA) = results.rtSte{iEL}(:,tcIdx);
         
         if doDprime
-            [dprime{iEL}(:,iSOA) crit{iEL}(:,iSOA)] = ...
-                rd_dprime(results.accMean{iEL}(:,tcIdx),[],'2afc');
+            dprime{iEL}(:,iSOA) = ...
+                rd_dprime(results.accMean{iEL}(:,tcIdx),[],'2afc','adjust');
         else
             dprime{iEL}(:,iSOA) = zeros(size(rtSte{iEL}(:,iSOA)));
-            crit{iEL}(:,iSOA) = zeros(size(rtSte{iEL}(:,iSOA)));
         end
     end
-    
-    %     % calculate dprime
-    %     results = rd_analyzeTemporalAttentionDprime(expt, results);
-    %     % read out dprime and crit
-    %     for iEL = 1:2 % early/late
-    %         dprime{iEL}(:,iSOA) = results.totals.dprime{iEL};
-    %         crit{iEL}(:,iSOA) = results.totals.crit{iEL};
-    %     end
 end
 
 p = expt.p;
@@ -114,8 +117,7 @@ if plotFigs
             rtLims = [0.2 1.6];
     end
     dpLims = [-0.5 2.7];
-    critLims = [-1 1];
-    effLims = [-0.5 8];
+    effLims = [-0.5 4];
     soaLims = [t1t2soa(1)-100 t1t2soa(end)+100];
     colors = get(0,'DefaultAxesColorOrder');
     axTitle = '';
@@ -131,10 +133,10 @@ if plotFigs
         
         xlabel('soa')
         ylabel('acc')
-        legend(p1, num2str(p.cueValidity'),'location','best')
         title(intervalNames{iRI})
         xlim(soaLims)
         ylim(accLims)
+        legend(p1, num2str(p.cueValidity'),'location','best')
         rd_supertitle(subjectID);
         rd_raiseAxis(gca);
         rd_supertitle(axTitle);
@@ -149,10 +151,10 @@ if plotFigs
         
         xlabel('soa')
         ylabel('rt')
-        legend(num2str(p.cueValidity'),'location','best')
         title(intervalNames{iRI})
         xlim(soaLims)
         ylim(rtLims)
+        legend(num2str(p.cueValidity'),'location','best')
         box off
         rd_supertitle(subjectID);
         rd_raiseAxis(gca);
@@ -170,10 +172,10 @@ if plotFigs
         
         xlabel('soa')
         ylabel('dprime')
-        legend(p1, num2str(p.cueValidity'),'location','best')
         title(intervalNames{iRI})
         xlim(soaLims)
         ylim(dpLims)
+        legend(p1, num2str(p.cueValidity'),'location','best')
         rd_supertitle(subjectID);
         rd_raiseAxis(gca);
         rd_supertitle(axTitle);
@@ -186,36 +188,27 @@ if plotFigs
         plot(soaLims, [0 0], '--k');
         
         p1 = plot(repmat(t1t2soa',1,numel(p.cueValidity)),...
-            crit{iRI}', '.-', 'MarkerSize', 20);
-        
-        xlabel('soa')
-        ylabel('crit')
-        legend(p1, num2str(p.cueValidity'),'location','best')
-        title(intervalNames{iRI})
-        xlim(soaLims)
-        ylim(critLims)
-        rd_supertitle(subjectID);
-        rd_raiseAxis(gca);
-        rd_supertitle(axTitle);
-    end
-    
-    fig(5) = figure;
-    for iRI = 1:numel(p.respInterval)
-        subplot(1,numel(p.respInterval),iRI)
-        hold on
-        plot(soaLims, [0 0], '--k');
-        
-        p1 = plot(repmat(t1t2soa',1,numel(p.cueValidity)),...
             eff{iRI}', '.-', 'MarkerSize', 20);
         
         xlabel('soa')
         ylabel('eff')
-        legend(p1, num2str(p.cueValidity'),'location','best')
         title(intervalNames{iRI})
         xlim(soaLims)
         ylim(effLims)
+        legend(p1, num2str(p.cueValidity'),'location','best')
         rd_supertitle(subjectID);
         rd_raiseAxis(gca);
         rd_supertitle(axTitle);
     end
+end
+
+%% Save figs
+if saveFigs
+    if isempty(T1T2Axis)
+        T1T2Str = 'T1T2all';
+    end
+    figPrefix = sprintf('%s_%s_contrast%d_run%02d%s_%s', ...
+        subjectInit, exptName, contrast, run, rtStr, T1T2Str);
+    figNames = {'acc','rt','dprime','eff'};
+    rd_saveAllFigs(fig, figNames, figPrefix, figDir)
 end

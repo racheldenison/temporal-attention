@@ -1,5 +1,8 @@
-function [expt results] = rd_analyzeTemporalAttention(expt, saveData, saveFigs, plotTimingFigs, saveTimingFigs, T1T2Axis, cleanRT)
+function [expt results] = rd_analyzeTemporalAttention(expt, saveData, saveFigs, plotTimingFigs, saveTimingFigs, T1T2Axis, cleanRT, extraSelection)
 
+if nargin < 8 || isempty(extraSelection)
+    extraSelection = '';
+end
 if nargin < 7 || isempty(cleanRT)
     cleanRT = 0;
 end
@@ -102,15 +105,25 @@ switch T1T2Axis
 end
 
 %% Extra selection step if desired
-% % only horizontal targets
-% for i=1:size(targetRotations,1)
-%     w0(i,1) = targetRotations(i,trials(i,2))==90;
-% end
+% same (or different) orientation (CW or CCW) for the two targets
+targetStates(:,1) = trials(:,strcmp(trials_headers, 'target1State'));
+targetStates(:,2) = trials(:,strcmp(trials_headers, 'target2State'));
 
-% % same (or different) orientation (CW or CCW) for the two targets
-% targetStates(:,1) = trials(:,strcmp(trials_headers, 'target1State'));
-% targetStates(:,2) = trials(:,strcmp(trials_headers, 'target2State'));
-% w0 = targetStates(:,1)~=targetStates(:,2);
+switch extraSelection
+    % % only horizontal targets
+    % for i=1:size(targetRotations,1)
+    %     w0(i,1) = targetRotations(i,trials(i,2))==90;
+    % end
+    
+    case 'sameOrient'
+        w0 = targetStates(:,1)==targetStates(:,2);
+    case 'diffOrient'
+        w0 = targetStates(:,1)~=targetStates(:,2);
+    otherwise
+        if ~strcmp(extraSelection,'')
+            error('extraSelection not recognized')
+        end
+end
 
 %% Analyze data
 switch steOption
@@ -119,7 +132,11 @@ switch steOption
         for iRI = 1:numel(p.respInterval)
             for iCV = 1:numel(p.cueValidity)
                 for iTC = 1:numel(p.targetContrasts)
-                    w = wAx & trials(:,respIntervalIdx)==iRI & trials(:,cueValidityIdx)==iCV & trials(:,targetContrastIdx)==iTC;
+                    if exist('w0','var')
+                        w = w0 & wAx & trials(:,respIntervalIdx)==iRI & trials(:,cueValidityIdx)==iCV & trials(:,targetContrastIdx)==iTC;
+                    else
+                        w = wAx & trials(:,respIntervalIdx)==iRI & trials(:,cueValidityIdx)==iCV & trials(:,targetContrastIdx)==iTC;
+                    end
                     
                     totals.all{iCV,iRI}(:,:,iTC) = trials(w,:);
                     

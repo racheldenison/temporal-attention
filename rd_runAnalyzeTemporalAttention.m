@@ -1,7 +1,8 @@
-% rd_runAnalyzeTemporalAttention.m
+function rd_runAnalyzeTemporalAttention(subject)
 
-subject = 'ek_cbD10_tilt*_tc16-64_soa1000-1300';
-% subject = 'maPilot_cb_tilt5_soa1000-1250';
+if nargin==0
+    subject = 'pv_cbD10_tilt*_tc16-64_soa1000-1300';
+end
 run = 8;
 
 subjectID = sprintf('%s_run%02d', subject, run);

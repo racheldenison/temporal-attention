@@ -3,10 +3,10 @@ function rd_combineRunsTemporalAttention(subject)
 %% setup
 if nargin==0
     % subject = 'ecPilot_cb_tilt1pt5_tc64-100_soa1000-1250';
-    subject = 'dg_cbD10_tilt*_tc16-64_soa1000-1100';
+    subject = 'ax_cbD10_tilt2pt3_tc16-64_soa1000-1800';
 end
 runs = 1:3;
-combinedRun = 18;
+combinedRun = 8;
 nRuns = numel(runs);
 
 saveData = 1;

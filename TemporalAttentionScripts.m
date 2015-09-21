@@ -5,6 +5,7 @@ rd_combineRunsTemporalAttention
 
 % to re-run analysis
 % eg. look at same/diff axis, clean RT
+rd_runAnalyzeTemporalAttentionGroup
 rd_runAnalyzeTemporalAttention
 
 % group analysis for E0

@@ -2,12 +2,47 @@
 
 %% Setup
 % subjectInits = {'rd','vp','hl','ho'};
-subjectInits = {'dg','sl','mr','ly','pv','ek','gk','md'}; % 'ek'
+% subjectInits = {'dg','sl','mr','ly','pv','ek','gk','md','ax'}; % 'ek'
+subjectInits = {'dg','ly','ek'};
 nSubjects = numel(subjectInits);
 groupStr = sprintf('N=%d', nSubjects);
 
 expName = 'E4'; % 'E2','E4'
-figPrefix = sprintf('g%s_N%d', expName, nSubjects);
+
+contrast = 64;
+T1T2Axis = ''; % 'same','diff'
+extraSelection = ''; % 'sameOrient','diffOrient'
+cleanRT = 1;
+
+analStr1 = sprintf('contrast%d', contrast);
+switch extraSelection
+    case 'sameOrient'
+        analStr2 = 'SO';
+    case 'diffOrient'
+        analStr2 = 'DO';
+    otherwise
+        analStr2 = '';
+end
+switch T1T2Axis
+    case 'same'
+        analStr3 = 'SA';
+    case 'diff'
+        analStr3 = 'DA';
+    otherwise
+        analStr3 = '';
+end
+analStr = sprintf('%s_%s%s', analStr1, analStr2, analStr3);
+if strcmp(analStr(end),'_')
+    analStr = analStr(1:end-1);
+end
+
+if cleanRT
+    rtStr = '_RTx';
+else
+    rtStr = '';
+end
+
+figPrefix = sprintf('g%s_N%d_trained800_%s%s', expName, nSubjects, analStr, rtStr);
 
 normalizeData = 0;
 saveFigs = 0;
@@ -15,12 +50,12 @@ saveFigs = 0;
 %% Get indiv subject data
 for iSubject = 1:nSubjects
     subjectInit = subjectInits{iSubject};
-    [acc rt t1t2soa p dp crit eff] = rd_plotTemporalAttentionMultiSOA(subjectInit);
+    [acc rt t1t2soa p dp eff] = ...
+        rd_plotTemporalAttentionMultiSOA(subjectInit, contrast, T1T2Axis, extraSelection, cleanRT);
     for iEL = 1:numel(acc)
         accData{iEL}(:,:,iSubject) = acc{iEL};
         rtData{iEL}(:,:,iSubject) = rt{iEL};
         dpData{iEL}(:,:,iSubject) = dp{iEL};
-        critData{iEL}(:,:,iSubject) = crit{iEL};
         effData{iEL}(:,:,iSubject) = eff{iEL};
     end
 end
@@ -31,7 +66,6 @@ if normalizeData
         accData{iEL} = normalizeDC(accData{iEL});
         rtData{iEL} = normalizeDC(rtData{iEL});
         dpData{iEL} = normalizeDC(dpData{iEL});
-        critData{iEL} = normalizeDC(critData{iEL});
         effData{iEL} = normalizeDC(effData{iEL});
     end
 end
@@ -53,13 +87,11 @@ for iEL = 1:numel(accData)
     accMean{iEL} = mean(accData{iEL},3);
     rtMean{iEL} = mean(rtData{iEL},3);
     dpMean{iEL} = mean(dpData{iEL},3);
-    critMean{iEL} = mean(critData{iEL},3);
     effMean{iEL} = mean(effData{iEL},3);
     
     accSte{iEL} = std(accData{iEL},0,3)./sqrt(nSubjects);
     rtSte{iEL} = std(rtData{iEL},0,3)./sqrt(nSubjects);
     dpSte{iEL} = std(dpData{iEL},0,3)./sqrt(nSubjects);
-    critSte{iEL} = std(critData{iEL},0,3)./sqrt(nSubjects);
     effSte{iEL} = std(effData{iEL},0,3)./sqrt(nSubjects);
 end
 
@@ -69,7 +101,6 @@ cueNames = {'valid','invalid','neutral'};
 accLims = [0.2 1];
 rtLims = [0.2 1.6];
 dpLims = [-0.5 2.7];
-critLims = [-1 1];
 effLims = [0 3.5];
 accDiffLims = [-0.15 0.25];
 accCueEffLims = [-0.3 0.35];
@@ -96,11 +127,10 @@ for iRI = 1:numel(p.respInterval)
 
     xlabel('soa')
     ylabel('acc')
-%     legend(p1, num2str(p.cueValidity'),'location','best')
-    legend(p1, cueNames,'location','best')
     title(intervalNames{iRI})
     xlim(soaLims)
     ylim(accLims)
+    legend(p1, cueNames,'location','best')
     rd_supertitle(subjectInits);
     rd_raiseAxis(gca);
     rd_supertitle(axTitle);
@@ -119,11 +149,10 @@ for iRI = 1:numel(p.respInterval)
     
     xlabel('soa')
     ylabel('rt')
-%     legend(num2str(p.cueValidity'),'location','best')
-    legend(p1, cueNames,'location','best')
     title(intervalNames{iRI})
     xlim(soaLims)
     ylim(rtLims)
+    legend(p1, cueNames,'location','best')
     box off
     rd_supertitle(subjectInits);
     rd_raiseAxis(gca);
@@ -144,41 +173,16 @@ for iRI = 1:numel(p.respInterval)
 
     xlabel('soa')
     ylabel('dprime')
-%     legend(p1, num2str(p.cueValidity'),'location','best')
-    legend(p1, cueNames,'location','best')
     title(intervalNames{iRI})
     xlim(soaLims)
     ylim(dpLims)
+    legend(p1, cueNames,'location','best')
     rd_supertitle(subjectInits);
     rd_raiseAxis(gca);
     rd_supertitle(axTitle);
 end
 
 fig(4) = figure;
-for iRI = 1:numel(p.respInterval)
-    subplot(1,numel(p.respInterval),iRI)
-    hold on
-    plot(soaLims, [0 0], '--k');
-    
-    p1 = plot(repmat(t1t2soa',1,numel(p.cueValidity)),...
-        critMean{iRI}', '-', 'LineWidth', 1.5);
-    e1 = errorbar(repmat(t1t2soa',1,numel(p.cueValidity)),...
-        critMean{iRI}', critSte{iRI}', '.', 'MarkerSize', 20, ...
-        'LineWidth', 1);
-
-    xlabel('soa')
-    ylabel('crit')
-%     legend(p1, num2str(p.cueValidity'),'location','best')
-    legend(p1, cueNames,'location','best')
-    title(intervalNames{iRI})
-    xlim(soaLims)
-    ylim(critLims)
-    rd_supertitle(subjectInits);
-    rd_raiseAxis(gca);
-    rd_supertitle(axTitle);
-end
-
-fig(5) = figure;
 for iRI = 1:numel(p.respInterval)
     subplot(1,numel(p.respInterval),iRI)
     hold on
@@ -192,17 +196,16 @@ for iRI = 1:numel(p.respInterval)
 
     xlabel('soa')
     ylabel('efficiency (dprime/rt)')
-%     legend(p1, num2str(p.cueValidity'),'location','best')
-    legend(p1, cueNames,'location','best')
     title(intervalNames{iRI})
     xlim(soaLims)
     ylim(effLims)
+    legend(p1, cueNames,'location','best')
     rd_supertitle(subjectInits);
     rd_raiseAxis(gca);
     rd_supertitle(axTitle);
 end
 
-fig(6) = figure;
+fig(5) = figure;
 for iRI = 1:numel(p.respInterval)
     subplot(1,numel(p.respInterval),iRI)
     set(gca,'ColorOrder',subjectColors)
@@ -222,7 +225,7 @@ for iRI = 1:numel(p.respInterval)
     rd_supertitle(axTitle);
 end
 
-fig(7) = figure;
+fig(6) = figure;
 for iRI = 1:numel(p.respInterval)
     subplot(1,numel(p.respInterval),iRI)
     set(gca,'ColorOrder',subjectColors)
@@ -243,7 +246,7 @@ for iRI = 1:numel(p.respInterval)
 end
 
 
-fig(8) = figure;
+fig(7) = figure;
 hold on
 plot(soaLims, [0 0], '--k')
 p1 = [];
@@ -267,7 +270,7 @@ xlim(soaLims)
 ylim(accCueEffLims)
 
 
-fig(9) = figure;
+fig(8) = figure;
 hold on
 plot(soaLims, [0.5 0.5], '--k');
 p1 = [];
@@ -291,7 +294,7 @@ xlim(soaLims)
 ylim(accLims)
 
 viNames = {'valid - neutral','neutral - invalid'};
-fig(10) = figure;
+fig(9) = figure;
 for iVI = 1:2
     subplot(2,1,iVI)
     hold on
@@ -328,6 +331,6 @@ end
 %% Save figs
 % figPrefix = [figPrefix '_sameAxDiffOrient'];
 if saveFigs
-    figNames = {'acc','rt','dprime','crit','eff','accCueEffect','accCueAve','accCueEffectOverlay','accCueAveOverlay','accCueEffectNOverlay'};
+    figNames = {'acc','rt','dprime','eff','accCueEffect','accCueAve','accCueEffectOverlay','accCueAveOverlay','accCueEffectNOverlay'};
     rd_saveAllFigs(fig, figNames, figPrefix, [])
 end
