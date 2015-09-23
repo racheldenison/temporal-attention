@@ -3,7 +3,7 @@ function rd_combineRunsTemporalAttention(subject)
 %% setup
 if nargin==0
     % subject = 'ecPilot_cb_tilt1pt5_tc64-100_soa1000-1250';
-    subject = 'ax_cbD10_tilt2pt3_tc16-64_soa1000-1800';
+    subject = 'ax_cbD10_tilt2pt3_tc16-64_soa1000-1300';
 end
 runs = 1:3;
 combinedRun = 8;
@@ -33,6 +33,8 @@ subjectID = sprintf('%s_run%02d', subject, combinedRun);
 trials = [];
 targetRotations = [];
 trialOrder = [];
+trialOrderRun = [];
+fixation = [];
 
 %% get data from each run
 for iRun = 1:nRuns
@@ -48,7 +50,12 @@ for iRun = 1:nRuns
     
     trials = [trials; data.expt.trials];
     targetRotations = [targetRotations; data.expt.targetRotations];
-    trialOrder = [trialOrder; data.expt.trialOrder + size(trialOrder,2)];
+    trialOrder = [trialOrder; data.expt.trialOrder];
+    trialOrderRun = [trialOrderRun; ones(size(data.expt.trialOrder))*run];
+    
+    eye = data.expt.eye;
+    eyeGood = eye.fixCue & eye.fixT1 & eye.fixT2;
+    fixation = [fixation; eyeGood'];
     
     timing(iRun) = data.expt.timing;
 end
@@ -59,6 +66,8 @@ expt.runs = runs;
 expt.p = data.expt.p; % assume all runs identical
 expt.timing = timing;
 expt.trialOrder = trialOrder;
+expt.trialOrderRun = trialOrderRun;
+expt.fixation = fixation;
 expt.trials_headers = data.expt.trials_headers; % assume all runs identical
 expt.trials = trials;
 expt.targetRotations = targetRotations;
