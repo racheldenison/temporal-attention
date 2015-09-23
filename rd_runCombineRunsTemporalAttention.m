@@ -1,7 +1,8 @@
 % rd_runCombineRunsTemporalAttention.m
 
-subjectInits = {'dg','sl','mr','ly','pv','ek','gk','md'};
+subjectInits = {'dg','sl','mr','ly','pv','ek','gk','md','ax'};
 soaStrs = {'1100','1300','1800'};
+% subjectInits = {'ax'};
 
 for iSubject = 1:numel(subjectInits)
     subjectInit = subjectInits{iSubject};

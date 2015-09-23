@@ -1,7 +1,7 @@
 % rd_runAnalyzeTemporalAttentionGroup.m
 
-% subjectInits = {'dg','sl','mr','ly','pv','ek','gk','md','ax'};
-subjectInits = {'pv','ek','gk','md','ax'};
+subjectInits = {'dg','sl','mr','ly','pv','ek','gk','md','ax'};
+% subjectInits = {'pv','ek','gk','md','ax'};
 nSubjects = numel(subjectInits);
 
 soas = {'100','300','800'};

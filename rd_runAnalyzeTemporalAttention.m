@@ -11,7 +11,7 @@ saveData = 1;
 saveFigs = 1;
 plotTimingFigs = 0;
 saveTimingFigs = 0;
-cleanRT = 0;
+cleanRT = 1;
 
 expName = 'E4_contrast_cbD10'; % 'E0_cb'
 % dataDir = 'data';
@@ -22,7 +22,7 @@ dataDir = sprintf('%s/%s/%s', dataDir, expName, subject(1:2));
 figDir = sprintf('%s/%s/%s', figDir, expName, subject(1:2));
 
 % load data file
-dataFile = dir(sprintf('%s/%s_T*', dataDir, subjectID));
+dataFile = dir(sprintf('%s/%s_T*.mat', dataDir, subjectID));
 if numel(dataFile)~=1
     fprintf('\n%s/%s*', dataDir, subjectID)
     error('more or fewer than 1 matching data file')
