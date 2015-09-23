@@ -119,6 +119,10 @@ switch extraSelection
         w0 = targetStates(:,1)==targetStates(:,2);
     case 'diffOrient'
         w0 = targetStates(:,1)~=targetStates(:,2);
+    case 'sameContrastOneBack'
+        w0 = rd_findOneBackSameDiff(expt)==1;
+    case 'diffContrastOneBack'
+        w0 = rd_findOneBackSameDiff(expt)==0;
     otherwise
         if ~strcmp(extraSelection,'')
             error('extraSelection not recognized')
@@ -138,15 +142,23 @@ switch steOption
                         w = wAx & trials(:,respIntervalIdx)==iRI & trials(:,cueValidityIdx)==iCV & trials(:,targetContrastIdx)==iTC;
                     end
                     
-                    totals.all{iCV,iRI}(:,:,iTC) = trials(w,:);
-                    
-                    totals.means{iRI}(iCV,:,iTC) = nanmean(totals.all{iCV,iRI}(:,:,iTC),1);
-                    totals.stds{iRI}(iCV,:,iTC) = nanstd(totals.all{iCV,iRI}(:,:,iTC),0,1);
-                    totals.stes{iRI}(iCV,:,iTC) = totals.stds{iRI}(iCV,:,iTC)./sqrt(size(totals.all{iCV,iRI}(:,:,iTC),1));
+                    try
+                        totals.all{iCV,iRI}(:,:,iTC) = trials(w,:);
+                        
+                        totals.means{iRI}(iCV,:,iTC) = nanmean(totals.all{iCV,iRI}(:,:,iTC),1);
+                        totals.stds{iRI}(iCV,:,iTC) = nanstd(totals.all{iCV,iRI}(:,:,iTC),0,1);
+                        totals.stes{iRI}(iCV,:,iTC) = totals.stds{iRI}(iCV,:,iTC)./sqrt(size(totals.all{iCV,iRI}(:,:,iTC),1));
+                    catch
+                        fprintf('\nwarning: unequal numbers of trials in different conditions\n\n')
+                        totals.all{iCV,iRI}(:,:,iTC) = NaN;
+                        
+                        totals.means{iRI}(iCV,:,iTC) = nanmean(trials(w,:),1);
+                        totals.stds{iRI}(iCV,:,iTC) = nanstd(trials(w,:),0,1);
+                        totals.stes{iRI}(iCV,:,iTC) = totals.stds{iRI}(iCV,:,iTC)./sqrt(size(trials(w,:),1));
+                    end
                 end
             end
         end
-        
     case 'set'
         %% standard error by trial set
         for iSet = 1:numel(setNums)
