@@ -49,7 +49,7 @@ for iSOA = 1:numel(soa1)
         subjectID, soa1(iSOA), soa2(iSOA));
     
     % load data from a given soa
-    dataFile = dir(sprintf('%s/%s_run%02d%s_T*', ...
+    dataFile = dir(sprintf('%s/%s_run%02d%s_T*20150923.mat', ...
         dataDir, subject, run, rtStr));
     if numel(dataFile)~=1
         fprintf('%s/%s_run%02d%s_T*', dataDir, subject, run, rtStr)
