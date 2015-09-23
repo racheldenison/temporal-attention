@@ -2,16 +2,20 @@
 
 %% Setup
 % subjectInits = {'rd','vp','hl','ho'};
-% subjectInits = {'dg','sl','mr','ly','pv','ek','gk','md','ax'}; % 'ek'
-subjectInits = {'dg','ly','ek'};
+subjectInits = {'dg','sl','mr','ly','pv','ek','gk','md','ax'}; % 'ek'
+% subjectInits = {'sl','pv','gk'}; % 100
+% subjectInits = {'mr','md','ax'}; % 300
+% subjectInits = {'dg','ly','ek'}; % 800
+% subjectInits = {'dg','sl','mr','ax'}; % rd ran (full or partial)
+% subjectInits = {'ly','pv','ek','gk','md'}; % wd ran
 nSubjects = numel(subjectInits);
 groupStr = sprintf('N=%d', nSubjects);
 
 expName = 'E4'; % 'E2','E4'
 
-contrast = 64;
+contrast = 16;
 T1T2Axis = ''; % 'same','diff'
-extraSelection = ''; % 'sameOrient','diffOrient'
+extraSelection = 'diffContrastOneBack'; % 'sameOrient','diffOrient','sameContrastOneBack','diffContrastOneBack'
 cleanRT = 1;
 
 analStr1 = sprintf('contrast%d', contrast);
@@ -20,6 +24,10 @@ switch extraSelection
         analStr2 = 'SO';
     case 'diffOrient'
         analStr2 = 'DO';
+    case 'sameContrastOneBack'
+        analStr2 = 'SC1';
+    case 'diffContrastOneBack'
+        analStr2 = 'DC1';
     otherwise
         analStr2 = '';
 end
@@ -42,7 +50,7 @@ else
     rtStr = '';
 end
 
-figPrefix = sprintf('g%s_N%d_trained800_%s%s', expName, nSubjects, analStr, rtStr);
+figPrefix = sprintf('g%s_N%d_%s%s', expName, nSubjects, analStr, rtStr);
 
 normalizeData = 0;
 saveFigs = 0;
@@ -257,7 +265,7 @@ e1(1) = errorbar(t1t2soa, mean(accDataCueEff{1},2), ...
     std(accDataCueEff{1},0,2)./sqrt(nSubjects),...
     '.','MarkerSize', 20,'LineWidth', 1);
 e1(2) = errorbar(t1t2soa, mean(accDataCueEff{2},2), ...
-    std(accDataCueEff{1},0,2)./sqrt(nSubjects),...
+    std(accDataCueEff{2},0,2)./sqrt(nSubjects),...
     '.r','MarkerSize', 20,'LineWidth', 1);
 
 plot(t1t2soa, mean(accDataCueEff{1},2),'o','LineWidth',1,'MarkerSize',8,'MarkerFaceColor','w')
@@ -281,7 +289,7 @@ e1(1) = errorbar(t1t2soa, mean(accDataCueAve{1},2), ...
     std(accDataCueAve{1},0,2)./sqrt(nSubjects),...
     '.','MarkerSize', 20,'LineWidth', 1);
 e1(2) = errorbar(t1t2soa, mean(accDataCueAve{2},2), ...
-    std(accDataCueAve{1},0,2)./sqrt(nSubjects),...
+    std(accDataCueAve{2},0,2)./sqrt(nSubjects),...
     '.r','MarkerSize', 20,'LineWidth', 1);
 
 plot(t1t2soa, mean(accDataCueAve{1},2),'o','LineWidth',1,'MarkerSize',8,'MarkerFaceColor','w')
@@ -308,7 +316,7 @@ for iVI = 1:2
         squeeze(std(accDataCueEffN{1}(:,:,iVI),0,2))./sqrt(nSubjects),...
         '.','MarkerSize', 20,'LineWidth', 1);
     e1(2,:) = errorbar(t1t2soa, squeeze(mean(accDataCueEffN{2}(:,:,iVI),2)), ...
-        squeeze(std(accDataCueEffN{1}(:,:,iVI),0,2))./sqrt(nSubjects),...
+        squeeze(std(accDataCueEffN{2}(:,:,iVI),0,2))./sqrt(nSubjects),...
         '.r','MarkerSize', 20,'LineWidth', 1);
     
     plot(t1t2soa, squeeze(mean(accDataCueEffN{1}(:,:,iVI),2)),'o','LineWidth',1,'MarkerSize',8,'MarkerFaceColor','w')
