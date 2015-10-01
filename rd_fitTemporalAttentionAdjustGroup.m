@@ -2,8 +2,9 @@
 
 %% setup
 % subjectIDs = {'bl','rd','id','ec','ld','en','sj','ml','ca','jl','ew','jx'};
-subjectIDs = {'id','ec','ld','en','sj','ml','ca','jl','ew','jx'};
-run = 9;
+% subjectIDs = {'id','ec','ld','en','sj','ml','ca','jl','ew','jx'};
+subjectIDs = {'ew','jx'};
+run = 29;
 nSubjects = numel(subjectIDs);
 
 saveIndivData = 1;
