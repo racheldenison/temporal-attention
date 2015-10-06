@@ -454,7 +454,7 @@ if ~isempty(workspaceFile)
 %     block = floor(iTrial/p.nTrialsPerBlock); % ad only
 end
 
-% devNum = -1;
+devNum = -1;
 
 % Present trials
 while trialCounter <= nTrials
