@@ -45,7 +45,7 @@ dataFile = dir(sprintf('%s/%s_run%02d*', dataDir, subject, run));
 load(sprintf('%s/%s', dataDir, dataFile(1).name))
 
 %% specify model
-modelName = 'mixtureKurtosisBySubject';
+modelName = 'mixtureNoBias';
 switch modelName
     case 'fixedNoBias'
         model = Orientation(NoGuessingModel, 1); % sd

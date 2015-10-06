@@ -6,7 +6,7 @@
 %% group i/o
 subjectIDs = {'bl','rd','id','ec','ld','en','sj','ml','ca','jl','ew','jx'};
 % subjectIDs = {'bl'};
-run = 9;
+run = 29;
 nSubjects = numel(subjectIDs);
 
 plotDistributions = 1;

@@ -2,12 +2,13 @@
 
 %% Setup
 % subjectInits = {'rd','vp','hl','ho'};
-subjectInits = {'dg','sl','mr','ly','pv','ek','gk','md','ax'}; % 'ek'
+% subjectInits = {'dg','sl','mr','ly','pv','ek','gk','md','ax'}; % 'ek'
 % subjectInits = {'sl','pv','gk'}; % 100
 % subjectInits = {'mr','md','ax'}; % 300
 % subjectInits = {'dg','ly','ek'}; % 800
 % subjectInits = {'dg','sl','mr','ax'}; % rd ran (full or partial)
 % subjectInits = {'ly','pv','ek','gk','md'}; % wd ran
+subjectInits = {'ax'};
 nSubjects = numel(subjectInits);
 groupStr = sprintf('N=%d', nSubjects);
 
@@ -15,7 +16,7 @@ expName = 'E4'; % 'E2','E4'
 
 contrast = 16;
 T1T2Axis = ''; % 'same','diff'
-extraSelection = 'diffContrastOneBack'; % 'sameOrient','diffOrient','sameContrastOneBack','diffContrastOneBack'
+extraSelection = ''; % 'sameOrient','diffOrient','sameContrastOneBack','diffContrastOneBack'
 cleanRT = 1;
 
 analStr1 = sprintf('contrast%d', contrast);
