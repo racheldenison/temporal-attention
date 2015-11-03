@@ -33,7 +33,7 @@ p.phLineWidth = 2; % (pixels)
 p.eyeRad = 1.5; % allowed fixation radius (degrees)    
 
 % Condition
-p.targetContrasts = [.16 .64]; % [.64 1];
+p.targetContrasts = .64; % [.64 1] [.16 .64];
 p.respInterval = [1 2]; % [1=early 2=late]
 p.cueValidity = [1 -1 0]; % [1=valid -1=invalid 0=neutral]
 % p.propValid = 0.67;
@@ -44,14 +44,14 @@ p.propValid = nnz(p.cueValidityFactor==1)./nnz(p.cueValidityFactor<3);
 p.propNeutral = nnz(p.cueValidityFactor==3)./numel(p.cueValidityFactor);
 
 % Timing
-p.soas = [1000 1250]/1000; % [short long]
+p.soas = [1000 1400]/1000; % [short long]
 p.preCueDur = 0.75; % time between fixation onset and cue
 p.cueDur = 0.2;
 p.targetDur = 3/100; % 30 ms / 33 ms
 p.maskSOA = 4/100; % 4/60 time between target onset and backward mask onset %%%% 1/100 to match other runs vp_cbD6
 p.maskDur = 1/100; % 1/60, 3/60
 p.respCueSOA = p.soas(2) + 0.5;
-p.respGoSOA = 1.0; % 0.6 % time between resp cue onset and go onset. set to zero for no go cue.
+p.respGoSOA = 0.6; % 0.6 % 1.0 % time between resp cue onset and go onset. set to zero for no go cue.
 p.iti = 0.5; % inter-trial interval (also, the duration of the feedback symbol)
 p.eyeSlack = 0.12; % cushion between last fixation check and next stimulus presentation
 
