@@ -1,7 +1,7 @@
 function rd_runAnalyzeTemporalAttention(subject)
 
 if nargin==0
-    subject = 'pv_cbD10_tilt*_tc16-64_soa1000-1300';
+    subject = 'rd_cbD10_tilt2_tc16-64_soa1000-1250';
 end
 run = 8;
 
@@ -13,7 +13,7 @@ plotTimingFigs = 0;
 saveTimingFigs = 0;
 cleanRT = 1;
 
-expName = 'E4_contrast_cbD10'; % 'E0_cb'
+expName = 'pilot'; % 'E0_cb', 'E4_contrast_cbD10'
 % dataDir = 'data';
 % figDir = 'figures';
 dataDir = pathToExpt('data');

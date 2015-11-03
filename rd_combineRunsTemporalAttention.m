@@ -3,10 +3,11 @@ function rd_combineRunsTemporalAttention(subject)
 %% setup
 if nargin==0
     % subject = 'ecPilot_cb_tilt1pt5_tc64-100_soa1000-1250';
-    subject = 'ax_cbD10_tilt2pt3_tc16-64_soa1000-1300';
+%     subject = 'ax_cbD10_tilt2pt3_tc16-64_soa1000-1300';
+    subject = 'rd_cbD10_tilt2_tc16-64_soa1000-1250';
 end
-runs = 1:3;
-combinedRun = 8;
+runs = 1:6;
+combinedRun = 98; % 8 = runs 1-3; 28 = runs 4-6; 98 = runs 1-6 
 nRuns = numel(runs);
 
 saveData = 1;
@@ -16,7 +17,7 @@ excludeFirstBlock = 0;
 nGoodTrialsToExclude = 64;
 startingExcludeTrials = [1 193];
 
-expName = 'E4_contrast_cbD10'; % 'E2_SOA_cbD6', 'E0_cb'
+expName = 'E2_SOA_cbD6'; % 'E2_SOA_cbD6', 'E0_cb', 'E4_contrast_cbD10','pilot'
 % dataDir = 'data';
 % figDir = 'figures';
 dataDir = pathToExpt('data');
@@ -57,7 +58,12 @@ for iRun = 1:nRuns
     eyeGood = eye.fixCue & eye.fixT1 & eye.fixT2;
     fixation = [fixation; eyeGood'];
     
-    timing(iRun) = data.expt.timing;
+    try
+        timing(iRun) = data.expt.timing;
+    catch
+        data.expt.timing = rmfield(data.expt.timing, {'timeMask1f','timeMaskBlank1f','timeMask2f','timeMaskBlank2f'});
+        timing(iRun) = data.expt.timing;
+    end
 end
 
 %% make the combined expt

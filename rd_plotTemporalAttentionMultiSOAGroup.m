@@ -2,13 +2,13 @@
 
 %% Setup
 % subjectInits = {'rd','vp','hl','ho'};
-% subjectInits = {'dg','sl','mr','ly','pv','ek','gk','md','ax'}; % 'ek'
+subjectInits = {'dg','sl','mr','ly','pv','ek','gk','md','ax'}; % 'ek'
 % subjectInits = {'sl','pv','gk'}; % 100
 % subjectInits = {'mr','md','ax'}; % 300
 % subjectInits = {'dg','ly','ek'}; % 800
 % subjectInits = {'dg','sl','mr','ax'}; % rd ran (full or partial)
 % subjectInits = {'ly','pv','ek','gk','md'}; % wd ran
-subjectInits = {'ax'};
+% subjectInits = {'ax'};
 nSubjects = numel(subjectInits);
 groupStr = sprintf('N=%d', nSubjects);
 

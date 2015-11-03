@@ -17,6 +17,10 @@ rd_plotTemporalAttentionMultiSOAGroup
 rd_plotTemporalAttentionMultiSOA 
     % can reanalyze with different T1T2Axis here
 
+% also, for contrast on x-axis
+rd_plotTemporalAttentionMultiSOAGroupCRF
+rd_plotTemporalAttentionMultiSOACRF 
+
 % main analysis
 rd_analyzeTemporalAttention
     % can perform an extra selection step here (e.g. same/diff orientation)

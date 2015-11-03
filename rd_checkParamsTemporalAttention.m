@@ -2,10 +2,10 @@
 
 %% setup
 % subject = 'ecPilot_cb_tilt1pt5_tc64-100_soa1000-1250';
-subject = 'ax_cbD10_tilt*_tc16-64_soa1000-1800';
+subject = 'rd_cbD10_tilt2_tc16-64_soa1000-1250';
 runs = 1:3;
 
-expName = 'E4_contrast_cbD10'; % 'E2_SOA_cbD6', 'E0_cb'
+expName = 'pilot'; % 'E2_SOA_cbD6', 'E0_cb', 'E4_contrast_cbD10'
 % dataDir = 'data';
 % figDir = 'figures';
 dataDir = pathToExpt('data');

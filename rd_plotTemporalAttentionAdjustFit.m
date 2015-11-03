@@ -4,13 +4,15 @@
 % @(data,g,sd)((1-g).*vonmisespdf(data.errors(:),0,deg2k(sd))+(g).*1/360)
 
 %% group i/o
-subjectIDs = {'bl','rd','id','ec','ld','en','sj','ml','ca','jl','ew','jx'};
-% subjectIDs = {'bl'};
-run = 29;
+% subjectIDs = {'bl','rd','id','ec','ld','en','sj','ml','ca','jl','ew','jx'};
+subjectIDs = {'bl','rd','id','ec','ld','en'};
+run = 9;
 nSubjects = numel(subjectIDs);
 
-plotDistributions = 1;
+plotDistributions = 0;
 saveFigs = 0;
+
+normalizeData = 1;
 
 groupFigTitle = [sprintf('%s ',subjectIDs{:}) sprintf('(N=%d), run %d', nSubjects, run)];
 
@@ -222,6 +224,18 @@ for iField = 1:numel(fieldNames)
     fieldName = fieldNames{iField};
     paramsMean.(fieldName) = mean(paramsData.(fieldName),3);
     paramsSte.(fieldName) = std(paramsData.(fieldName),0,3)./sqrt(nSubjects);
+    
+    if normalizeData
+        % use the Morey 2008 correction
+        vals = paramsData.(fieldName);
+        valsn = normalizeDC(vals);
+        
+        [fixed1 fixed2 N] = size(valsn);
+        M = fixed1*fixed2;
+        morey = M/(M-1);
+        
+        paramsSte.(fieldName) = sqrt(morey*var(valsn,0,3)./(nSubjects));
+    end
 end
 
 %% plot fit parameters

@@ -11,23 +11,25 @@ if nargin < 5
 end
 
 % subjectInit = 'vp';
-exptName = 'cbD10'; % 'cbD6', 'cbD10'
+exptName = 'cbD6'; % 'cbD6', 'cbD10'
 tilt = '*';
 % contrast = 16; % plot one contrast at a time
 
 % soa1 = [1000 1000 1000 1000 1000 1000 1000 1000 1000 1000];
 % soa2 = [1100 1150 1200 1250 1300 1350 1400 1450 1500 1800];
-soa1 = [1000 1000 1000];
-soa2 = [1100 1300 1800];
+% soa1 = [1000 1000 1000];
+% soa2 = [1100 1300 1800];
+soa1 = [1000 1000 1000 1000 1000];
+soa2 = [1200 1300 1350 1400 1500];
 t1t2soa = soa2 - soa1;
-run = 8; % 8 = runs 1-3; 9 = runs 2-3; 18 = runs 1-3 with first good block of each day excluded
+run = 98; % 8 = runs 1-3; 9 = runs 2-3; 18 = runs 1-3 with first good block of each day excluded
 
-plotFigs = 0;
+plotFigs = 1;
 saveFigs = 0;
 
 doDprime = 1;
 
-expName = 'E4_contrast_cbD10'; % 'E2_SOA_cbD6', 'E4_contrast_cbD10'
+expName = 'E2_SOA_cbD6'; % 'E2_SOA_cbD6', 'E4_contrast_cbD10'
 dataDir = pathToExpt('data');
 dataDir = sprintf('%s/%s/%s', dataDir, expName, subjectInit(1:2));
 figDir = sprintf('%s/%s/%s', pathToExpt('figures'), expName, subjectInit(1:2));
@@ -45,11 +47,11 @@ end
 
 %% Get data
 for iSOA = 1:numel(soa1)
-    subject = sprintf('%s_soa%d-%d', ...
+    subject = sprintf('%s*_soa%d-%d', ...
         subjectID, soa1(iSOA), soa2(iSOA));
     
     % load data from a given soa
-    dataFile = dir(sprintf('%s/%s_run%02d%s_T*20150923.mat', ...
+    dataFile = dir(sprintf('%s/%s_run%02d%s_T*.mat', ...
         dataDir, subject, run, rtStr));
     if numel(dataFile)~=1
         fprintf('%s/%s_run%02d%s_T*', dataDir, subject, run, rtStr)
