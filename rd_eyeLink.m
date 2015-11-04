@@ -222,11 +222,13 @@ switch command
             
             % update duration of current fixation
             if fixation==1 && fixStart==0
+                tFix = 0;
                 tFixStart = GetSecs;
                 fixStart = 1;
             elseif fixation==1 && fixStart==1
                 tFix = GetSecs-tFixStart;
             else
+                tFix = 0;
                 fixStart = 0;
             end
             
