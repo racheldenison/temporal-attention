@@ -12,20 +12,33 @@ saveTimingFigs = 1;
 
 if nargin==1
     workspaceFile = [];
-elseif nargin==2
+elseif nargin>1
     workspaceOption = varargin{1};
-    if ischar(workspaceOption) && strcmp(workspaceOption,'w')
+    if isempty(workspaceOption)
+        workspaceFile = [];
+    elseif ischar(workspaceOption) && strcmp(workspaceOption,'w')
         % workspaceFile = [pathToExpt('data') '/pilot/ad/adPilot_cb_tc64-100_soa1000-1250_run01_WORKSPACE.mat'];
         workspaceFile = sprintf('data/%s_WORKSPACE.mat', subjectID);
     else
         error('to load from workspace file, input "w" as second argument')
     end
-else
+elseif nargin>2
+    p0 = varargin{2};
+elseif nargin>3
     error('wrong number of input arguments')
 end
 
 p = temporalAttentionParams;
 
+% note, p fields may have dependencies: check that all fields are set!
+if exist('p0','var')
+    fNames = fields(p0);
+    for iF = 1:numel(fNames)
+        fName = fNames{iF};
+        p.(fName) = p0.(fName);
+    end
+end
+    
 if strcmp(subjectID,'test')
     p.eyeTracking = 0;
 end
