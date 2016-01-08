@@ -12,7 +12,8 @@ saveTimingFigs = 1;
 
 if nargin==1
     workspaceFile = [];
-elseif nargin>1
+end
+if nargin>1
     workspaceOption = varargin{1};
     if isempty(workspaceOption)
         workspaceFile = [];
@@ -22,9 +23,11 @@ elseif nargin>1
     else
         error('to load from workspace file, input "w" as second argument')
     end
-elseif nargin>2
+end
+if nargin>2
     p0 = varargin{2};
-elseif nargin>3
+end
+if nargin>3
     error('wrong number of input arguments')
 end
 
