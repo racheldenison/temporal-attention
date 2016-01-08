@@ -1,18 +1,18 @@
-% rd_plotTemporalAttentionAdjustFit.m
+ % rd_plotTemporalAttentionAdjustFit.m
 
 % standard_model = StandardMixtureModel_SD;
 % @(data,g,sd)((1-g).*vonmisespdf(data.errors(:),0,deg2k(sd))+(g).*1/360)
 
 %% group i/o
-% subjectIDs = {'bl','rd','id','ec','ld','en','sj','ml','ca','jl','ew','jx'};
-subjectIDs = {'bl','rd','id','ec','ld','en'};
+subjectIDs = {'bl','rd','id','ec','ld','en','sj','ml','ca','jl','ew','jx'};
+% subjectIDs = {'bl','rd','id','ec','ld','en'};
 run = 9;
 nSubjects = numel(subjectIDs);
 
 plotDistributions = 0;
 saveFigs = 0;
 
-normalizeData = 1;
+normalizeData = 0;
 
 groupFigTitle = [sprintf('%s ',subjectIDs{:}) sprintf('(N=%d), run %d', nSubjects, run)];
 

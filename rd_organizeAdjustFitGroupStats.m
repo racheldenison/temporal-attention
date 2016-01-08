@@ -8,21 +8,33 @@
 % load data/adjust_fit_group_stats_mixtureNoBias_run09_N12_20150407.mat
 % load data/adjust_fit_group_stats_mixtureWithBiasMaxPosterior_run09_N12_20150512.mat
 load data/adjust_fit_group_stats_mixtureNoBiasMaxPosterior_run09_N12_20150512.mat
-% load data/adjust_fit_group_stats_swapNoBiasMaxPosterior_run09_N12_20150512.mat
+% % load data/adjust_fit_group_stats_swapNoBiasMaxPosterior_run09_N12_20150512.mat
 % load data/adjust_fit_group_stats_swapWithBiasMaxPosterior_run09_N12_20150516.mat
 % load data/adust_fit_group_stats_variablePrecisionMaxPosterior_run09_N12_20150720.mat
 
-% load data/adjust_fit_group_stats_mixtureNoBiasMaxPosterior_run19_N12_20150513.mat
+% % load data/adjust_fit_group_stats_mixtureNoBiasMaxPosterior_run19_N12_20150513.mat
 % load data/adjust_fit_group_stats_swapNoBiasMaxPosterior_run19_N12_20150601.mat
 % load data/adjust_fit_group_stats_mixtureWithBiasMaxPosterior_run19_N12_20150601.mat
+
+% load data/adjust_fit_group_stats_mixtureNoBiasMaxPosterior_run29_N12_20151209.mat
+
 % paramsData paramsMean paramsSte run subjectIDs
 
-nSubjects = numel(subjectIDs);
+subjects = [];
 
 targetNames = {'T1','T2'};
 validityNames = {'valid','invalid','neutral'};
 
-measures = fields(paramsData);
+% measures = fields(paramsData);
+measures = {'sd';'g'};
+
+if ~isempty(subjects)
+    paramsData0 = paramsData;
+    for iM = 1:numel(measures)
+        m = measures{iM};
+        paramsData.(m) = paramsData.(m)(:,:,subjects);
+    end
+end
 
 nVal = size(paramsData.(measures{1}),1);
 nTarg = size(paramsData.(measures{1}),2);
@@ -79,14 +91,18 @@ for iM = 1:numel(measures)
         
         fprintf('\nWilcoxon sign-rank test')
         [pVI] = signrank(dataV,dataI);
+        [p, h, statsVI] = signrank(dataV,dataI,'method','approximate');
         [pVN] = signrank(dataV,dataN);
+        [p, h, statsVN] = signrank(dataV,dataN,'method','approximate');
         [pNI] = signrank(dataN,dataI);
-        fprintf('\nvalid vs. invalid: p = %1.5f', pVI)
-        fprintf('\nvalid vs. neutral: p = %1.5f', pVN)
-        fprintf('\nneutral vs. invalid: p = %1.5f\n', pNI)
+        [p, h, statsNI] = signrank(dataN,dataI,'method','approximate');
+        fprintf('\nvalid vs. invalid: Z = %1.3f, p = %1.5f', statsVI.zval, pVI)
+        fprintf('\nvalid vs. neutral: Z = %1.3f, p = %1.5f', statsVN.zval, pVN)
+        fprintf('\nneutral vs. invalid: Z = %1.3f, p = %1.5f\n', statsNI.zval, pNI)
     end
 end
 
+%% Collapsing across T1 and T2
 fprintf('\n\nCollapsing across T1 and T2\n')
 for iM = 1:numel(measures)
     m = measures{iM};

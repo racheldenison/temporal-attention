@@ -2,7 +2,8 @@
 
 %% Setup
 % subjectInits = {'rd','vp','hl','ho'};
-subjectInits = {'dg','sl','mr','ly','pv','ek','gk','md','ax'}; % 'ek'
+subjectInits = {'rd','hl','ho'};
+% subjectInits = {'dg','sl','mr','ly','pv','ek','gk','md','ax'}; % 'ek'
 % subjectInits = {'sl','pv','gk'}; % 100
 % subjectInits = {'mr','md','ax'}; % 300
 % subjectInits = {'dg','ly','ek'}; % 800
@@ -12,12 +13,12 @@ subjectInits = {'dg','sl','mr','ly','pv','ek','gk','md','ax'}; % 'ek'
 nSubjects = numel(subjectInits);
 groupStr = sprintf('N=%d', nSubjects);
 
-expName = 'E4'; % 'E2','E4'
+expName = 'E2'; % 'E2','E4'
 
-contrast = 16;
+contrast = 64;
 T1T2Axis = ''; % 'same','diff'
 extraSelection = ''; % 'sameOrient','diffOrient','sameContrastOneBack','diffContrastOneBack'
-cleanRT = 1;
+cleanRT = 0;
 
 analStr1 = sprintf('contrast%d', contrast);
 switch extraSelection

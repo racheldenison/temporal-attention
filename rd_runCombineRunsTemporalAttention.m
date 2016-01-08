@@ -2,8 +2,8 @@
 
 % subjectInits = {'dg','sl','mr','ly','pv','ek','gk','md','ax'};
 % soaStrs = {'1100','1300','1800'};
-subjectInits = {'rd'};
-soaStrs = {'1100', '1200', '1250', '1300', '1350', '1400', '1450', '1500', '1800'};
+subjectInits = {'hl','ho','rd'};
+soaStrs = {'1100','1150','1200','1250','1300','1350','1400','1450','1500','1800'};
 
 for iSubject = 1:numel(subjectInits)
     subjectInit = subjectInits{iSubject};

@@ -6,12 +6,11 @@ subjectIDs = {'bl','rd','id','ec','ld','en','sj','ml','ca','jl','ew','jx'};
 run = 9;
 nSubjects = numel(subjectIDs);
 
-plotDistributions = 1;
-saveFigs = 1;
+saveFigs = 0;
 
 groupFigTitle = [sprintf('%s ',subjectIDs{:}) sprintf('(N=%d), run %d', nSubjects, run)];
 
-modelNames = {'mixtureNoBias','mixtureKurtosis'}; % 'fixedNoBias','mixtureWithBias','mixtureNoBias','swapNoBias', 'swapWithBias', 'variablePrecision', 'variablePrecisionGammaSD'
+modelNames = {'fixedNoBias','mixtureNoBias'}; % 'fixedNoBias','mixtureWithBias','mixtureNoBias','swapNoBias', 'swapWithBias', 'variablePrecision', 'variablePrecisionGammaSD'
 
 %% get data
 for iSubject = 1:nSubjects
@@ -51,7 +50,21 @@ for iM = 1:nMeasures
 end
 
 groupDiffMean = mean(groupDiff,2);
+groupDiffStd = std(groupDiff,0,2);
 groupDiffSte = std(groupDiff,0,2)./sqrt(nSubjects);
+
+disp([groupDiffMean groupDiffStd])
+
+[h p ci stat] = ttest(groupDiff')
+
+%% non-parametric
+fprintf('\nWilcoxon sign-rank test\n')
+for iM = 1:nMeasures
+    measure = measures{iM};
+    p = signrank(groupDiff(iM,:));
+    [pp, h, stats] = signrank(groupDiff(iM,:),0,'method','approximate');
+    fprintf('%s: Z = %1.3f, p = %1.5f\n', measure, stats.zval, p)
+end
 
 %% plot
 % individuals

@@ -6,8 +6,8 @@ if nargin==0
 %     subject = 'ax_cbD10_tilt2pt3_tc16-64_soa1000-1300';
     subject = 'rd_cbD10_tilt2_tc16-64_soa1000-1250';
 end
-runs = 1:6;
-combinedRun = 98; % 8 = runs 1-3; 28 = runs 4-6; 98 = runs 1-6; 88 = runs 1-6 ste by set 
+runs = 4:6;
+combinedRun = 28; % 8 = runs 1-3; 28 = runs 4-6; 98 = runs 1-6; 88 = runs 1-6 ste by set 
 nRuns = numel(runs);
 
 saveData = 1;

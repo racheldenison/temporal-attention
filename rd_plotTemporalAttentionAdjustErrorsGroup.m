@@ -255,6 +255,21 @@ for iField = 1:numel(fieldNames)
     rd_raiseAxis(gca);
 end
 
+%% descriptive stats
+for iRI = 1:2
+    fprintf('\n%s\n',targetNames{iRI})
+    vals = descripData.sd(:,:,iRI);
+    [h pVI ci statVI] = ttest(vals(:,1), vals(:,2));
+    [h pVN ci statVN] = ttest(vals(:,1), vals(:,3));
+    [h pNI ci statNI] = ttest(vals(:,3), vals(:,2));
+    
+    fprintf('valid vs. invalid: t(%d) = %1.5f, p = %1.5f\n', ...
+        statVI.df, statVI.tstat, pVI)
+    fprintf('valid vs. neutral: t(%d) = %1.5f, p = %1.5f\n', ...
+        statVN.df, statVN.tstat, pVN)
+    fprintf('neutral vs. invalid: t(%d) = %1.5f, p = %1.5f\n', ...
+        statNI.df, statNI.tstat, pNI)
+end
 
 %% dots
 % target orientation

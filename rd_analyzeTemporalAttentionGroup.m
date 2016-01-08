@@ -10,7 +10,7 @@ soa2 = 1250;
 
 run = 9;
 
-normalizeData = 1;
+normalizeData = 0;
 
 saveFigs = 0;
 
@@ -344,6 +344,10 @@ rt_all = [rt1; rt2];
 
 %% Collapsing across T1/T2
 accDataCT = (accDataC{1} + accDataC{2})/2;
+rtDataCT = (rtDataC{1} + rtDataC{2})/2;
+
+accMeanCT = mean(accDataCT,2);
+rtMeanCT = mean(rtDataCT,2);
 
 %% Quick stats
 for iEL = 1:2
@@ -366,6 +370,71 @@ fprintf('valid vs. invalid, t(%d) = %1.3f, p = %1.4f\n', svi.df, svi.tstat, pvi)
 fprintf('valid vs. neutral, t(%d) = %1.3f, p = %1.4f\n', svn.df, svn.tstat, pvn)
 fprintf('neutral vs. invalid, t(%d) = %1.3f, p = %1.4f\n\n', sni.df, sni.tstat, pni)
 
+%% Ranomization tests
+% load empirical null distribution
+R = load('data/E0_randomizationTest_workspace_run09_N10_20160107b.mat');
 
+% calculate observed pairwise differences
+accDataCPairwise(1,:) = accMeanC(1,:) - accMeanC(2,:); % VI
+accDataCPairwise(2,:) = accMeanC(1,:) - accMeanC(3,:); % VN
+accDataCPairwise(3,:) = accMeanC(3,:) - accMeanC(2,:); % NI
 
+accDataCTPairwise(1) = accMeanCT(1) - accMeanCT(2);
+accDataCTPairwise(2) = accMeanCT(1) - accMeanCT(3);
+accDataCTPairwise(3) = accMeanCT(3) - accMeanCT(2);
 
+% calculate observed pairwise differences
+rtDataCPairwise(1,:) = rtMeanC(1,:) - rtMeanC(2,:); % VI
+rtDataCPairwise(2,:) = rtMeanC(1,:) - rtMeanC(3,:); % VN
+rtDataCPairwise(3,:) = rtMeanC(3,:) - rtMeanC(2,:); % NI
+
+rtDataCTPairwise(1) = rtMeanCT(1) - rtMeanCT(2);
+rtDataCTPairwise(2) = rtMeanCT(1) - rtMeanCT(3);
+rtDataCTPairwise(3) = rtMeanCT(3) - rtMeanCT(2);
+
+fprintf('RANDOMIZATION TESTS, across contrasts\n')
+fprintf('Accuracy\n')
+for iEL = 1:2
+    fprintf('T%d\n',iEL)
+    for iVC = 1:3 % validity comparison
+        pC(iVC,iEL) = (nnz(R.accDataCPairwise(iVC,iEL,:) > accDataCPairwise(iVC,iEL)) + ...
+            nnz(R.accDataCPairwise(iVC,iEL,:) < -accDataCPairwise(iVC,iEL)))/R.nSamples;
+    end
+    
+    fprintf('valid vs. invalid, p = %1.3f\n', pC(1,iEL))
+    fprintf('valid vs. neutral, p = %1.3f\n', pC(2,iEL))
+    fprintf('neutral vs. invalid, p = %1.3f\n\n', pC(3,iEL))
+end
+    
+fprintf('Collapsing across T1 and T2\n')
+for iVC = 1:3 % validity comparison
+    pCT(iVC) = (nnz(R.accDataCTPairwise(iVC,:) > accDataCTPairwise(iVC)) + ...
+        nnz(R.accDataCTPairwise(iVC,:) < -accDataCTPairwise(iVC)))/R.nSamples;
+end
+
+fprintf('valid vs. invalid, p = %1.3f\n', pCT(1))
+fprintf('valid vs. neutral, p = %1.3f\n', pCT(2))
+fprintf('neutral vs. invalid, p = %1.3f\n\n', pCT(3))
+
+fprintf('RT\n')
+for iEL = 1:2
+    fprintf('T%d\n',iEL)
+    for iVC = 1:3 % validity comparison
+        pC(iVC,iEL) = (nnz(R.rtDataCPairwise(iVC,iEL,:) < rtDataCPairwise(iVC,iEL)) + ...
+            nnz(R.rtDataCPairwise(iVC,iEL,:) > -rtDataCPairwise(iVC,iEL)))/R.nSamples;
+    end
+    
+    fprintf('valid vs. invalid, p = %1.3f\n', pC(1,iEL))
+    fprintf('valid vs. neutral, p = %1.3f\n', pC(2,iEL))
+    fprintf('neutral vs. invalid, p = %1.3f\n\n', pC(3,iEL))
+end
+    
+fprintf('Collapsing across T1 and T2\n')
+for iVC = 1:3 % validity comparison
+    pCT(iVC) = (nnz(R.rtDataCTPairwise(iVC,:) < rtDataCTPairwise(iVC)) + ...
+        nnz(R.rtDataCTPairwise(iVC,:) > -rtDataCTPairwise(iVC)))/R.nSamples;
+end
+
+fprintf('valid vs. invalid, p = %1.3f\n', pCT(1))
+fprintf('valid vs. neutral, p = %1.3f\n', pCT(2))
+fprintf('neutral vs. invalid, p = %1.3f\n\n', pCT(3))
