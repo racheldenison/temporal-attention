@@ -6,6 +6,7 @@
 %% group i/o
 subjectIDs = {'bl','rd','id','ec','ld','en','sj','ml','ca','jl','ew','jx'};
 % subjectIDs = {'bl','rd','id','ec','ld','en'};
+% subjectIDs = {'bl'};
 run = 9;
 nSubjects = numel(subjectIDs);
 
@@ -37,7 +38,7 @@ for iSubject = 1:nSubjects
     load(sprintf('%s/%s', dataDir, dataFile.name))
     
     % setup
-    df = 4;
+    df = 12;
     xEdges = -90:df:90;
     xgrid = xEdges(1:end-1) + df/2; % bin centers
     paramNames = model.paramNames;
@@ -158,15 +159,19 @@ for iSubject = 1:nSubjects
             end
             
             if plotDistributions
-                ylims = [-0.02 0.06];
+                xlims = [-90 90];
+                ylims = [0 0.03]; % [-0.02 0.06];
                 validityOrder = [1 3 2];
                 figure(iSubject)
                 subplot(3,2,(validityOrder(iV)-1)*2+iEL)
                 hold on
-                plot(xgrid,pdfData)
-                plot(x,y,'r','LineWidth',1.5)
+%                 plot(xgrid,pdfData)
+                bar(xgrid,pdfData,'FaceColor',[.7 .7 .7],'EdgeColor',[.7 .7 .7])
+                plot(x,y,'k','LineWidth',1.5)
                 %         plot(xgrid,pdfModel,'.r')
-                plot(xgrid, resid, 'g')
+%                 plot(xgrid, resid, 'g')
+                set(gca,'XTick',[-90 -45 0 45 90])
+                xlim(xlims)
                 ylim(ylims)
                 title(sprintf('%s %s', targetNames{iEL}, validityNames{iV}))
             end

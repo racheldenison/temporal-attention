@@ -22,6 +22,8 @@ end
 steOption = 'trial'; % 'trial','set'
 fprintf('\nStandard error by %s\n\n', steOption)
 
+plotFigs = 1;
+
 %% Read out variables from expt
 subjectID = expt.subjectID;
 p = expt.p;
@@ -168,91 +170,93 @@ if saveData
 end
 
 %% Plot figs
-intervalNames = {'early','late'};
-errorLims = [0 30];
-accLims = [0 1];
-rtLims = [0 5];
-contrastLims = [p.targetContrasts(1)-0.05 p.targetContrasts(end)+0.05];
-colors = get(0,'DefaultAxesColorOrder');
-
-fig(1) = figure;
-for iRI = 1:numel(p.respInterval)
-    subplot(1,numel(p.respInterval),iRI)
-    hold on
+if plotFigs
+    intervalNames = {'early','late'};
+    errorLims = [0 30];
+    accLims = [0 1];
+    rtLims = [0 5];
+    contrastLims = [p.targetContrasts(1)-0.05 p.targetContrasts(end)+0.05];
+    colors = get(0,'DefaultAxesColorOrder');
     
-    if numel(p.targetContrasts)>1
-        p1 = errorbar(repmat(p.targetContrasts',1,numel(p.cueValidity)),...
-            errorMean{iRI}', errorSte{iRI}', '.', 'MarkerSize', 20);
-    else
-        for i = 1:length(errorMean{iRI})
-            p1(i) = errorbar(p.targetContrasts,...
-                errorMean{iRI}(i), errorSte{iRI}(i), '.', 'MarkerSize', 20);
-            set(p1(i),'color', colors(i,:))
+    fig(1) = figure;
+    for iRI = 1:numel(p.respInterval)
+        subplot(1,numel(p.respInterval),iRI)
+        hold on
+        
+        if numel(p.targetContrasts)>1
+            p1 = errorbar(repmat(p.targetContrasts',1,numel(p.cueValidity)),...
+                errorMean{iRI}', errorSte{iRI}', '.', 'MarkerSize', 20);
+        else
+            for i = 1:length(errorMean{iRI})
+                p1(i) = errorbar(p.targetContrasts,...
+                    errorMean{iRI}(i), errorSte{iRI}(i), '.', 'MarkerSize', 20);
+                set(p1(i),'color', colors(i,:))
+            end
         end
+        xlabel('contrast')
+        ylabel('error')
+        legend(p1, num2str(p.cueValidity'),'location','best')
+        title(intervalNames{iRI})
+        xlim(contrastLims)
+        ylim(errorLims)
+        rd_supertitle(subjectID);
+        rd_raiseAxis(gca);
+        rd_supertitle(axTitle);
     end
-    xlabel('contrast')
-    ylabel('error')
-    legend(p1, num2str(p.cueValidity'),'location','best')
-    title(intervalNames{iRI})
-    xlim(contrastLims)
-    ylim(errorLims)
-    rd_supertitle(subjectID);
-    rd_raiseAxis(gca);
-    rd_supertitle(axTitle);
-end
-
-fig(2) = figure;
-for iRI = 1:numel(p.respInterval)
-    subplot(1,numel(p.respInterval),iRI)
-    hold on
     
-    if numel(p.targetContrasts)>1
-        p1 = errorbar(repmat(p.targetContrasts',1,numel(p.cueValidity)),...
-            accMean{iRI}', accSte{iRI}', '.', 'MarkerSize', 20);
-    else
-        for i = 1:length(accMean{iRI})
-            p1(i) = errorbar(p.targetContrasts,...
-                accMean{iRI}(i), accSte{iRI}(i), '.', 'MarkerSize', 20);
-            set(p1(i),'color', colors(i,:))
+    fig(2) = figure;
+    for iRI = 1:numel(p.respInterval)
+        subplot(1,numel(p.respInterval),iRI)
+        hold on
+        
+        if numel(p.targetContrasts)>1
+            p1 = errorbar(repmat(p.targetContrasts',1,numel(p.cueValidity)),...
+                accMean{iRI}', accSte{iRI}', '.', 'MarkerSize', 20);
+        else
+            for i = 1:length(accMean{iRI})
+                p1(i) = errorbar(p.targetContrasts,...
+                    accMean{iRI}(i), accSte{iRI}(i), '.', 'MarkerSize', 20);
+                set(p1(i),'color', colors(i,:))
+            end
         end
+        xlabel('contrast')
+        ylabel('acc')
+        legend(p1, num2str(p.cueValidity'),'location','best')
+        title(intervalNames{iRI})
+        xlim(contrastLims)
+        ylim(accLims)
+        rd_supertitle(subjectID);
+        rd_raiseAxis(gca);
+        rd_supertitle(axTitle);
     end
-    xlabel('contrast')
-    ylabel('acc')
-    legend(p1, num2str(p.cueValidity'),'location','best')
-    title(intervalNames{iRI})
-    xlim(contrastLims)
-    ylim(accLims)
-    rd_supertitle(subjectID);
-    rd_raiseAxis(gca);
-    rd_supertitle(axTitle);
-end
-
-fig(3) = figure;
-for iRI = 1:numel(p.respInterval)
-    subplot(1,numel(p.respInterval),iRI)
-    hold on
     
-    if numel(p.targetContrasts)>1
-        p1 = errorbar(repmat(p.targetContrasts',1,numel(p.cueValidity)),...
-            rtMean{iRI}', rtSte{iRI}', '.', 'MarkerSize', 20);
-    else
-        for i = 1:length(rtMean{iRI})
-            p1(i) = errorbar(p.targetContrasts,...
-                rtMean{iRI}(i), rtSte{iRI}(i), '.', 'MarkerSize', 20);
-            set(p1(i),'color', colors(i,:))
+    fig(3) = figure;
+    for iRI = 1:numel(p.respInterval)
+        subplot(1,numel(p.respInterval),iRI)
+        hold on
+        
+        if numel(p.targetContrasts)>1
+            p1 = errorbar(repmat(p.targetContrasts',1,numel(p.cueValidity)),...
+                rtMean{iRI}', rtSte{iRI}', '.', 'MarkerSize', 20);
+        else
+            for i = 1:length(rtMean{iRI})
+                p1(i) = errorbar(p.targetContrasts,...
+                    rtMean{iRI}(i), rtSte{iRI}(i), '.', 'MarkerSize', 20);
+                set(p1(i),'color', colors(i,:))
+            end
         end
+        
+        xlabel('contrast')
+        ylabel('rt')
+        legend(num2str(p.cueValidity'),'location','best')
+        title(intervalNames{iRI})
+        xlim(contrastLims)
+        ylim(rtLims)
+        box off
+        rd_supertitle(subjectID);
+        rd_raiseAxis(gca);
+        rd_supertitle(axTitle);
     end
-
-    xlabel('contrast')
-    ylabel('rt')
-    legend(num2str(p.cueValidity'),'location','best')
-    title(intervalNames{iRI})
-    xlim(contrastLims)
-    ylim(rtLims)
-    box off
-    rd_supertitle(subjectID);
-    rd_raiseAxis(gca);
-    rd_supertitle(axTitle);
 end
 
 %% Save figs

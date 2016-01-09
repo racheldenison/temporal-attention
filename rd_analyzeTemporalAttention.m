@@ -25,7 +25,7 @@ end
 steOption = 'trial'; % 'trial','set'
 fprintf('\nStandard error by %s\n\n', steOption)
 
-plotFigs = 0;
+plotFigs = 1;
 
 %% Read out variables from expt
 subjectID = expt.subjectID;

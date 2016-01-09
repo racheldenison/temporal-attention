@@ -26,7 +26,7 @@ targetNames = {'T1','T2'};
 validityNames = {'valid','invalid','neutral'};
 
 % measures = fields(paramsData);
-measures = {'sd';'g'};
+measures = {'g';'sd'};
 
 if ~isempty(subjects)
     paramsData0 = paramsData;
@@ -44,14 +44,14 @@ nSub = size(paramsData.(measures{1}),3);
 table_headers = [{'subject','T1T2','validity'}, measures'];
 idx = 1;
 for iSub = 1:nSub
-    for iTarg = 1:nTarg
+    for iT = 1:nTarg
         for iVal = 1:nVal
             data = [];
             for iM = 1:numel(measures)
                 m = measures{iM};
-                data = [data paramsData.(m)(iVal,iTarg,iSub)];
+                data = [data paramsData.(m)(iVal,iT,iSub)];
             end
-            table(idx,:) = [iSub iTarg iVal data];
+            table(idx,:) = [iSub iT iVal data];
             idx = idx + 1;
         end
     end
@@ -61,10 +61,10 @@ end
 for iM = 1:numel(measures)
     m = measures{iM};
     fprintf('\n\n%s', m)
-    for iTarg = 1:nTarg
-        dataV = squeeze(paramsData.(m)(1,iTarg,:));
-        dataI = squeeze(paramsData.(m)(2,iTarg,:));
-        dataN = squeeze(paramsData.(m)(3,iTarg,:));
+    for iT = 1:nTarg
+        dataV = squeeze(paramsData.(m)(1,iT,:));
+        dataI = squeeze(paramsData.(m)(2,iT,:));
+        dataN = squeeze(paramsData.(m)(3,iT,:));
     
         % qqplot to visualize deviations from normality
         figure
@@ -77,10 +77,10 @@ for iM = 1:numel(measures)
         subplot(1,3,3)
         qqplot(dataN-dataI)
         title('neutral vs. invalid')
-        rd_supertitle(sprintf('%s %s', targetNames{iTarg}, m));
+        rd_supertitle(sprintf('%s %s', targetNames{iT}, m));
         rd_raiseAxis(gca);
         
-        fprintf('\nT%d',iTarg)
+        fprintf('\nT%d',iT)
         fprintf('\nt-test')
         [hVI pVI] = ttest(dataV,dataI);
         [hVN pVN] = ttest(dataV,dataN);
@@ -149,6 +149,37 @@ for iM = 1:numel(measures)
     fprintf('valid vs. invalid, p = %1.4f\n', pvi)
     fprintf('valid vs. neutral, p = %1.4f\n', pvn)
     fprintf('neutral vs. invalid, p = %1.4f\n\n', pni)
+end
+
+%% Ranomization tests
+% load empirical null distribution
+R = load('data/adjust_randomizationTest_workspace_run09_N12_20160108.mat');
+
+% calculate observed pairwise differences
+for iM = 1:numel(measures)
+    m = measures{iM};
+    pd(1,:,iM) = paramsMean.(m)(2,:) - paramsMean.(m)(1,:); % VI
+    pd(2,:,iM) = paramsMean.(m)(3,:) - paramsMean.(m)(1,:); % VN
+    pd(3,:,iM) = paramsMean.(m)(2,:) - paramsMean.(m)(3,:); % NI
+end
+
+fprintf('RANDOMIZATION TESTS\n')
+for iM = 1:numel(measures)
+    m = measures{iM};
+    fprintf('\n%s\n', m)
+    for iT = 1:nTarg
+        fprintf('T%d\n',iT)
+        for iVC = 1:3 % validity comparison
+            maxval = max(pd(iVC,iT,iM), -pd(iVC,iT,iM));
+            minval = min(pd(iVC,iT,iM), -pd(iVC,iT,iM));
+            pC(iVC,iT) = (nnz(R.pd(iVC,iT,iM,:) > maxval) + ...
+                nnz(R.pd(iVC,iT,iM,:) < minval))/R.nSamples;
+        end
+        
+        fprintf('valid vs. invalid, p = %1.3f\n', pC(1,iT))
+        fprintf('valid vs. neutral, p = %1.3f\n', pC(2,iT))
+        fprintf('neutral vs. invalid, p = %1.3f\n\n', pC(3,iT))
+    end
 end
 
 
