@@ -21,10 +21,15 @@ rd_plotTemporalAttentionMultiSOA
 rd_plotTemporalAttentionMultiSOAGroupCRF
 rd_plotTemporalAttentionMultiSOACRF 
 
+% multi-SOA resampling
+rd_plotTemporalAttentionMultiSOABootstrapErrorBars
+rd_plotTemporalAttentionMultiSOAResampledNull
+rd_resampleTemporalAttentionMultiSOA
+
 % main analysis
 rd_analyzeTemporalAttention
     % can perform an extra selection step here (e.g. same/diff orientation)
     
 
-    
+
     
