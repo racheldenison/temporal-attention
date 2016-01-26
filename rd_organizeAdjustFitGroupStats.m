@@ -163,7 +163,7 @@ for iM = 1:numel(measures)
     pd(3,:,iM) = paramsMean.(m)(2,:) - paramsMean.(m)(3,:); % NI
 end
 
-fprintf('RANDOMIZATION TESTS\n')
+fprintf('RANDOMIZATION TESTS: Fixed effects\n')
 for iM = 1:numel(measures)
     m = measures{iM};
     fprintf('\n%s\n', m)
@@ -182,6 +182,49 @@ for iM = 1:numel(measures)
     end
 end
 
+%% randomization on subject means
+nShuffles = 1000;
+for iShuffle = 1:nShuffles
+    for iSub = 1:nSub
+        for iM = 1:numel(measures)
+            m = measures{iM};
+            newOrder = randperm(3);
+            paramsDataShuffle.(m)(:,:,iSub,iShuffle) = ...
+                paramsData.(m)(newOrder,:,iSub);
+        end
+    end
+end
 
+for iM = 1:numel(measures)
+    m = measures{iM};
+    paramsDataShuffleDiff.(m)(1,:,:,:) = paramsDataShuffle.(m)(2,:,:,:) - paramsDataShuffle.(m)(1,:,:,:); % VI
+    paramsDataShuffleDiff.(m)(2,:,:,:) = paramsDataShuffle.(m)(3,:,:,:) - paramsDataShuffle.(m)(1,:,:,:); % VN
+    paramsDataShuffleDiff.(m)(3,:,:,:) = paramsDataShuffle.(m)(2,:,:,:) - paramsDataShuffle.(m)(3,:,:,:); % NI
+end
 
-            
+for iM = 1:numel(measures)
+    m = measures{iM};
+    for iVC = 1:3
+        paramsMeanShuffleDiff.(m)(iVC,:,:) = squeeze(mean(paramsDataShuffleDiff.(m)(iVC,:,:,:),3));
+    end
+end
+
+fprintf('RANDOMIZATION TESTS: Random effects\n')
+for iM = 1:numel(measures)
+    m = measures{iM};
+    fprintf('\n%s\n', m)
+    for iT = 1:nTarg
+        fprintf('T%d\n',iT)
+        for iVC = 1:3 % validity comparison
+            maxval = max(pd(iVC,iT,iM), -pd(iVC,iT,iM));
+            minval = min(pd(iVC,iT,iM), -pd(iVC,iT,iM));
+            pC(iVC,iT) = (nnz(paramsMeanShuffleDiff.(m)(iVC,iT,:) > maxval) + ...
+                nnz(paramsMeanShuffleDiff.(m)(iVC,iT,:) < minval))/nShuffles;
+        end
+        
+        fprintf('valid vs. invalid, p = %1.3f\n', pC(1,iT))
+        fprintf('valid vs. neutral, p = %1.3f\n', pC(2,iT))
+        fprintf('neutral vs. invalid, p = %1.3f\n\n', pC(3,iT))
+    end
+end
+
