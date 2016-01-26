@@ -1,8 +1,8 @@
 % rd_plotTemporalAttentionMultiSOAGroup.m
 
 %% Setup
-% subjectInits = {'rd','vp','hl','ho'};
-subjectInits = {'rd','hl','ho'};
+subjectInits = {'rd','hl','ho','vp'};
+% subjectInits = {'rd','hl','ho'};
 % subjectInits = {'dg','sl','mr','ly','pv','ek','gk','md','ax'}; % 'ek'
 % subjectInits = {'sl','pv','gk'}; % 100
 % subjectInits = {'mr','md','ax'}; % 300
@@ -19,6 +19,7 @@ contrast = 64;
 T1T2Axis = ''; % 'same','diff'
 extraSelection = ''; % 'sameOrient','diffOrient','sameContrastOneBack','diffContrastOneBack'
 cleanRT = 0;
+normalizeData = 0;
 
 analStr1 = sprintf('contrast%d', contrast);
 switch extraSelection
@@ -52,10 +53,15 @@ else
     rtStr = '';
 end
 
-figPrefix = sprintf('g%s_N%d_%s%s', expName, nSubjects, analStr, rtStr);
+if normalizeData
+    normStr = '_norm';
+else
+    normStr = '';
+end
 
-normalizeData = 0;
-saveFigs = 0;
+figPrefix = sprintf('g%s_N%d_%s%s%s', expName, nSubjects, analStr, rtStr, normStr);
+
+saveFigs = 1;
 
 %% Get indiv subject data
 for iSubject = 1:nSubjects
@@ -108,12 +114,12 @@ end
 %% Plot figs
 intervalNames = {'T1','T2'};
 cueNames = {'valid','invalid','neutral'};
-accLims = [0.2 1];
-rtLims = [0.2 1.6];
-dpLims = [-0.5 2.7];
-effLims = [0 3.5];
-accDiffLims = [-0.15 0.25];
-accCueEffLims = [-0.3 0.35];
+accLims = [0.5 1];
+rtLims = [0.6 1];
+dpLims = [0 2];
+effLims = [0 2.5];
+accDiffLims = [-0.1 0.2];
+accCueEffLims = [-0.15 0.2];
 soaLims = [t1t2soa(1)-100 t1t2soa(end)+100];
 colors = get(0,'DefaultAxesColorOrder');
 axTitle = '';
@@ -328,6 +334,7 @@ for iVI = 1:2
     xlabel('soa')
     ylabel('cuing effect (accuracy)')
     xlim(soaLims)
+    ylim(accCueEffLims);
     title(viNames{iVI})
 end
 

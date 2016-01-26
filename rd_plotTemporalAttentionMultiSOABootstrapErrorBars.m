@@ -1,7 +1,7 @@
 % rd_plotTemporalAttentionMultiSOABootstrapErrorBars.m
 
 %% Setup
-subjectInit = 'rd';
+subjectInit = 'ho';
 exptName = 'cbD6'; % 'cbD6', 'cbD10'
 
 run = 98;
@@ -63,7 +63,7 @@ for iSOA = 1:nSOA
 end
 
 %% Plot
-ci = ciBoot;
+ci = ciBoot - repmat(accMean,[1,1,1,2]);
 colors = {'b','r','k'};
 figure
 for iT = 1:2
