@@ -21,6 +21,9 @@ rd_plotTemporalAttentionMultiSOA
 rd_plotTemporalAttentionMultiSOAGroupCRF
 rd_plotTemporalAttentionMultiSOACRF 
 
+% by axis/orientation 
+rd_plotTemporalAttentionMultiSOAAxisOrient
+
 % multi-SOA resampling
 rd_plotTemporalAttentionMultiSOABootstrapErrorBars
 rd_plotTemporalAttentionMultiSOAResampledNull

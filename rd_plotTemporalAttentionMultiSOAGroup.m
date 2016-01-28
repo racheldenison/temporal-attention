@@ -61,7 +61,7 @@ end
 
 figPrefix = sprintf('g%s_N%d_%s%s%s', expName, nSubjects, analStr, rtStr, normStr);
 
-saveFigs = 1;
+saveFigs = 0;
 
 %% Get indiv subject data
 for iSubject = 1:nSubjects
