@@ -438,3 +438,21 @@ end
 fprintf('valid vs. invalid, p = %1.3f\n', pCT(1))
 fprintf('valid vs. neutral, p = %1.3f\n', pCT(2))
 fprintf('neutral vs. invalid, p = %1.3f\n\n', pCT(3))
+
+%% Effect size
+% calculate observed pairwise differences
+for iT = 1:2
+    accDataCP(1,:,iT) = accDataC{iT}(1,:) - accDataC{iT}(2,:); % VI
+    accDataCP(2,:,iT) = accDataC{iT}(1,:) - accDataC{iT}(3,:); % VN
+    accDataCP(3,:,iT) = accDataC{iT}(3,:) - accDataC{iT}(2,:); % NI
+end
+
+dP = mean(accDataCP,2)./std(accDataCP,0,2);
+
+% R: pwr.t.test(d = 1.2335, sig.level = .05, power = .8, type = "paired")
+% http://www.statmethods.net/stats/power.html
+% http://powerandsamplesize.com/Calculators/Test-1-Mean/1-Sample-Equality
+
+
+
+

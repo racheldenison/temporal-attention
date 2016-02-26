@@ -228,3 +228,17 @@ for iM = 1:numel(measures)
     end
 end
 
+%% Effect size
+% calculate observed pairwise differences
+m = 'sd';
+for iT = 1:2
+    pdData(1,:,iT) = paramsData.(m)(1,iT,:) - paramsData.(m)(2,iT,:); % VI
+    pdData(2,:,iT) = paramsData.(m)(1,iT,:) - paramsData.(m)(3,iT,:); % VN
+    pdData(3,:,iT) = paramsData.(m)(3,iT,:) - paramsData.(m)(2,iT,:); % NI
+end
+pdData = -pdData;
+
+dP = mean(pdData,2)./std(pdData,0,2);
+
+% R: pwr.t.test(d = 1.2335, sig.level = .05, power = .8, type = "paired")
+

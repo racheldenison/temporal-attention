@@ -24,3 +24,7 @@ rd_fitTemporalAttentionAdjustVP
 rd_fitTemporalAttentionAdjustVPGroup
 rd_plotTemporalAttentionAdjustFitVP
 rd_plotTemporalAttentionAdjustFitBootstrap
+
+% resampling
+rd_resampleTemporalAttentionAdjustGroup
+rd_resampleTemporalAttentionAdjust
