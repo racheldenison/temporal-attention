@@ -1,7 +1,7 @@
 function results = rd_temporalAttention(subjectID, varargin)
 
 %% Setup
-if nargin==0
+if nargin<1
     subjectID = 'test';
 end
 
@@ -10,7 +10,7 @@ saveFigs = 1;
 plotTimingFigs = 1;
 saveTimingFigs = 1;
 
-if nargin==1
+if nargin<2
     workspaceFile = [];
 end
 if nargin>1
@@ -86,7 +86,7 @@ end
 % Find keyboard device number
 devNum = findKeyboardDevNumsAtLocationNYU(p.testingLocation);
 if isempty(devNum)
-    error('Could not find Keypad!')
+    %error('Could not find Keypad!')
 %     devNum = -1;
 end
 devNum = -1;
@@ -116,8 +116,8 @@ end
 % end
 
 % Set up window
-[window rect] = Screen('OpenWindow', screenNumber);
-% [window rect] = Screen('OpenWindow', screenNumber, [], [0 0 800 600]);
+% [window rect] = Screen('OpenWindow', screenNumber);
+[window rect] = Screen('OpenWindow', screenNumber, [], [0 0 800 600]);
 white = WhiteIndex(window);  % Retrieves the CLUT color code for white.
 [cx cy] = RectCenter(rect);
 Screen('TextSize', window, p.fontSize);
@@ -458,7 +458,7 @@ lastFewAcc = [];
 stairIdx = numel(p.stairs); % start easy
 timing.startTime = GetSecs;
 trialCounter = 1;
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Option to load a previous run from a saved workspace file (the TEMP.mat file)
 % note this will overwrite most of the settings generated above
 if ~isempty(workspaceFile)
@@ -470,7 +470,7 @@ if ~isempty(workspaceFile)
 %     p.forwardMask = 0; % ad only
 %     block = floor(iTrial/p.nTrialsPerBlock); % ad only
 end
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 devNum = -1;
 
 % Present trials
@@ -603,7 +603,7 @@ while trialCounter <= nTrials
     end
     
     % Present images
-    if p.forwardMask && ~strcmp(p.maskType,'none')
+    if p.forwardMask(1) && ~strcmp(p.maskType,'none')
         % mask 1 - forward mask
         DrawFormattedText(window, 'x', 'center', 'center', white);
         drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
@@ -640,7 +640,7 @@ while trialCounter <= nTrials
     end
 
     % mask 1 - backward mask
-    if ~strcmp(p.maskType,'none')
+    if ~strcmp(p.maskType,'none') && p.backwardMask(1)
         DrawFormattedText(window, 'x', 'center', 'center', white);
         drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
         Screen('DrawTexture', window, maskTex, [], imRect);
@@ -674,7 +674,7 @@ while trialCounter <= nTrials
     % mask 2 - forward mask
     % to display the T2 forward mask, the mask must be scheduled to start
     % *after* the end of the T1 backward mask
-    if p.forwardMask && (timeCue + p.soas(2) - p.forwardMaskSOA) > (timeMask1 + p.maskDur) && ~strcmp(p.maskType,'none')
+    if p.forwardMask(2) && (timeCue + p.soas(2) - p.forwardMaskSOA) > (timeMask1 + p.maskDur) && ~strcmp(p.maskType,'none')
         DrawFormattedText(window, 'x', 'center', 'center', white);
         drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
         Screen('DrawTexture', window, maskTex, [], imRect);
@@ -710,7 +710,7 @@ while trialCounter <= nTrials
     end
     
     % mask 2 - backward mask
-    if ~strcmp(p.maskType,'none')
+    if ~strcmp(p.maskType,'none') && p.backwardMask(2)
         DrawFormattedText(window, 'x', 'center', 'center', white);
         drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
         Screen('DrawTexture', window, maskTex, [], imRect);
