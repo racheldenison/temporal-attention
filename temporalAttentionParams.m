@@ -1,6 +1,6 @@
 function p = temporalAttentionParams
 
-p.testingLocation = 'laptop'; % 'CarrascoL1','laptop','desk'
+p.testingLocation = 'CarrascoL1'; % 'CarrascoL1','laptop','desk'
 
 switch p.testingLocation
     case {'laptop','desk'}
@@ -14,8 +14,8 @@ switch p.testingLocation
         p.keyNames = {'1!','2@'};
         p.refRate = 1/100;
         p.screenSize = [40 30];
-        p.screenRes = [1024 768];
-        p.viewDist = 56;
+        p.screenRes = [1280 960]; % [1024 768]
+        p.viewDist = 57; % 56
         p.eyeTracking = 1; 
     otherwise
         error('Testing location not found in temporalAttentionParams.')
@@ -51,7 +51,7 @@ p.targetDur = 3/100; % 30 ms / 33 ms
 p.maskSOA = p.soas(2) - p.soas(1);%4/100; % 4/60 time between target onset and backward mask onset %%%% 1/100 to match other runs vp_cbD6
 p.maskDur = 1/100; % 1/60, 3/60
 p.respCueSOA = p.soas(2) + 0.5;
-p.respGoSOA = 0.6; % 0.6 % 1.0 % time between resp cue onset and go onset. set to zero for no go cue.
+p.respGoSOA = 1.5; % 0.6 % 1.0 % time between resp cue onset and go onset. set to zero for no go cue.
 p.iti = 0.5; % inter-trial interval (also, the duration of the feedback symbol)
 p.eyeSlack = 0.12; % cushion between last fixation check and next stimulus presentation
 

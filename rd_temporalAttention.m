@@ -116,8 +116,8 @@ end
 % end
 
 % Set up window
-% [window rect] = Screen('OpenWindow', screenNumber);
-[window rect] = Screen('OpenWindow', screenNumber, [], [0 0 800 600]);
+[window rect] = Screen('OpenWindow', screenNumber);
+% [window rect] = Screen('OpenWindow', screenNumber, [], [0 0 800 600]);
 white = WhiteIndex(window);  % Retrieves the CLUT color code for white.
 [cx cy] = RectCenter(rect);
 Screen('TextSize', window, p.fontSize);
@@ -144,11 +144,14 @@ end
 % Load calibration file
 switch p.testingLocation
     case 'CarrascoL1'
-        load('../../Displays/0001_james_TrinitonG520_1280x960_57cm_Input1_140129.mat');
-        Screen('LoadNormalizedGammaTable', window, repmat(calib.table,1,3));
+%         load('../../Displays/0001_james_TrinitonG520_1280x960_57cm_Input1_140129.mat');
+%         table = repmat(calib.table,1,3);
+        load('../../Displays/Carrasco_L1_SonyGDM5402_sRGB_calibration_02292016.mat');
+        table = CLUT;
+        Screen('LoadNormalizedGammaTable', window, table);
         % check gamma table
         gammatable = Screen('ReadNormalizedGammaTable', window);
-        if nnz(abs(gammatable-repmat(calib.table,1,3))>0.0001)
+        if nnz(abs(gammatable-table)>0.0001)
             error('Gamma table not loaded correctly! Perhaps set screen res and retry.')
         end
     otherwise
@@ -747,6 +750,20 @@ while trialCounter <= nTrials
         Eyelink('Message', 'EVENT_RESPCUE');
     end
     
+    % Check for eye movements
+    if p.eyeTracking
+        while GetSecs < timeRespCue + p.respGoSOA - p.eyeSlack && ~stopThisTrial
+            WaitSecs(.01);
+            fixation = rd_eyeLink('fixcheck', window, {cx, cy, rad});
+            [stopThisTrial trialOrder, nTrials] = fixationBreakTasks(...
+                fixation, window, white*p.backgroundColor, trialOrder, iTrial, nTrials);
+        end
+        fixRespCue(iTrial) = fixation;
+        if stopThisTrial
+            continue
+        end
+    end
+    
     % Present go cue (indicating you're allowed to make a response)
     if p.respGoSOA > 0
         Screen('FillRect', window, white*p.backgroundColor);
@@ -902,6 +919,7 @@ if p.eyeTracking
     expt.eye.fixCue = fixCue;
     expt.eye.fixT1 = fixT1;
     expt.eye.fixT2 = fixT2;
+    expt.eye.fixRespCue = fixRespCue;
 end
 
 %% Calculate more timing things
