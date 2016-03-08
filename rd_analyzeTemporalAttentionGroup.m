@@ -441,13 +441,39 @@ fprintf('neutral vs. invalid, p = %1.3f\n\n', pCT(3))
 
 %% Effect size
 % calculate observed pairwise differences
+% ACC
+% collapsing across contrast
 for iT = 1:2
     accDataCP(1,:,iT) = accDataC{iT}(1,:) - accDataC{iT}(2,:); % VI
     accDataCP(2,:,iT) = accDataC{iT}(1,:) - accDataC{iT}(3,:); % VN
     accDataCP(3,:,iT) = accDataC{iT}(3,:) - accDataC{iT}(2,:); % NI
 end
 
-dP = mean(accDataCP,2)./std(accDataCP,0,2);
+accdCP = mean(accDataCP,2)./std(accDataCP,0,2);
+
+% collapsing across target and contrast
+accDataCTP(1,:) = accDataCT(1,:) - accDataCT(2,:); % VI
+accDataCTP(2,:) = accDataCT(1,:) - accDataCT(3,:); % VN
+accDataCTP(3,:) = accDataCT(3,:) - accDataCT(2,:); % NI
+
+accdCTP = mean(accDataCTP,2)./std(accDataCTP,0,2);
+
+% RT
+% collapsing across contrast
+for iT = 1:2
+    rtDataCP(1,:,iT) = rtDataC{iT}(1,:) - rtDataC{iT}(2,:); % VI
+    rtDataCP(2,:,iT) = rtDataC{iT}(1,:) - rtDataC{iT}(3,:); % VN
+    rtDataCP(3,:,iT) = rtDataC{iT}(3,:) - rtDataC{iT}(2,:); % NI
+end
+
+rtdCP = mean(rtDataCP,2)./std(rtDataCP,0,2);
+
+% collapsing across target and contrast
+rtDataCTP(1,:) = rtDataCT(1,:) - rtDataCT(2,:); % VI
+rtDataCTP(2,:) = rtDataCT(1,:) - rtDataCT(3,:); % VN
+rtDataCTP(3,:) = rtDataCT(3,:) - rtDataCT(2,:); % NI
+
+rtdCTP = mean(rtDataCTP,2)./std(rtDataCTP,0,2);
 
 % R: pwr.t.test(d = 1.2335, sig.level = .05, power = .8, type = "paired")
 % http://www.statmethods.net/stats/power.html
