@@ -245,8 +245,11 @@ switch p.maskType
     case 'filterednoise'
         idx = 1;
         while idx <= 100
-            masktemp = makeFilteredNoise(p.imSize(1)/1.3, p.maskContrast, ...
-                0, 180, p.spatialFrequency, 2, pixelsPerDegree, 1);
+%             masktemp = makeFilteredNoise(p.imSize(1)/1.3, p.maskContrast, ...
+%                 0, 180, p.spatialFrequency, 2, pixelsPerDegree, 1);
+            masktemp = makeFilteredNoise2(p.imSize(1), p.maskContrast, ...
+                0, 180, p.maskSFBand(1), p.maskSFBand(2), pixelsPerDegree, 0);
+            masktemp = maskWithGaussian(masktemp, size(mmasktemp,1), targetSize);
             if mean(masktemp(:))<0.51 && mean(masktemp(:))>0.49
                 mask{idx} = masktemp;
                 idx = idx+1;
