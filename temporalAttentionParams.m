@@ -106,6 +106,7 @@ end
 % Masks
 p.maskType = 'filterednoise'; % none, whitenoise, verticalgrating, crossedgratings, filterednoise
 p.maskContrast = 1;
+p.maskSFBand = [1/1.5 1.5]*p.spatialFrequency;
 p.forwardMask = [0 0]; % T1, T2     1 to use forward mask, 0 for no forward mask
 p.forwardMaskSOA = p.maskSOA - p.targetDur + p.maskDur; % equates ISIs between targets and masks
 p.backwardMask = [0 1]; % T1, T2    1 to use backward mask, 0 for no backward mask
