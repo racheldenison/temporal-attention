@@ -249,7 +249,7 @@ switch p.maskType
 %                 0, 180, p.spatialFrequency, 2, pixelsPerDegree, 1);
             masktemp = makeFilteredNoise2(p.imSize(1), p.maskContrast, ...
                 0, 180, p.maskSFBand(1), p.maskSFBand(2), pixelsPerDegree, 0);
-            masktemp = maskWithGaussian(masktemp, size(mmasktemp,1), targetSize);
+            masktemp = maskWithGaussian(masktemp, size(masktemp,1), targetSize*p.maskApertureFactor);
             if mean(masktemp(:))<0.51 && mean(masktemp(:))>0.49
                 mask{idx} = masktemp;
                 idx = idx+1;
