@@ -249,8 +249,15 @@ switch p.maskType
 %                 0, 180, p.spatialFrequency, 2, pixelsPerDegree, 1);
             masktemp = makeFilteredNoise2(p.imSize(1), p.maskContrast, ...
                 0, 180, p.maskSFBand(1), p.maskSFBand(2), pixelsPerDegree, 0);
-            masktemp = maskWithGaussian(masktemp, size(masktemp,1), targetSize*p.maskApertureFactor);
+            masktemp = maskWithGaussian(masktemp, size(masktemp,1), targetSize);
             if mean(masktemp(:))<0.51 && mean(masktemp(:))>0.49
+                % match rms contrast
+                for i = 1:5 % a few loops of scaling and truncation
+                    maskRMSFactor = std(target{1,1,1}(:))/std(masktemp(:));
+                    masktemp = (masktemp-.5)*maskRMSFactor + .5;
+                    masktemp(masktemp>1) = 1;
+                    masktemp(masktemp<0) = 0;
+                end
                 mask{idx} = masktemp;
                 idx = idx+1;
             end
