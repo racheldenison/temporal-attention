@@ -255,6 +255,8 @@ switch p.maskType
                 idx = idx+1;
             end
         end
+    case 'bullseye'
+       mask = 'something'; 
     otherwise
         error('maskType not recognized')
 end

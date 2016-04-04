@@ -104,7 +104,7 @@ switch p.rotateTarget
 end
 
 % Masks
-p.maskType = 'filterednoise'; % none, whitenoise, verticalgrating, crossedgratings, filterednoise
+p.maskType = 'filterednoise'; % none, whitenoise, verticalgrating, crossedgratings, filterednoise, bullseye
 p.maskContrast = 1;
 p.maskSFBand = [1/1.5 1.5]*p.spatialFrequency;
 p.forwardMask = [0 0]; % T1, T2     1 to use forward mask, 0 for no forward mask
