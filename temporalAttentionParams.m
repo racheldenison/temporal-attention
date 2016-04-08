@@ -1,6 +1,6 @@
 function p = temporalAttentionParams
 
-p.testingLocation = 'CarrascoL1'; % 'CarrascoL1','laptop','desk'
+p.testingLocation = 'laptop'; % 'CarrascoL1','laptop','desk'
 
 switch p.testingLocation
     case {'laptop','desk'}
@@ -104,7 +104,7 @@ switch p.rotateTarget
 end
 
 % Masks
-p.maskType = 'filterednoise'; % none, whitenoise, verticalgrating, crossedgratings, filterednoise, bullseye
+p.maskType = 'bullseye'; % none, whitenoise, verticalgrating, crossedgratings, filterednoise, bullseye
 p.maskContrast = 1;
 p.maskSFBand = [1/1.3 1.3]*p.spatialFrequency;
 p.forwardMask = [0 0]; % T1, T2     1 to use forward mask, 0 for no forward mask

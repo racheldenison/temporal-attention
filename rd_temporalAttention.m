@@ -263,7 +263,8 @@ switch p.maskType
             end
         end
     case 'bullseye'
-       mask = 'something'; 
+       m = buildBullseye(p.spatialFrequency,p.imSize,pixelsPerDegree,p.maskContrast);
+       mask = maskWithGaussian(m, size(m,1), targetSize);
     otherwise
         error('maskType not recognized')
 end
