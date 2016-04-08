@@ -253,7 +253,7 @@ switch p.maskType
             if mean(masktemp(:))<0.51 && mean(masktemp(:))>0.49
                 % match rms contrast
                 for i = 1:5 % a few loops of scaling and truncation
-                    maskRMSFactor = std(target{1,1,1}(:))/std(masktemp(:));
+                    maskRMSFactor = std(target{1,1,1}(:))/std(masktemp(:))
                     masktemp = (masktemp-.5)*maskRMSFactor + .5;
                     masktemp(masktemp>1) = 1;
                     masktemp(masktemp<0) = 0;
