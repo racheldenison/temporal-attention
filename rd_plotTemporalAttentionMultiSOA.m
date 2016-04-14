@@ -22,7 +22,7 @@ soa2 = [1100 1150 1200 1250 1300 1350 1400 1450 1500 1800];
 t1t2soa = soa2 - soa1;
 run = 98; % 8 = runs 1-3; 9 = runs 2-3; 18 = runs 1-3 with first good block of each day excluded
 
-plotFigs = 1;
+plotFigs = 0;
 saveFigs = 0;
 
 doDprime = 1;
