@@ -247,17 +247,22 @@ switch p.maskType
         while idx <= 100
 %             masktemp = makeFilteredNoise(p.imSize(1)/1.3, p.maskContrast, ...
 %                 0, 180, p.spatialFrequency, 2, pixelsPerDegree, 1);
-            masktemp = makeFilteredNoise2(p.imSize(1), p.maskContrast, ...
+            masktemp0 = makeFilteredNoise2(p.imSize(1), p.maskContrast, ...
                 0, 180, p.maskSFBand(1), p.maskSFBand(2), pixelsPerDegree, 0);
-            masktemp = maskWithGaussian(masktemp, size(masktemp,1), targetSize);
+            masktemp = maskWithGaussian(masktemp0, size(masktemp0,1), targetSize);
             if mean(masktemp(:))<0.51 && mean(masktemp(:))>0.49
                 % match rms contrast
                 for i = 1:5 % a few loops of scaling and truncation
-                    maskRMSFactor = std(target{1,1,1}(:))/std(masktemp(:))
+                    maskRMSFactor = std(target{1,1,1}(:))/std(masktemp(:));
                     masktemp = (masktemp-.5)*maskRMSFactor + .5;
                     masktemp(masktemp>1) = 1;
                     masktemp(masktemp<0) = 0;
+                    maskRMSFactors(i) = maskRMSFactor;
                 end
+                masktemp = (masktemp0-.5)*prod(maskRMSFactors)*1.2 + .5;
+                masktemp(masktemp>1) = 1;
+                masktemp(masktemp<0) = 0;
+                masktemp = maskWithGaussianPt5(masktemp, size(masktemp,1), targetSize);
                 mask{idx} = masktemp;
                 idx = idx+1;
             end
