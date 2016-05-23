@@ -98,6 +98,19 @@ for iEL = 1:numel(accData)
     accDataCueEffN{iEL}(:,:,2) = squeeze(accData{iEL}(3,:,:) - accData{iEL}(2,:,:));
 end
 
+%% now for dprime
+% Cuing effect and average across cue validities
+for iEL = 1:numel(dpData)
+    dpDataCueEff{iEL} = squeeze(dpData{iEL}(1,:,:) - dpData{iEL}(2,:,:));
+    dpDataCueAve{iEL} = squeeze(mean(dpData{iEL},1));
+end
+
+% Cuing effect valid/invalid vs. neutral
+for iEL = 1:numel(accData)
+    dpDataCueEffN{iEL}(:,:,1) = squeeze(dpData{iEL}(1,:,:) - dpData{iEL}(3,:,:));
+    dpDataCueEffN{iEL}(:,:,2) = squeeze(dpData{iEL}(3,:,:) - dpData{iEL}(2,:,:));
+end
+
 %% Group summary stats
 for iEL = 1:numel(accData)
     accMean{iEL} = mean(accData{iEL},3);

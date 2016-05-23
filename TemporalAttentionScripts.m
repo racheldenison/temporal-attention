@@ -16,6 +16,7 @@ rd_plotTemporalAttentionMultiSOAGroup
 % -> settings in:
 rd_plotTemporalAttentionMultiSOA 
     % can reanalyze with different T1T2Axis here
+rd_gatherTemporalAttentionMultiSOAData
 
 % also, for contrast on x-axis
 rd_plotTemporalAttentionMultiSOAGroupCRF
