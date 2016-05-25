@@ -263,8 +263,21 @@ switch p.maskType
             end
         end
     case 'bullseye'
-       m = buildBullseye(p.spatialFrequency,p.imSize,pixelsPerDegree,p.maskContrast);
-       mask = maskWithGaussian(m, size(m,1), targetSize);
+        m = buildBullseye(p.spatialFrequency,p.imSize,pixelsPerDegree,p.maskContrast);
+        mask = maskWithGaussian(m, size(m,1), targetSize);
+    case 'pseudotarget'
+        idx = 1;
+        for iP = 1:numel(p.targetPhases)
+            for iC = 1:numel(p.targetContrasts)
+                for iT = 1:numel(p.targetStates)
+                    mask{idx} = target{iC,iT,iP};
+                    mask{idx+...
+                        numel(p.targetPhases)*numel(p.targetContrasts)*numel(p.targetStates)} = ...
+                        rot90(target{iC,iT,iP}); % rotate 90 degrees
+                    idx = idx + 1;
+                end
+            end
+        end
     otherwise
         error('maskType not recognized')
 end
@@ -407,6 +420,10 @@ targetRotations = repmat(targetRotations, p.nReps, 1);
 targetPhases = repmat(targetPhases, p.nReps, 1);
 nTrials = size(trials,1);
 
+% generate mask order
+masks = mod(1:nTrials,numel(maskTexs))+1;
+masks = masks(randperm(nTrials))';
+
 % show trials and blocks
 fprintf('\n%s\n\n%d trials, %1.2f blocks\n\n', datestr(now), nTrials, nTrials/p.nTrialsPerBlock)
 
@@ -547,8 +564,8 @@ while trialCounter <= nTrials
     tex1 = targetTex(tcCond,ts1Cond,ph(1));
     tex2 = targetTex(tcCond,ts2Cond,ph(2));
     
-    % Select mask texture randomly
-    maskIdx = randi(numel(maskTexs));
+    % Select mask texture
+    maskIdx = masks(trialIdx);
     maskTex = maskTexs(maskIdx);
     
     % Set rotation based on staircase (bypass previous)
@@ -574,6 +591,7 @@ while trialCounter <= nTrials
     trialsPresented.vals(iTrial).respTargetCond = respTargetCond;
     trialsPresented.vals(iTrial).rot = rot;
     trialsPresented.vals(iTrial).ph = ph;
+    trialsPresented.vals(iTrial).maskIdx = maskIdx;
     
     % Present fixation
     DrawFormattedText(window, 'x', 'center', 'center', white);
@@ -920,6 +938,7 @@ expt.trials_headers = trials_headers;
 expt.trials = trials;
 expt.targetRotations = targetRotations;
 expt.targetPhases = targetPhases;
+expt.masks = masks;
 expt.trialsPresented = trialsPresented;
 
 if p.staircase
