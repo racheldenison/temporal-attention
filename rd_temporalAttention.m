@@ -814,7 +814,8 @@ while trialCounter <= nTrials
     responseKey = [];
     while isempty(responseKey) % record wrong key as missed trial
         [secs, keyCode] = KbWait(devNum);
-        rt = secs - timeRespCue;
+%         rt = secs - timeRespCue;
+        rt = secs - timeGoCue;
         responseKey = find(p.keyCodes==find(keyCode));
         if numel(responseKey)>1 % if more than one key was pressed simultaneously
             responseKey = [];

@@ -209,7 +209,7 @@ end
 if plotFigs
 intervalNames = {'early','late'};
 accLims = [0.2 1];
-rtLims = [0.2 1.6]; % [0.8 2.2];
+rtLims = [0 1]; %[0.2 1.6]; % [0.8 2.2];
 contrastLims = [p.targetContrasts(1)-0.05 p.targetContrasts(end)+0.05];
 colors = get(0,'DefaultAxesColorOrder');
 
