@@ -49,7 +49,9 @@ p.preCueDur = 0.75; % time between fixation onset and cue
 p.cueDur = 0.2;
 p.targetDur = 3/100; % 30 ms / 33 ms
 p.maskSOA = p.soas(2) - p.soas(1);%4/100; % 4/60 time between target onset and backward mask onset %%%% 1/100 to match other runs vp_cbD6
-p.maskDur = 3/100; % 1/60, 3/60
+p.maskDur = p.targetDur; % 1/60, 3/60
+% p.forwardMaskSOA = p.maskSOA - p.targetDur + p.maskDur; % equates ISIs between targets and masks
+p.forwardMaskSOA = p.maskSOA; 
 p.respCueSOA = p.soas(2) + 0.5;
 p.respGoSOA = 1.5; % 0.6 % 1.0 % time between resp cue onset and go onset. set to zero for no go cue.
 p.iti = 0.5; % inter-trial interval (also, the duration of the feedback symbol)
@@ -107,8 +109,7 @@ end
 p.maskType = 'pseudotarget'; % none, whitenoise, verticalgrating, crossedgratings, filterednoise, bullseye
 p.maskContrast = 1;
 p.maskSFBand = [1/1.3 1.3]*p.spatialFrequency;
-p.forwardMask = [0 0]; % T1, T2     1 to use forward mask, 0 for no forward mask
-p.forwardMaskSOA = p.maskSOA - p.targetDur + p.maskDur; % equates ISIs between targets and masks
+p.forwardMask = [1 0]; % T1, T2     1 to use forward mask, 0 for no forward mask
 p.backwardMask = [0 1]; % T1, T2    1 to use backward mask, 0 for no backward mask
 
 % Sounds

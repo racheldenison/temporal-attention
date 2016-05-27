@@ -426,8 +426,11 @@ targetPhases = repmat(targetPhases, p.nReps, 1);
 nTrials = size(trials,1);
 
 % generate mask order
-masks = mod(1:nTrials,numel(maskTexs))+1;
-masks = masks(randperm(nTrials))';
+masks0 = mod(1:nTrials,numel(maskTexs))+1;
+nMasksPerTrial = sum(p.forwardMask) + sum(p.backwardMask);
+for iMask = 1:nMasksPerTrial
+    masks(:,iMask) = masks0(randperm(nTrials));
+end
 
 % show trials and blocks
 fprintf('\n%s\n\n%d trials, %1.2f blocks\n\n', datestr(now), nTrials, nTrials/p.nTrialsPerBlock)
@@ -570,8 +573,9 @@ while trialCounter <= nTrials
     tex2 = targetTex(tcCond,ts2Cond,ph(2));
     
     % Select mask texture
-    maskIdx = masks(trialIdx);
-    maskTex = maskTexs(maskIdx);
+    maskIdx = masks(trialIdx,:);
+    maskTex = maskTexs(maskIdx); % a row of textures for forward and backward masks
+    maskCount = 1;
     
     % Set rotation based on staircase (bypass previous)
     if p.staircase
@@ -646,8 +650,9 @@ while trialCounter <= nTrials
         % mask 1 - forward mask
         DrawFormattedText(window, 'x', 'center', 'center', white);
         drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
-        Screen('DrawTexture', window, maskTex, [], imRect);
+        Screen('DrawTexture', window, maskTex(maskCount), [], imRect);
         timeMask1f = Screen('Flip', window, timeCue + p.soas(1) - p.forwardMaskSOA - slack);
+        maskCount = maskCount+1;
         
         % blank
         Screen('FillRect', window, white*p.backgroundColor);
@@ -682,8 +687,9 @@ while trialCounter <= nTrials
     if ~strcmp(p.maskType,'none') && p.backwardMask(1)
         DrawFormattedText(window, 'x', 'center', 'center', white);
         drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
-        Screen('DrawTexture', window, maskTex, [], imRect);
+        Screen('DrawTexture', window, maskTex(maskCount), [], imRect);
         timeMask1 = Screen('Flip', window, timeIm1 + p.maskSOA - slack);
+        maskCount = maskCount+1;
         
         % blank
         Screen('FillRect', window, white*p.backgroundColor);
@@ -716,8 +722,9 @@ while trialCounter <= nTrials
     if p.forwardMask(2) && (timeCue + p.soas(2) - p.forwardMaskSOA) > (timeMask1 + p.maskDur) && ~strcmp(p.maskType,'none')
         DrawFormattedText(window, 'x', 'center', 'center', white);
         drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
-        Screen('DrawTexture', window, maskTex, [], imRect);
+        Screen('DrawTexture', window, maskTex(maskCount), [], imRect);
         timeMask2f = Screen('Flip', window, timeCue + p.soas(2) - p.forwardMaskSOA - slack);
+        maskCount = maskCount+1;
         
         % blank
         Screen('FillRect', window, white*p.backgroundColor);
@@ -752,8 +759,9 @@ while trialCounter <= nTrials
     if ~strcmp(p.maskType,'none') && p.backwardMask(2)
         DrawFormattedText(window, 'x', 'center', 'center', white);
         drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
-        Screen('DrawTexture', window, maskTex, [], imRect);
+        Screen('DrawTexture', window, maskTex(maskCount), [], imRect);
         timeMask2 = Screen('Flip', window, timeIm2 + p.maskSOA - slack);
+        maskCount = maskCount+1;
         
         % blank
         Screen('FillRect', window, white*p.backgroundColor);
