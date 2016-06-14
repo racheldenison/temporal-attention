@@ -671,6 +671,14 @@ while trialCounter <= nTrials
         timeMaskBlank1f = NaN;
     end
     
+    % sound 1
+    if p.playTargetSound
+        PsychPortAudio('FillBuffer', pahandle, p.targetSound);
+        timeTargetSound1 = PsychPortAudio('Start', pahandle, [], timeCue + p.soas(1), 1);
+    else
+        timeTargetSound1 = NaN;
+    end
+    
     % target 1
     DrawFormattedText(window, 'x', 'center', 'center', white);
     drawPlaceholders(window, white, p.backgroundColor*white, phRect, p.phLineWidth, p.showPlaceholders)
@@ -741,6 +749,14 @@ while trialCounter <= nTrials
     else
         timeMask2f = NaN;
         timeMaskBlank2f = NaN;
+    end
+    
+    % sound 2
+    if p.playTargetSound
+        PsychPortAudio('FillBuffer', pahandle, p.targetSound);
+        timeTargetSound2 = PsychPortAudio('Start', pahandle, [], timeCue + p.soas(2), 1);
+    else
+        timeTargetSound2 = NaN;
     end
     
     % target 2
@@ -887,12 +903,14 @@ while trialCounter <= nTrials
     timing.timeCue(trialIdx,1) = timeCue;
     timing.timeMask1f(trialIdx,1) = timeMask1f;
     timing.timeMaskBlank1f(trialIdx,1) = timeMaskBlank1f;
+    timing.timeTargetSound1(trialIdx,1) = timeTargetSound1;
     timing.timeIm1(trialIdx,1) = timeIm1;
     timing.timeBlank1(trialIdx,1) = timeBlank1;
     timing.timeMask1(trialIdx,1) = timeMask1;
     timing.timeMaskBlank1(trialIdx,1) = timeMaskBlank1;
     timing.timeMask2f(trialIdx,1) = timeMask2f;
     timing.timeMaskBlank2f(trialIdx,1) = timeMaskBlank2f;
+    timing.timeTargetSound2(trialIdx,1) = timeTargetSound2;
     timing.timeIm2(trialIdx,1) = timeIm2;
     timing.timeBlank2(trialIdx,1) = timeBlank2;
     timing.timeMask2(trialIdx,1) = timeMask2;

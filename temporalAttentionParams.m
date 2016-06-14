@@ -38,8 +38,8 @@ p.respInterval = [1 2]; % [1=early 2=late]
 p.cueValidity = [1 -1 0]; % [1=valid -1=invalid 0=neutral]
 % p.propValid = 0.67;
 % p.cueValidityFactor = generatePropFactor(p.propValid);
-p.cueValidityFactor = [1 1 1 2 3]; % eg. [1 1 2 3] is 50% valid, 25% invalid, 25% neutral
-% p.cueValidityFactor = 1;
+% p.cueValidityFactor = [1 1 1 2 3]; % eg. [1 1 2 3] is 50% valid, 25% invalid, 25% neutral
+p.cueValidityFactor = 1;
 p.propValid = nnz(p.cueValidityFactor==1)./nnz(p.cueValidityFactor<3);
 p.propNeutral = nnz(p.cueValidityFactor==3)./numel(p.cueValidityFactor);
 
@@ -120,6 +120,12 @@ for iTone = 1:numel(p.cueFreqs)
     tone = MakeBeep(p.cueFreqs(iTone), p.cueDur, p.Fs);
     p.cueTones(iTone,:) = applyEnvelope(tone, p.Fs);
 end
+p.playTargetSound = 1;
+p.targetSoundDur = 0.03;
+p.targetSoundFreq = [200 10000];
+p.targetSound = makeNoiseBurst(0, p.targetSoundDur, 5,...
+    p.targetSoundFreq(1), p.targetSoundFreq(2), p.Fs, 0)';
+% p.targetSound = applyEnvelope(MakeBeep(p.targetSoundFreq, p.targetSoundDur, p.Fs), p.Fs);
 % 10^0.5 for every 10dB
 
 
