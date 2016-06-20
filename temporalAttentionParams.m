@@ -16,7 +16,7 @@ switch p.testingLocation
         p.screenSize = [40 30];
         p.screenRes = [1280 960]; % [1024 768]
         p.viewDist = 57; % 56
-        p.eyeTracking = 1; 
+        p.eyeTracking = 0; 
     otherwise
         error('Testing location not found in temporalAttentionParams.')
 end
@@ -38,8 +38,8 @@ p.respInterval = [1 2]; % [1=early 2=late]
 p.cueValidity = [1 -1 0]; % [1=valid -1=invalid 0=neutral]
 % p.propValid = 0.67;
 % p.cueValidityFactor = generatePropFactor(p.propValid);
-% p.cueValidityFactor = [1 1 1 2 3]; % eg. [1 1 2 3] is 50% valid, 25% invalid, 25% neutral
-p.cueValidityFactor = 1;
+p.cueValidityFactor = [1 1 1 2 3]; % eg. [1 1 2 3] is 50% valid, 25% invalid, 25% neutral
+% p.cueValidityFactor = 1;
 p.propValid = nnz(p.cueValidityFactor==1)./nnz(p.cueValidityFactor<3);
 p.propNeutral = nnz(p.cueValidityFactor==3)./numel(p.cueValidityFactor);
 
@@ -106,10 +106,10 @@ switch p.rotateTarget
 end
 
 % Masks
-p.maskType = 'h&vgratings'; % none, whitenoise, verticalgrating, crossedgratings, filterednoise, bullseye, pseudotarget, h&vgratings
+p.maskType = 'pseudotarget'; % none, whitenoise, verticalgrating, crossedgratings, filterednoise, bullseye, pseudotarget, h&vgratings
 p.maskContrast = 1;
 p.maskSFBand = [1/1.3 1.3]*p.spatialFrequency;
-p.forwardMask = [1 0]; % T1, T2     1 to use forward mask, 0 for no forward mask
+p.forwardMask = [0 0]; % T1, T2     1 to use forward mask, 0 for no forward mask
 p.backwardMask = [0 1]; % T1, T2    1 to use backward mask, 0 for no backward mask
 
 % Sounds
@@ -120,7 +120,7 @@ for iTone = 1:numel(p.cueFreqs)
     tone = MakeBeep(p.cueFreqs(iTone), p.cueDur, p.Fs);
     p.cueTones(iTone,:) = applyEnvelope(tone, p.Fs);
 end
-p.playTargetSound = 1;
+p.playTargetSound = 0;
 p.targetSoundDur = 0.03;
 p.targetSoundFreq = [200 10000];
 p.targetSound = makeNoiseBurst(0, p.targetSoundDur, 5,...
