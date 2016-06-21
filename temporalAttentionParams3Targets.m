@@ -83,7 +83,7 @@ end
 % target rotation
 switch p.task
     case 'targetOrientation'
-        p.rotateTarget = 'cb'; % 'none','rotT2'= rotate T2 90 deg, 'rotT1' = rotate T1 90 deg, 'cb'= counterbalanced vert/horiz, 'cbvar'= cb with tilt variability, 'cbvark'= cb with +/-k tilt variability, 'cardobl'= cardinal + oblique orientations, 'card4'= 4 cardinal directions (triangle), 'card4wap'= like card4 but rotate the entire aperture ("card4 w/ aperture")
+        p.rotateTarget = 'vh'; % 'none','random','cb'= counterbalanced vert/horiz,'vh'= vert/horiz not fully counterbalanced
     case 'spatialFrequency'
         p.rotateTarget = 'random'; % random rotations
 end

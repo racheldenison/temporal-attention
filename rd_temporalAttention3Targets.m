@@ -349,6 +349,14 @@ switch p.rotateTarget
         tr(tr==2) = 90;
         targetRotations = sortrows(tr);
         trials = repmat(trials,8,1);
+    case 'vh'
+        % vertical and horizontal rotations, but not counterbalanced
+        tr = fullfact([2 2 2]); % h or v for each target
+        tr = repmat(tr,ceil(nTrials0/8),1);
+        tr(tr==1) = 0;
+        tr(tr==2) = 90;
+        tr = tr(randperm(size(tr,1)),:);
+        targetRotations = tr(1:nTrials0,:);
     otherwise
         error('p.rotateTarget not recognized')
 end
