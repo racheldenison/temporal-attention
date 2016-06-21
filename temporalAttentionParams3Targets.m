@@ -1,6 +1,6 @@
 function p = temporalAttentionParams3Targets
 
-p.testingLocation = 'laptop'; % 'CarrascoL1','laptop','desk'
+p.testingLocation = 'CarrascoL1'; % 'CarrascoL1','laptop','desk'
 
 switch p.testingLocation
     case {'laptop','desk'}
@@ -16,7 +16,7 @@ switch p.testingLocation
         p.screenSize = [40 30];
         p.screenRes = [1280 960]; % [1024 768]
         p.viewDist = 57; % 56
-        p.eyeTracking = 0; 
+        p.eyeTracking = 1; 
     otherwise
         error('Testing location not found in temporalAttentionParams.')
 end

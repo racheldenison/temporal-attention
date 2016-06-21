@@ -540,6 +540,7 @@ while trialCounter <= nTrials
         maskTex = maskTexs(maskIdx); % a row of textures for forward and backward masks
     else
         maskIdx = NaN;
+        masks = NaN;
     end
     maskCount = 1;
     
@@ -1058,8 +1059,8 @@ if p.eyeTracking
     rd_eyeLink('eyestop', window, {eyeFile, eyeDataDir});
     
     % rename eye file
-    eyeFileFull = sprintf('%s/%s_TemporalAttention_%s.edf', eyeDataDir, subjectID, datestr(now, 'yyyymmdd'));
-    copyfile(sprintf('%s/%s.edf', eyeDataDir, eyeFile), eyeFileFull)
+    eyeFileFull = sprintf('%s/%s_TemporalAttention3Targets_%s.edf', eyeDataDir, subjectID, datestr(now, 'yyyymmdd'));
+    movefile(sprintf('%s/%s.edf', eyeDataDir, eyeFile), eyeFileFull)
 end
 
 %% Clean up
