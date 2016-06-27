@@ -1002,11 +1002,22 @@ while trialCounter <= nTrials
         DrawFormattedText(window, breakMessage, 'center', 'center', [1 1 1]*white);
         Screen('Flip', window);
         WaitSecs(1);
+        
+        block = block+1; % keep track of block for block message only
+        
+        if any(block==p.sessionStartBlocks)
+           session = find(block==p.sessionStartBlocks); 
+           DrawFormattedText(window, 'Thanks, done for today!', 'center', 'center', [1 1 1]*white);
+           Screen('Flip', window);
+           saveWorkspaceFile;
+           transferEyeData;
+           Screen('CloseAll')
+           return
+        end
+        
         if iTrial < nTrials
             KbWait(devNum);
         end
-        
-        block = block+1; % keep track of block for block message only
     end
 end
 timing.endTime = GetSecs;
