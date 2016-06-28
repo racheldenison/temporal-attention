@@ -84,7 +84,7 @@ end
 % target rotation
 switch p.task
     case 'targetOrientation'
-        p.rotateTarget = 'vh'; % 'none','random','cb'= counterbalanced vert/horiz,'vh'= vert/horiz not fully counterbalanced
+        p.rotateTarget = 'cb'; % 'none','random','cb'= counterbalanced vert/horiz,'vh'= vert/horiz not fully counterbalanced
     case 'spatialFrequency'
         p.rotateTarget = 'random'; % random rotations
 end
