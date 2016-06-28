@@ -1,6 +1,6 @@
 function p = temporalAttentionParams3Targets
 
-p.testingLocation = 'laptop'; % 'CarrascoL1','laptop','desk'
+p.testingLocation = 'CarrascoL1'; % 'CarrascoL1','laptop','desk'
 
 switch p.testingLocation
     case {'laptop','desk'}
@@ -16,16 +16,17 @@ switch p.testingLocation
         p.screenSize = [40 30];
         p.screenRes = [1280 960]; % [1024 768]
         p.viewDist = 57; % 56
-        p.eyeTracking = 0; 
+        p.eyeTracking = 1; 
     otherwise
         error('Testing location not found in temporalAttentionParams.')
 end
 
+p.sessionStartBlocks = [6 11];
 p.keyCodes = KbName(p.keyNames);
 p.backgroundColor = 0.5;
 p.goCueColor = 0.75;
 p.nReps = 1;
-p.nTrialsPerBlock = 64;
+p.nTrialsPerBlock = 64; % 64
 p.font = 'Verdana';
 p.fontSize = 24;
 p.showPlaceholders = 1;
@@ -62,7 +63,7 @@ p.imPos = [4 4];
 p.imSize = [4 4]; % this is the size of the image container that holds the stim
 p.targetSize = 0.5; % 0.5 sigma of gaussian / 1.5 side length of T/L / 1.5 width of triangle
 p.spatialFrequency = 4; % 4
-p.targetOrientation = [-2 2]; % eg. [-10 10]
+p.targetOrientation = [-4 4]; % eg. [-10 10]
 p.targetPhases = 0; % eg. 0, or [0 pi/2 pi 3*pi/2]
 
 % Staircase (implemented only for targetOrientation for now)

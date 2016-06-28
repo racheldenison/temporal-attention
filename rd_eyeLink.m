@@ -183,7 +183,7 @@ switch command
         rad = in{3}; % acceptable fixation radius %%% in px?
         
         timeout = 3.00; % 3.00 % maximum fixation check time
-        tFixMin = 0.20; % 0.10 % minimum correct fixation time
+        tFixMin = 0.30; % 0.10 % minimum correct fixation time
         
         Eyelink('Message', 'FIX_HOLD_CHECK');
         
