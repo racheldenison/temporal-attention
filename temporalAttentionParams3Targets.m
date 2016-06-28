@@ -63,7 +63,7 @@ p.imPos = [4 4];
 p.imSize = [4 4]; % this is the size of the image container that holds the stim
 p.targetSize = 0.5; % 0.5 sigma of gaussian / 1.5 side length of T/L / 1.5 width of triangle
 p.spatialFrequency = 4; % 4
-p.targetOrientation = [-4 4]; % eg. [-10 10]
+p.targetOrientation = [-5 5]; % eg. [-10 10]
 p.targetPhases = 0; % eg. 0, or [0 pi/2 pi 3*pi/2]
 
 % Staircase (implemented only for targetOrientation for now)
@@ -84,7 +84,7 @@ end
 % target rotation
 switch p.task
     case 'targetOrientation'
-        p.rotateTarget = 'cb'; % 'none','random','cb'= counterbalanced vert/horiz,'vh'= vert/horiz not fully counterbalanced
+        p.rotateTarget = 'vh'; % 'none','random','cb'= counterbalanced vert/horiz,'vh'= vert/horiz not fully counterbalanced
     case 'spatialFrequency'
         p.rotateTarget = 'random'; % random rotations
 end
