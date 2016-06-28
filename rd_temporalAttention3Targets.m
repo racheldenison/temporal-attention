@@ -1012,6 +1012,7 @@ while trialCounter <= nTrials
            saveWorkspaceFile;
            transferEyeData;
            Screen('CloseAll')
+           rd_analyzeTemporalAttentionWorkspace;
            return
         end
         
