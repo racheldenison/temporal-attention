@@ -1,6 +1,9 @@
 % rd_analyzeTemporalAttentionWorkspace.m
 
 %% load workspace
+if ~exist('session','var')
+    session = 0;
+end
 
 %% setup
 % not completed trials
@@ -63,10 +66,10 @@ rtLims = [0 1]; %[0.2 1.6]; % [0.8 2.2];
 contrastLims = [p.targetContrasts(1)-0.05 p.targetContrasts(end)+0.05];
 colors = get(0,'DefaultAxesColorOrder');
 
-figure
+fig(1) = figure;
 imagesc(trials)
 
-fig(1) = figure;
+fig(2) = figure;
 for iRI = 1:numel(p.respInterval)
     subplot(1,numel(p.respInterval),iRI)
     hold on
@@ -93,7 +96,7 @@ for iRI = 1:numel(p.respInterval)
     rd_supertitle(axTitle);
 end
 
-fig(2) = figure;
+fig(3) = figure;
 for iRI = 1:numel(p.respInterval)
     subplot(1,numel(p.respInterval),iRI)
     hold on
@@ -119,4 +122,10 @@ for iRI = 1:numel(p.respInterval)
     rd_supertitle(subjectID);
     rd_raiseAxis(gca);
     rd_supertitle(axTitle);
+end
+
+%% Save figs
+if saveFigs
+    figNames = {'trials','acc','rt'};
+    rd_saveAllFigs(fig, figNames, sprintf('%s_TemporalAttention3Targets_WORKSPACE%d', subjectID, session))
 end
