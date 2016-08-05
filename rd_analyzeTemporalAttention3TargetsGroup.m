@@ -1,12 +1,17 @@
 % rd_analyzeTemporalAttention3TargetsGroup.m
 
 exptName = 'cbD15';
-subjectInits = {'gb','xw','yz','jg','rd'};
+subjectInits = {'gb','xw','yz','jg','rd','ht','gb2','ds','ik','jp'};
 contrastIdx = 1;
 
 run = 1;
 
 normalizeData = 0;
+if normalizeData
+    normStr = '_n';
+else
+    normStr = '';
+end
 
 saveFigs = 0;
 
@@ -15,13 +20,13 @@ nSubjects = numel(subjectInits);
 % dataDir = pathToExpt('data');
 % dataDir = [pathToExpt('data') '/pilot/rd'];
 
-doRandomizationTests = 0; % requries having generated empirical null distributions
+doRandomizationTests = 1; % requries having generated empirical null distributions
 
 %% Get data
 for iSubject = 1:nSubjects 
     subjectInit = subjectInits{iSubject};
     
-    dataDir = sprintf('%s/E5_T3_cbD15/%s', pathToExpt('data'), subjectInit(1:2));
+    dataDir = sprintf('%s/E5_T3_cbD15/%s', pathToExpt('data'), subjectInit);
     subjectID = sprintf('%s_%s', subjectInit, exptName);
     
     % load data from a given soa
@@ -72,17 +77,19 @@ end
 % average across contrasts
 if normalizeData
     % use the Morey 2008 correction
-    a = cat(3, accDataC{1}, accDataC{2});
+    a = cat(3, accDataC{1}, accDataC{2}, accDataC{3});
     b = normalizeDC(shiftdim(a,2));
     c = shiftdim(b,1);
     accDataC{1} = c(:,:,1);
     accDataC{2} = c(:,:,2);
+    accDataC{3} = c(:,:,3);
     
-    a = cat(3, rtDataC{1}, rtDataC{2});
+    a = cat(3, rtDataC{1}, rtDataC{2}, rtDataC{3});
     b = normalizeDC(shiftdim(a,2));
     c = shiftdim(b,1);
     rtDataC{1} = c(:,:,1);
     rtDataC{2} = c(:,:,2);
+    rtDataC{3} = c(:,:,3);
     
     [fixed1 fixed2 N] = size(b);
     M = fixed1*fixed2;
@@ -143,7 +150,9 @@ for iRI = 1:numel(p.respInterval)
     set(gca,'XTick',1:nSubjects)
     xlabel('subject')
     ylabel('acc')
-    legend(p1, cueNames,'location','best')
+    if iRI==numel(p.respInterval)
+        legend(p1, cueNames{idx},'location','SE')
+    end
     title(intervalNames{iRI})
     xlim(xlims)
     ylim(accLims)
@@ -163,57 +172,59 @@ for iRI = 1:numel(p.respInterval)
     set(gca,'XTick',1:nSubjects)
     xlabel('subject')
     ylabel('rt')
-    legend(cueNames,'location','best')
+    if iRI==numel(p.respInterval)
+        legend(cueNames{idx},'location','best')
+    end
     title(intervalNames{iRI})
     xlim(xlims)
 %     ylim(rtLims)
-    ylim([0.2 4])
+    ylim([0 1.3])
     box off
     rd_supertitle(sprintf('%s run %d, contrast = %d%%, N=%d', exptName, run, tc, nSubjects));
     rd_raiseAxis(gca);
 end
 
-fig(3) = figure;
-for iRI = 1:numel(p.respInterval)
-    subplot(1,numel(p.respInterval),iRI);
-    hold on
-    
-    plot([0 nCV+1], [0.5 0.5], '--k');
-    b1 = bar(1:nCV, accMean(idx,iRI),'FaceColor',[.5 .5 .5]);
-    p1 = errorbar(1:nCV, accMean(idx,iRI)', accSte(idx,iRI)','k','LineStyle','none');
-    
-    set(gca,'XTick',1:nCV)
-%     set(gca,'XTickLabel', p.cueValidity(idx))
-    set(gca,'XTickLabel', cueNames(idx))
-    xlabel('cue validity')
-    ylabel('acc')
-    title(intervalNames{iRI})
-    ylim([0.3 max(accMean(:))*1.1])
-    ylim([.3 .9])
-    box off
-    rd_supertitle(sprintf('%s run %d, contrast = %d%%, N=%d', exptName, run, tc, nSubjects));
-    rd_raiseAxis(gca);
-end
-
-fig(4) = figure;
-for iRI = 1:numel(p.respInterval)
-    subplot(1,numel(p.respInterval),iRI);
-    hold on
-    
-    b1 = bar(1:nCV, rtMean(idx,iRI),'FaceColor',[.5 .5 .5]);
-    p1 = errorbar(1:nCV, rtMean(idx,iRI)', rtSte(idx,iRI)','k','LineStyle','none');
-    
-    set(gca,'XTick',1:nCV)
-%     set(gca,'XTickLabel', p.cueValidity(idx))
-    set(gca,'XTickLabel', cueNames(idx))
-    xlabel('cue validity')
-    ylabel('rt')
-    title(intervalNames{iRI})
-    ylim([min(rtMean(:))*0.9 max(rtMean(:))*1.1])
-    box off
-    rd_supertitle(sprintf('%s run %d, contrast = %d%%, N=%d', exptName, run, tc, nSubjects));
-    rd_raiseAxis(gca);
-end
+% fig(3) = figure;
+% for iRI = 1:numel(p.respInterval)
+%     subplot(1,numel(p.respInterval),iRI);
+%     hold on
+%     
+%     plot([0 nCV+1], [0.5 0.5], '--k');
+%     b1 = bar(1:nCV, accMean(idx,iRI),'FaceColor',[.5 .5 .5]);
+%     p1 = errorbar(1:nCV, accMean(idx,iRI)', accSte(idx,iRI)','k','LineStyle','none');
+%     
+%     set(gca,'XTick',1:nCV)
+% %     set(gca,'XTickLabel', p.cueValidity(idx))
+%     set(gca,'XTickLabel', cueNames(idx))
+%     xlabel('cue validity')
+%     ylabel('acc')
+%     title(intervalNames{iRI})
+%     ylim([0.3 max(accMean(:))*1.1])
+%     ylim([.3 .9])
+%     box off
+%     rd_supertitle(sprintf('%s run %d, contrast = %d%%, N=%d', exptName, run, tc, nSubjects));
+%     rd_raiseAxis(gca);
+% end
+% 
+% fig(4) = figure;
+% for iRI = 1:numel(p.respInterval)
+%     subplot(1,numel(p.respInterval),iRI);
+%     hold on
+%     
+%     b1 = bar(1:nCV, rtMean(idx,iRI),'FaceColor',[.5 .5 .5]);
+%     p1 = errorbar(1:nCV, rtMean(idx,iRI)', rtSte(idx,iRI)','k','LineStyle','none');
+%     
+%     set(gca,'XTick',1:nCV)
+% %     set(gca,'XTickLabel', p.cueValidity(idx))
+%     set(gca,'XTickLabel', cueNames(idx))
+%     xlabel('cue validity')
+%     ylabel('rt')
+%     title(intervalNames{iRI})
+%     ylim([min(rtMean(:))*0.9 max(rtMean(:))*1.1])
+%     box off
+%     rd_supertitle(sprintf('%s run %d, contrast = %d%%, N=%d', exptName, run, tc, nSubjects));
+%     rd_raiseAxis(gca);
+% end
 
 % average across contrasts
 fig(5) = figure;
@@ -323,26 +334,28 @@ end
 %% Save figs
 if saveFigs
     figNames = {'indivAcc','indivRT','groupAcc','groupRT'};
-    figPrefix = sprintf('groupData_N%d_%s_run%02d_TemporalAttention3Targets_T1T2all_contrast%d', nSubjects, exptName, run, tc);
-    rd_saveAllFigs(fig(1:4), figNames, figPrefix, [], '-depsc2')
+    figPrefix = sprintf('groupData_N%d_%s_run%02d_TemporalAttention3Targets_T1T2all_contrast%d%s', nSubjects, exptName, run, tc, normStr);
+    rd_saveAllFigs(fig([1 2 5 6]), figNames, figPrefix)
 
-    figNames = {'groupAccContrastAve','groupRTContrastAve','groupAccAllContrasts','groupRTAllContrasts'};
-    figPrefix = sprintf('groupData_N%d_%s_run%02d_TemporalAttention3Targets_T1T2all', nSubjects, exptName, run);
-    rd_saveAllFigs(fig(5:end), figNames, figPrefix, [], '-depsc2')
+%     figNames = {'groupAccContrastAve','groupRTContrastAve','groupAccAllContrasts','groupRTAllContrasts'};
+%     figPrefix = sprintf('groupData_N%d_%s_run%02d_TemporalAttention3Targets_T1T2all%s', nSubjects, exptName, run, normStr);
+%     rd_saveAllFigs(fig(5:end), figNames, figPrefix)
 end
 
 %% Reshape data for output to R
 acc1 = reshape(accData{1}', nSubjects*3, 1);
 acc2 = reshape(accData{2}', nSubjects*3, 1);
+acc3 = reshape(accData{3}', nSubjects*3, 1);
 rt1 = reshape(rtData{1}', nSubjects*3, 1);
 rt2 = reshape(rtData{2}', nSubjects*3, 1);
+rt3 = reshape(rtData{3}', nSubjects*3, 1);
 
-acc_all = [acc1; acc2];
-rt_all = [rt1; rt2];
+acc_all = [acc1; acc2; acc3];
+rt_all = [rt1; rt2; rt3];
 
-%% Collapsing across T1/T2
-accDataCT = (accDataC{1} + accDataC{2})/2;
-rtDataCT = (rtDataC{1} + rtDataC{2})/2;
+%% Collapsing across T1/T2/T3
+accDataCT = (accDataC{1} + accDataC{2} + accDataC{3})/3;
+rtDataCT = (rtDataC{1} + rtDataC{2} + rtDataC{3})/3;
 
 accMeanCT = mean(accDataCT,2);
 rtMeanCT = mean(rtDataCT,2);
@@ -359,7 +372,7 @@ for iT = 1:nT
     fprintf('neutral vs. invalid, t(%d) = %1.3f, p = %1.4f\n\n', sni.df, sni.tstat, pni)
 end
 
-fprintf('Collapsing across T1 and T2\n')
+fprintf('Collapsing across T1, T2, T3\n')
 vals = accDataCT;
 [hvi pvi cvi svi] = ttest(vals(1,:),vals(2,:));
 [hvn pvn cvn svn] = ttest(vals(1,:),vals(3,:));
@@ -371,7 +384,7 @@ fprintf('neutral vs. invalid, t(%d) = %1.3f, p = %1.4f\n\n', sni.df, sni.tstat, 
 %% Ranomization tests
 if doRandomizationTests
     % load empirical null distribution
-    R = load('data/E0_randomizationTest_workspace_run09_N10_20160107b.mat');
+    R = load('data/E5_randomizationTest_workspace_run01_N10_20160804.mat');
     
     % calculate observed pairwise differences
     accDataCPairwise(1,:) = accMeanC(1,:) - accMeanC(2,:); % VI
@@ -405,7 +418,7 @@ if doRandomizationTests
         fprintf('neutral vs. invalid, p = %1.3f\n\n', pC(3,iT))
     end
     
-    fprintf('Collapsing across T1 and T2\n')
+    fprintf('Collapsing across targets\n')
     for iVC = 1:3 % validity comparison
         pCT(iVC) = (nnz(R.accDataCTPairwise(iVC,:) > accDataCTPairwise(iVC)) + ...
             nnz(R.accDataCTPairwise(iVC,:) < -accDataCTPairwise(iVC)))/R.nSamples;
@@ -428,7 +441,7 @@ if doRandomizationTests
         fprintf('neutral vs. invalid, p = %1.3f\n\n', pC(3,iT))
     end
     
-    fprintf('Collapsing across T1 and T2\n')
+    fprintf('Collapsing across targets\n')
     for iVC = 1:3 % validity comparison
         pCT(iVC) = (nnz(R.rtDataCTPairwise(iVC,:) < rtDataCTPairwise(iVC)) + ...
             nnz(R.rtDataCTPairwise(iVC,:) > -rtDataCTPairwise(iVC)))/R.nSamples;
@@ -448,6 +461,27 @@ for iT = 1:nT
 end
 
 dP = mean(accDataCP,2)./std(accDataCP,0,2);
+
+for iT = 1:nT
+    rtDataCP(1,:,iT) = rtDataC{iT}(1,:) - rtDataC{iT}(2,:); % VI
+    rtDataCP(2,:,iT) = rtDataC{iT}(1,:) - rtDataC{iT}(3,:); % VN
+    rtDataCP(3,:,iT) = rtDataC{iT}(3,:) - rtDataC{iT}(2,:); % NI
+end
+
+dP = mean(rtDataCP,2)./std(rtDataCP,0,2);
+
+% collapsing across target and contrast
+accDataCTP(1,:) = accDataCT(1,:) - accDataCT(2,:); % VI
+accDataCTP(2,:) = accDataCT(1,:) - accDataCT(3,:); % VN
+accDataCTP(3,:) = accDataCT(3,:) - accDataCT(2,:); % NI
+ 
+dCTP = mean(accDataCTP,2)./std(accDataCTP,0,2);
+
+rtDataCTP(1,:) = rtDataCT(1,:) - rtDataCT(2,:); % VI
+rtDataCTP(2,:) = rtDataCT(1,:) - rtDataCT(3,:); % VN
+rtDataCTP(3,:) = rtDataCT(3,:) - rtDataCT(2,:); % NI
+ 
+dCTP = mean(rtDataCTP,2)./std(rtDataCTP,0,2);
 
 % R: pwr.t.test(d = 1.2335, sig.level = .05, power = .8, type = "paired")
 % http://www.statmethods.net/stats/power.html
