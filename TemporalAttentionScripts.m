@@ -37,5 +37,8 @@ rd_analyzeTemporalAttention
     % can perform an extra selection step here (e.g. same/diff orientation)
 rd_analyzeTemporalAttention3Targets    
 
+% costs vs. benefits
+rd_plotTemporalAttentionTradeoffs
+
 
     

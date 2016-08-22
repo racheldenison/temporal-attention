@@ -8,27 +8,29 @@ targetStates = unique(targetState);
 
 totalsAll = results.totals.all;
 
+nT = numel(expt.p.respInterval);
+
 %% results separated by target state (ccw/cw)
-for iEL = 1:2
+for iT = 1:nT
     for iCV = 1:3
         for iState = 1:numel(targetStates)
             state = targetStates(iState);
-            w = totalsAll{iCV,iEL}(:,targetStateIdx)==state;
-            meanByState{iState,iEL}(iCV,:) = mean(totalsAll{iCV,iEL}(w,:));
+            w = totalsAll{iCV,iT}(:,targetStateIdx)==state;
+            meanByState{iState,iT}(iCV,:) = mean(totalsAll{iCV,iT}(w,:));
         end
     end
 end
 
 %% acc data by state
-for iEL = 1:2
+for iT = 1:nT
     for iState = 1:numel(targetStates)
-        accStateMean{iEL}(:,iState) = meanByState{iState,iEL}(:,accIdx);
+        accStateMean{iT}(:,iState) = meanByState{iState,iT}(:,accIdx);
     end
 end
 
 %% calculate dprime
-for iEL = 1:2
-    [dprime{iEL}, criterion{iEL}] = rd_dprime(accStateMean{iEL}(:,1), 1-accStateMean{iEL}(:,2), '2afc','adjust');
+for iT = 1:nT
+    [dprime{iT}, criterion{iT}] = rd_dprime(accStateMean{iT}(:,1), 1-accStateMean{iT}(:,2), '2afc','adjust');
 end
 
 %% store dprime and criterion

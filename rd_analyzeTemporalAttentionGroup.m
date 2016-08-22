@@ -2,6 +2,7 @@
 
 exptName = 'cb';
 subjectInits = {'rd','ld','id','bl','ad','vp','ma','ty','zw','ec'};
+% subjectInits = {'ma', 'ad', 'bl', 'ec', 'ty', 'zw'};
 tilt = '*';
 contrast = '*'; % '64'; % 
 contrastIdx = 1; % only plot one contrast at a time
@@ -10,7 +11,7 @@ soa2 = 1250;
 
 run = 9;
 
-normalizeData = 0;
+normalizeData = 1;
 
 saveFigs = 0;
 

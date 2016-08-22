@@ -6,6 +6,7 @@ contrastIdx = 1;
 
 run = 1;
 
+doDprime = 0;
 normalizeData = 0;
 if normalizeData
     normStr = '_n';
@@ -20,7 +21,7 @@ nSubjects = numel(subjectInits);
 % dataDir = pathToExpt('data');
 % dataDir = [pathToExpt('data') '/pilot/rd'];
 
-doRandomizationTests = 1; % requries having generated empirical null distributions
+doRandomizationTests = 0; % requries having generated empirical null distributions
 
 %% Get data
 for iSubject = 1:nSubjects 
@@ -51,32 +52,64 @@ for iSubject = 1:nSubjects
     for iT = 1:nT % early/late
         accData{iT}(:,iSubject) = results.accMean{iT}(:,contrastIdx);
         rtData{iT}(:,iSubject) = results.rtMean{iT}(:,contrastIdx);
+        
+        % replace accData with dprime if requested
+        if doDprime
+            accData{iT}(:,iSubject) = ...
+                rd_dprime(accData{iT}(:,iSubject),[],'2afc','adjust');
+        end
     end
     
     % also gather all the data for all contrasts
-    for iContrast = 1:numel(expt.p.targetContrasts)
-        for iT = 1:nT % early/late
-            accDataAll{iT}(:,iSubject,iContrast) = results.accMean{iT}(:,iContrast);
-            rtDataAll{iT}(:,iSubject,iContrast) = results.rtMean{iT}(:,iContrast);
-            
-            % average across contrasts
-            accDataC{iT}(:,iSubject) = mean(results.accMean{iT},2);
-            rtDataC{iT}(:,iSubject) = mean(results.rtMean{iT},2);
+    %     for iContrast = 1:numel(expt.p.targetContrasts)
+    for iT = 1:nT % early/late
+        %             accDataAll{iT}(:,iSubject,iContrast) = results.accMean{iT}(:,iContrast);
+        %             rtDataAll{iT}(:,iSubject,iContrast) = results.rtMean{iT}(:,iContrast);
+        
+        % average across contrasts
+        accDataC{iT}(:,iSubject) = mean(results.accMean{iT},2);
+        rtDataC{iT}(:,iSubject) = mean(results.rtMean{iT},2);
+        
+        % replace accData with dprime if requested
+        if doDprime
+            accDataC{iT}(:,iSubject) = ...
+                rd_dprime(accDataC{iT}(:,iSubject),[],'2afc','adjust');
         end
+    end
+    %     end
+    
+    % break down invalid condition by which target was cued
+    invalid = rd_breakdownInvalidT3(expt,results);
+    nInvalidTrials(:,:,iSubject) = invalid.nTrials;
+    ibNames = {'valid','neutral','invalid1','invalid2'};
+    for iT = 1:nT
+        ad = accData{iT}(:,iSubject);
+        rd = rtData{iT}(:,iSubject);
+        accDataIB{iT}(:,iSubject) = [ad([1 3]); invalid.accMean{iT,1}; invalid.accMean{iT,2}];
+        rtDataIB{iT}(:,iSubject) = [rd([1 3]); invalid.rtMean{iT,1}; invalid.rtMean{iT,2}];
     end
 end
 
-% summary across subjects
-for iT = 1:nT % early/late
+%% Summary across subjects
+for iT = 1:nT
     accMean(:,iT) = mean(accData{iT},2);
     accSte(:,iT) = std(accData{iT},0,2)./sqrt(nSubjects);
     rtMean(:,iT) = mean(rtData{iT},2);
     rtSte(:,iT) = std(rtData{iT},0,2)./sqrt(nSubjects);
 end
 
-% average across contrasts
+% invalid breakdown
+for iT = 1:nT 
+    accMeanIB(:,iT) = mean(accDataIB{iT},2);
+    accSteIB(:,iT) = std(accDataIB{iT},0,2)./sqrt(nSubjects);
+    rtMeanIB(:,iT) = mean(rtDataIB{iT},2);
+    rtSteIB(:,iT) = std(rtDataIB{iT},0,2)./sqrt(nSubjects);
+end
+
+%% Normalize
 if normalizeData
     % use the Morey 2008 correction
+    % avarage across contrast
     a = cat(3, accDataC{1}, accDataC{2}, accDataC{3});
     b = normalizeDC(shiftdim(a,2));
     c = shiftdim(b,1);
@@ -95,11 +128,35 @@ if normalizeData
     M = fixed1*fixed2;
     morey = M/(M-1);
     
+    % invalid breakdown
+    a = cat(3, accDataIB{1}, accDataIB{2}, accDataIB{3});
+    b = normalizeDC(shiftdim(a,2));
+    c = shiftdim(b,1);
+    accDataIB{1} = c(:,:,1);
+    accDataIB{2} = c(:,:,2);
+    accDataIB{3} = c(:,:,3);
+    
+    a = cat(3, rtDataIB{1}, rtDataIB{2}, rtDataIB{3});
+    b = normalizeDC(shiftdim(a,2));
+    c = shiftdim(b,1);
+    rtDataIB{1} = c(:,:,1);
+    rtDataIB{2} = c(:,:,2);
+    rtDataIB{3} = c(:,:,3);
+    
+    [fixed1 fixed2 N] = size(b);
+    M = fixed1*fixed2;
+    moreyIB = M/(M-1);
+    
     for iT = 1:nT
         accMeanC(:,iT) = mean(accDataC{iT},2);
         accSteC(:,iT) = sqrt(morey*var(accDataC{iT},0,2)./(nSubjects));
         rtMeanC(:,iT) = mean(rtDataC{iT},2);
         rtSteC(:,iT) = sqrt(morey*var(rtDataC{iT},0,2)./(nSubjects));
+        
+        accMeanIB(:,iT) = mean(accDataIB{iT},2);
+        accSteIB(:,iT) = sqrt(moreyIB*var(accDataIB{iT},0,2)./(nSubjects));
+        rtMeanIB(:,iT) = mean(rtDataIB{iT},2);
+        rtSteIB(:,iT) = sqrt(moreyIB*var(rtDataIB{iT},0,2)./(nSubjects));
     end
 else
     for iT = 1:nT % early/late
@@ -114,13 +171,13 @@ else
     end
 end
 
-% all contrasts separately
-for iT = 1:nT % early/late
-    accMeanAll{iT} = squeeze(mean(accDataAll{iT},2));
-    accSteAll{iT} = squeeze(std(accDataAll{iT},0,2)./sqrt(nSubjects));
-    rtMeanAll{iT} = squeeze(mean(rtDataAll{iT},2));
-    rtSteAll{iT} = squeeze(std(rtDataAll{iT},0,2)./sqrt(nSubjects));
-end
+% % all contrasts separately
+% for iT = 1:nT % early/late
+%     accMeanAll{iT} = squeeze(mean(accDataAll{iT},2));
+%     accSteAll{iT} = squeeze(std(accDataAll{iT},0,2)./sqrt(nSubjects));
+%     rtMeanAll{iT} = squeeze(mean(rtDataAll{iT},2));
+%     rtSteAll{iT} = squeeze(std(rtDataAll{iT},0,2)./sqrt(nSubjects));
+% end
 
 p = expt.p;
 nCV = numel(p.cueValidity);
@@ -129,8 +186,8 @@ tc = p.targetContrasts(contrastIdx)*100;
 %% Plot figs
 intervalNames = {'T1','T2','T3'};
 cueNames = {'valid','invalid','neutral'};
-accLims = [0.2 1];
-rtLims = [0.3 1.3]; % [0.3 1.6]
+accLims = [0.4 1];
+rtLims = [0.3 1.4]; 
 xlims = [0 nSubjects+1];
 colors = get(0,'DefaultAxesColorOrder');
 axTitle = '';
@@ -325,6 +382,151 @@ end
 %     rd_supertitle(axTitle);
 % end
 
+% invalid breakdown - indiv
+fig(9) = figure;
+for iRI = 1:numel(p.respInterval)
+    subplot(1,numel(p.respInterval),iRI);
+    hold on
+    plot(xlims, [0.5 0.5], '--k');
+    
+    p1 = bar(repmat((1:nSubjects)',1,nCV+1),...
+        accDataIB{iRI}');
+%     colormap(colors(idx,:))
+%     colormap(flag(nCV));
+
+    set(gca,'XTick',1:nSubjects)
+    set(gca,'XTickLabel', subjectInits)
+    xlabel('subject')
+    ylabel('acc')
+    if iRI==numel(p.respInterval)
+        legend(p1, ibNames,'location','SE')
+    end
+    title(intervalNames{iRI})
+    xlim(xlims)
+    ylim(accLims)
+    rd_supertitle(sprintf('%s run %d, N=%d', exptName, run, nSubjects));
+    rd_raiseAxis(gca);
+end
+
+fig(10) = figure;
+for iRI = 1:numel(p.respInterval)
+    subplot(1,numel(p.respInterval),iRI);
+    
+    p1 = bar(repmat((1:nSubjects)',1,nCV+1),...
+        rtDataIB{iRI}');
+%     colormap(colors(idx,:))
+%     colormap(flag(nCV));
+    
+    set(gca,'XTick',1:nSubjects)
+    set(gca,'XTickLabel', subjectInits)
+    xlabel('subject')
+    ylabel('rt')
+    if iRI==numel(p.respInterval)
+        legend(ibNames,'location','best')
+    end
+    title(intervalNames{iRI})
+    xlim(xlims)
+%     ylim(rtLims)
+    ylim([0 1.3])
+    box off
+    rd_supertitle(sprintf('%s run %d, N=%d', exptName, run, nSubjects));
+    rd_raiseAxis(gca);
+end
+
+% invalid breakdown - group
+fig(11) = figure;
+for iRI = 1:numel(p.respInterval)
+    subplot(1,numel(p.respInterval),iRI);
+    hold on
+    
+    plot([0 nCV+2], [0.5 0.5], '--k');
+    b1 = bar(1:nCV+1, accMeanIB(:,iRI),'FaceColor',[.5 .5 .5]);
+    p1 = errorbar(1:nCV+1, accMeanIB(:,iRI)', accSteIB(:,iRI)','k','LineStyle','none');
+    
+    set(gca,'XTick',1:nCV+1)
+%     set(gca,'XTickLabel', p.cueValidity(idx))
+    set(gca,'XTickLabel', ibNames)
+    xlabel('cue validity')
+    ylabel('acc')
+    title(intervalNames{iRI})
+    xlim([0 nCV+2])
+    ylim([0.3 max(accMeanIB(:))*1.1])
+    ylim([.3 .9])
+    box off
+    rd_supertitle(sprintf('%s run %d, N=%d', exptName, run, nSubjects));
+    rd_raiseAxis(gca);
+end
+
+fig(12) = figure;
+for iRI = 1:numel(p.respInterval)
+    subplot(1,numel(p.respInterval),iRI);
+    hold on
+    
+    b1 = bar(1:nCV+1, rtMeanIB(:,iRI),'FaceColor',[.5 .5 .5]);
+    p1 = errorbar(1:nCV+1, rtMeanIB(:,iRI)', rtSteIB(:,iRI)','k','LineStyle','none');
+    
+    set(gca,'XTick',1:nCV+1)
+%     set(gca,'XTickLabel', p.cueValidity(idx))
+    set(gca,'XTickLabel', ibNames)
+    xlabel('cue validity')
+    ylabel('rt')
+    title(intervalNames{iRI})
+    xlim([0 nCV+2])
+    ylim([min(rtMeanIB(:))*0.9 max(rtMeanIB(:))*1.1])
+    ylim([.2 .8])
+    box off
+    rd_supertitle(sprintf('%s run %d, N=%d', exptName, run, nSubjects));
+    rd_raiseAxis(gca);
+end
+
+% 5 bars - group
+fig(13) = figure;
+for iRI = 1:numel(p.respInterval)
+    subplot(1,numel(p.respInterval),iRI);
+    hold on
+    
+    plot([0 nCV+3], [0.5 0.5], '--k');
+    b1 = bar(1:nCV, accMeanC(idx,iRI),'FaceColor',[.5 .5 .5]);
+    b2 = bar(nCV+1:nCV+2, accMeanIB(3:4,iRI),'FaceColor',[.8 .8 .8]);
+    p1 = errorbar(1:nCV, accMeanC(idx,iRI)', accSteC(idx,iRI)','k','LineStyle','none');
+    p2 = errorbar(nCV+1:nCV+2, accMeanIB(3:4,iRI)', accSteIB(3:4,iRI)','k','LineStyle','none');
+    
+    set(gca,'XTick',1:nCV+2)
+%     set(gca,'XTickLabel', p.cueValidity(idx))
+    set(gca,'XTickLabel', [cueNames(idx) ibNames(3:4)])
+    xlabel('cue validity')
+    ylabel('acc')
+    title(intervalNames{iRI})
+    xlim([0 nCV+3])
+    ylim([.5 .9])
+    box off
+    rd_supertitle(sprintf('%s run %d, N=%d', exptName, run, nSubjects));
+    rd_raiseAxis(gca);
+end
+
+fig(14) = figure;
+for iRI = 1:numel(p.respInterval)
+    subplot(1,numel(p.respInterval),iRI);
+    hold on
+    
+    b1 = bar(1:nCV, rtMeanC(idx,iRI),'FaceColor',[.5 .5 .5]);
+    b2 = bar(nCV+1:nCV+2, rtMeanIB(3:4,iRI),'FaceColor',[.8 .8 .8]);
+    p1 = errorbar(1:nCV, rtMeanC(idx,iRI)', rtSteC(idx,iRI)','k','LineStyle','none');
+    p2 = errorbar(nCV+1:nCV+2, rtMeanIB(3:4,iRI)', rtSteIB(3:4,iRI)','k','LineStyle','none');
+    
+    set(gca,'XTick',1:nCV+2)
+%     set(gca,'XTickLabel', p.cueValidity(idx))
+    set(gca,'XTickLabel', [cueNames(idx) ibNames(3:4)])
+    xlabel('cue validity')
+    ylabel('rt')
+    title(intervalNames{iRI})
+    xlim([0 nCV+3])
+    ylim([0 .7])
+    box off
+    rd_supertitle(sprintf('%s run %d, N=%d', exptName, run, nSubjects));
+    rd_raiseAxis(gca);
+end
+
 %% Set figure properties
 for iF = 1:numel(fig)
     % set font size of titles, axis labels, and legends
@@ -380,6 +582,21 @@ vals = accDataCT;
 fprintf('valid vs. invalid, t(%d) = %1.3f, p = %1.4f\n', svi.df, svi.tstat, pvi)
 fprintf('valid vs. neutral, t(%d) = %1.3f, p = %1.4f\n', svn.df, svn.tstat, pvn)
 fprintf('neutral vs. invalid, t(%d) = %1.3f, p = %1.4f\n\n', sni.df, sni.tstat, pni)
+
+for iT = 1:nT
+    fprintf('T%d\n',iT)
+    vals = accDataIB{iT};
+    [hvi1 pvi1 cvi1 svi1] = ttest(vals(1,:),vals(3,:)); % VI1
+    [hvi2 pvi2 cvi2 svi2] = ttest(vals(1,:),vals(4,:)); % VI2
+    [hvn pvn cvn svn] = ttest(vals(1,:),vals(2,:)); % VN
+    [hni1 pni1 cni1 sni1] = ttest(vals(2,:),vals(3,:)); % NI1
+    [hni2 pni2 cni2 sni2] = ttest(vals(2,:),vals(4,:)); % NI2
+    fprintf('valid vs. invalid1, t(%d) = %1.3f, p = %1.4f\n', svi1.df, svi1.tstat, pvi1)
+    fprintf('valid vs. invalid2, t(%d) = %1.3f, p = %1.4f\n', svi2.df, svi2.tstat, pvi2)
+    fprintf('valid vs. neutral, t(%d) = %1.3f, p = %1.4f\n', svn.df, svn.tstat, pvn)
+    fprintf('neutral vs. invalid1, t(%d) = %1.3f, p = %1.4f\n', sni1.df, sni1.tstat, pni1)
+    fprintf('neutral vs. invalid2, t(%d) = %1.3f, p = %1.4f\n\n', sni2.df, sni2.tstat, pni2)
+end
 
 %% Ranomization tests
 if doRandomizationTests
@@ -482,6 +699,19 @@ rtDataCTP(2,:) = rtDataCT(1,:) - rtDataCT(3,:); % VN
 rtDataCTP(3,:) = rtDataCT(3,:) - rtDataCT(2,:); % NI
  
 dCTP = mean(rtDataCTP,2)./std(rtDataCTP,0,2);
+
+% invalid breakdown
+for iT = 1:nT
+    accDataIBP(1,:,iT) = accDataIB{iT}(1,:) - accDataIB{iT}(3,:); % VI1
+    accDataIBP(2,:,iT) = accDataIB{iT}(1,:) - accDataIB{iT}(4,:); % VI2
+    accDataIBP(3,:,iT) = accDataIB{iT}(1,:) - accDataIB{iT}(2,:); % VN
+    accDataIBP(4,:,iT) = accDataIB{iT}(2,:) - accDataIB{iT}(3,:); % NI1
+    accDataIBP(5,:,iT) = accDataIB{iT}(2,:) - accDataIB{iT}(4,:); % NI2
+end
+
+dP = mean(accDataIBP,2)./std(accDataIBP,0,2);
+
+[hh pp] = ttest(accDataIBP,[],[],[],2);
 
 % R: pwr.t.test(d = 1.2335, sig.level = .05, power = .8, type = "paired")
 % http://www.statmethods.net/stats/power.html

@@ -3,11 +3,12 @@
 %% setup
 e0 = load('data/E0_workspace_run09_N10_20160224.mat');
 e3 = load('data/E3_workspace_run09_N12_20160224.mat');
-e5 = load('data/E5_workspace_run01_N10_20160804.mat');
+e5 = load('data/E5_workspace_run01_N10_20160806.mat');
 
 pdata.e0 = e0.accDataCP;
 pdata.e3 = e3.pdData;
-pdata.e5 = e5.accDataCP;
+% pdata.e5 = e5.accDataCP; 
+pdata.e5 = e5.accDataIBP([1 3 4],:,:); % VI1, VN, NI1 /// % VI1, VI2, VN, NI1, NI2
 
 % expNames = fields(pdata);
 expNames = {'e0','e3','e5'};
