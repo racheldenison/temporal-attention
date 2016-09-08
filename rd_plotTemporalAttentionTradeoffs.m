@@ -8,11 +8,23 @@ e5 = load('data/E5_workspace_run01_N10_20160806.mat');
 pdata.e0 = e0.accDataCP;
 pdata.e3 = e3.pdData;
 % pdata.e5 = e5.accDataCP; 
-pdata.e5 = e5.accDataIBP([1 3 4],:,:); % VI1, VN, NI1 /// % VI1, VI2, VN, NI1, NI2
+pdata.e5 = e5.accDataIBP([1 3 4],:,1:2); % VI1, VN, NI1 /// % VI1, VI2, VN, NI1, NI2
 
 % expNames = fields(pdata);
 expNames = {'e0','e3','e5'};
+% expNames = {'e0','e3'};
 nExp = numel(expNames);
+
+%% correlation for each experiment
+for iE = 1:nExp
+    exp = expNames{iE};
+    fprintf('%s\n', exp)
+    vals = pdata.(exp);
+    [r p] = corr(vals(2,:,1)', vals(3,:,2)');
+    fprintf('T1b-T2c: r=%.3f, p=%.3f\n', r, p)
+    [r p] = corr(vals(3,:,1)', vals(2,:,2)');
+    fprintf('T1c-T2b: r=%.3f, p=%.3f\n', r, p)
+end
 
 %% normalize
 for iE = 1:nExp
@@ -20,9 +32,9 @@ for iE = 1:nExp
     pdatan.(exp) = zscore(pdata.(exp),0,2);
 end
 
-if any(strcmp(expNames,'e5'))
-    pdatan.e5 = pdatan.e5(:,:,1:2);
-end
+% if any(strcmp(expNames,'e5'))
+%     pdatan.e5 = pdatan.e5(:,:,1:2);
+% end
 
 pdatanAll = [];
 for iE = 1:nExp

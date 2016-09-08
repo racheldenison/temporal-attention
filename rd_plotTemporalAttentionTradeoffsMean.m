@@ -5,10 +5,28 @@ e0 = load('data/E0_workspace_run09_N10_20160224.mat');
 e3 = load('data/E3_workspace_run09_N12_20160224.mat');
 e5 = load('data/E5_workspace_run01_N10_20160806.mat');
 
+% fractional benefits and costs?
+normalizeWithinTarget = 1;
+baselineOpt = 'condsum'; % 'vi','condsum'
+
 % valid vs. invalid
 vi.e0 = squeeze(mean(e0.accDataCP(1,:,:),2));
 vi.e3 = squeeze(mean(e3.pdData(1,:,:),2));
 vi.e5 = squeeze(mean(e5.accDataCP(1,:,:),2));
+
+vi12.e5 = squeeze(mean(e5.accDataIBP(1:2,:,:),2))'; % target x VI1/VI2
+
+% sum across conditions
+condsum.e0 = sum(e0.accMeanC)';
+condsum.e3 = sum(e3.paramsMean.sd)';
+condsum.e5 = sum(e3.accMeanC)';
+
+condsum12.e5(:,1) = sum(e5.accMeanIB(1:3,:)); % I1
+condsum12.e5(:,2) = sum(e5.accMeanIB([1 2 4],:)); % I2
+
+% set baseline
+base = eval(baselineOpt);
+base12 = eval([baselineOpt '12']);
 
 % mean benefits and costs
 % VI, VN, NI
@@ -71,11 +89,23 @@ for iExp = 1:nExp
     for iT = 1:numel(tn)
         bn = sprintf('%sb', tn{iT});
         benefit = bc.(expName).(bn);
+        if normalizeWithinTarget
+            benefit = benefit/vi.(expName)(iT);
+        end
         nontargets = setdiff(alltargets,iT);
         for iNT = 1:numel(nontargets)
             nt = nontargets(iNT);
             cn = sprintf('%sc_cue%s',tn{nt},tn{iT});
             cost = bc.(expName).(cn);
+            if normalizeWithinTarget
+                if strcmp(expName,'e5')
+                    targets = setdiff(alltargets,nt);
+                    idx = find(targets==iT);
+                    cost = cost/vi12.(expName)(nt,idx);
+                else
+                    cost = cost/vi.(expName)(nt);
+                end
+            end
             pairedBC.(expName)(iT,:,iNT) = [benefit cost];
             pairNames.(expName){iT,iNT} = sprintf('%s_%s',bn,cn);
         end
@@ -83,9 +113,9 @@ for iExp = 1:nExp
 end
 
 %% plot
-% colors = {'b','r','k'};
+colors = {'b','r','k'};
 % colors = {[97 47 255]/255,[255 4 0]/255,[255 177 6]/255};
-colors = {[.1 .1 .1], [.4 .4 .4], [.7 .7 .7]};
+% colors = {[.1 .1 .1], [.4 .4 .4], [.7 .7 .7]};
 shapes = {'o','s','^'};
 faceColors = {[1 1 1],[.5 .5 .5]};
 faceColors2 = colors;
@@ -105,21 +135,29 @@ for iExp = 1:nExp
 end
 legend(expNames)
 
-discrimPairedBC = [pairedBC.e0; pairedBC.e5(:,:,1); pairedBC.e5(:,:,2)]; 
-allPairedBCN = [discrimPairedBC/max(discrimPairedBC(:)); pairedBC.e3/max(pairedBC.e3(:))];
+% discrimPairedBC = [pairedBC.e0; pairedBC.e5(:,:,1); pairedBC.e5(:,:,2)]; 
+% allPairedBCN = [discrimPairedBC/max(discrimPairedBC(:)); pairedBC.e3/max(pairedBC.e3(:))];
+% 
+% [r p] = corr(allPairedBCN);
 
-[r p] = corr(allPairedBCN);
+allPaired = [pairedBC.e0; pairedBC.e3; pairedBC.e5(:,:,1); pairedBC.e5(:,:,2)];
+[r p] = corr(allPaired)
+
+aa = [pairedBC.e0; pairedBC.e5(:,:,1); pairedBC.e5(:,:,2)];
+
 
 figure
 hold on
 for iExp = [1 3]
     expName = expNames{iExp};
     for iNT = 1:size(pairedBC.(expName),3)
-        vals = pairedBC.(expName)(:,:,iNT)/max(discrimPairedBC(:));
+%         vals = pairedBC.(expName)(:,:,iNT)/max(discrimPairedBC(:));
+        vals = pairedBC.(expName)(:,:,iNT);
         plot(vals(:,1),vals(:,2),'.','color',colors{iExp})
     end
 end
-vals = pairedBC.e3/max(pairedBC.e3(:));
+% vals = pairedBC.e3/max(pairedBC.e3(:));
+vals = pairedBC.e3;
 plot(vals(:,1),vals(:,2),'.','color',colors{2})
 xlabel('benefit')
 ylabel('cost')
@@ -130,19 +168,23 @@ for iExp = [1 3]
     expName = expNames{iExp};
     for iT = 1:size(pairedBC.(expName),1)
         for iNT = 1:size(pairedBC.(expName),3)
-            vals = pairedBC.(expName)(:,:,iNT)/max(discrimPairedBC(:));
+%             vals = pairedBC.(expName)(:,:,iNT)/max(discrimPairedBC(:));
+            vals = pairedBC.(expName)(:,:,iNT);
             plot(vals(iT,1),vals(iT,2),shapes{iT},'color',colors{iExp},'MarkerFaceColor',faceColors{iNT})
         end
     end
 end
-vals = pairedBC.e3/max(pairedBC.e3(:));
+% vals = pairedBC.e3/max(pairedBC.e3(:));
+vals = pairedBC.e3;
 for iT = 1:size(pairedBC.e3,1)
     plot(vals(iT,1),vals(iT,2),shapes{iT},'color',colors{2})
 end
 xlabel('benefit')
 ylabel('cost')
-xlim([-.2 1.01])
-ylim([-.2 1.01])
+xlim([-.4 1.2])
+ylim([-.4 1.2])
+set(gca,'XTick',[-.4 0 .4 .8 1.2])
+set(gca,'YTick',[-.4 0 .4 .8 1.2])
 axis square
 
 figure
@@ -155,12 +197,14 @@ for iExp = [1 3]
         for iNT = 1:size(pairedBC.(expName),3)
             nontargets = setdiff(alltargets,iT);
             nt = nontargets(iNT);
-            vals = pairedBC.(expName)(:,:,iNT)/max(discrimPairedBC(:));
+%             vals = pairedBC.(expName)(:,:,iNT)/max(discrimPairedBC(:));
+            vals = pairedBC.(expName)(:,:,iNT);
             plot(vals(iT,1),vals(iT,2),shapes{iExp},'color',colors{iT},'MarkerFaceColor',faceColors2{nt},'LineWidth',1.5,'MarkerSize',10)
         end
     end
 end
-vals = pairedBC.e3/max(pairedBC.e3(:));
+% vals = pairedBC.e3/max(pairedBC.e3(:));
+vals = pairedBC.e3;
 for iT = 1:size(pairedBC.e3,1)
     nontargets = setdiff([1 2],iT);
     nt = nontargets;
@@ -168,8 +212,10 @@ for iT = 1:size(pairedBC.e3,1)
 end
 xlabel('benefit')
 ylabel('cost')
-xlim([-.2 1.01])
-ylim([-.2 1.01])
+xlim([-.4 1.2])
+ylim([-.4 1.2])
+set(gca,'XTick',[-.4 0 .4 .8 1.2])
+set(gca,'YTick',[-.4 0 .4 .8 1.2])
 axis square
 
 

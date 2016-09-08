@@ -13,6 +13,8 @@ shuffleLabels = {'cueValidity'};
 
 nSubjects = numel(subjectInits);
 
+% ibInfo = load('data/E5_nInvalidTrials_N10_20160822.mat');
+
 %% Resample
 for iSample = 1:nSamples
     fprintf('%d\n', iSample)
@@ -57,6 +59,18 @@ for iSample = 1:nSamples
         % average across T1/T2/T3
         accDataCT = (accDataC{1} + accDataC{2} + accDataC{3})./2;
         rtDataCT = (rtDataC{1} + rtDataC{2} + rtDataC{3})./2;
+        
+        % break down invalid condition by which target was cued
+        % (randomly generate cued target assignments for resampled data)
+        invalid = rd_breakdownInvalidT3Resample(expt,results);
+        nInvalidTrials(:,:,iSubject) = invalid.nTrials;
+        ibNames = {'valid','neutral','invalid1','invalid2'};
+        for iT = 1:nT
+            ad = accDataC{iT}(:,iSubject);
+            rd = rtDataC{iT}(:,iSubject);
+            accDataIB{iT}(:,iSubject) = [ad([1 3]); invalid.accMean{iT,1}; invalid.accMean{iT,2}];
+            rtDataIB{iT}(:,iSubject) = [rd([1 3]); invalid.rtMean{iT,1}; invalid.rtMean{iT,2}];
+        end
     end
     
     % pairwise differences across subjects
@@ -79,6 +93,23 @@ for iSample = 1:nSamples
     rtDataCTPairwise(1,iSample) = mean(rtDataCT(1,:) - rtDataCT(2,:));
     rtDataCTPairwise(2,iSample) = mean(rtDataCT(1,:) - rtDataCT(3,:));
     rtDataCTPairwise(3,iSample) = mean(rtDataCT(3,:) - rtDataCT(2,:));
+    
+    % pairwise differences  - invalid breakdown
+    for iT = 1:nT 
+        accDataIBPairwise(1,iT,iSample) = mean(accDataIB{iT}(1,:) - accDataIB{iT}(3,:)); % VI1
+        accDataIBPairwise(2,iT,iSample) = mean(accDataIB{iT}(1,:) - accDataIB{iT}(4,:)); % VI2
+        accDataIBPairwise(3,iT,iSample) = mean(accDataIB{iT}(1,:) - accDataIB{iT}(2,:)); % VN
+        accDataIBPairwise(4,iT,iSample) = mean(accDataIB{iT}(2,:) - accDataIB{iT}(3,:)); % NI1
+        accDataIBPairwise(5,iT,iSample) = mean(accDataIB{iT}(2,:) - accDataIB{iT}(4,:)); % NI2
+    end
+
+    for iT = 1:nT 
+        rtDataIBPairwise(1,iT,iSample) = mean(rtDataIB{iT}(1,:) - rtDataIB{iT}(3,:)); % VI1
+        rtDataIBPairwise(2,iT,iSample) = mean(rtDataIB{iT}(1,:) - rtDataIB{iT}(4,:)); % VI2
+        rtDataIBPairwise(3,iT,iSample) = mean(rtDataIB{iT}(1,:) - rtDataIB{iT}(2,:)); % VN
+        rtDataIBPairwise(4,iT,iSample) = mean(rtDataIB{iT}(2,:) - rtDataIB{iT}(3,:)); % NI1
+        rtDataIBPairwise(5,iT,iSample) = mean(rtDataIB{iT}(2,:) - rtDataIB{iT}(4,:)); % NI2
+    end
 end
 
 %% figures
@@ -116,6 +147,27 @@ for iVC = 1:3
     subplot(1,3,iVC)
     hist(rtDataCTPairwise(iVC,:))
     title(vcLabels{iVC})
+end
+rd_supertitle('RT');
+rd_raiseAxis(gca);
+
+vcLabelsIB = {'VI1','VI2','VN','NI1','NI2'};
+% acc
+figure
+for iVC = 1:5
+    subplot(1,5,iVC)
+    hist(squeeze(accDataIBPairwise(iVC,:,:))')
+    title(vcLabelsIB{iVC})
+end
+rd_supertitle('acc');
+rd_raiseAxis(gca);
+
+% rt
+figure
+for iVC = 1:5
+    subplot(1,5,iVC)
+    hist(squeeze(rtDataIBPairwise(iVC,:,:))')
+    title(vcLabelsIB{iVC})
 end
 rd_supertitle('RT');
 rd_raiseAxis(gca);

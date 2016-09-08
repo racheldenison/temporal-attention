@@ -1,9 +1,19 @@
-% rd_plotTemporalAttentionTradeoffsMean.m
+% rd_plotTemporalAttentionTradeoffsAll.m
 
 %% setup
 e0 = load('data/E0_workspace_run09_N10_20160224.mat');
 e3 = load('data/E3_workspace_run09_N12_20160224.mat');
 e5 = load('data/E5_workspace_run01_N10_20160806.mat');
+
+% fractional benefits and costs?
+normalizeWithinTarget = 1;
+
+% valid vs. invalid
+vi.e0 = e0.accDataCP(1,:,:); % 1 x subject x target
+vi.e3 = e3.pdData(1,:,:);
+vi.e5 = e5.accDataCP(1,:,:);
+
+vi12.e5 = e5.accDataIBP(1:2,:,:); % VI1/VI2 x subject x target
 
 % benefits and costs
 % VI, VN, NI
@@ -43,18 +53,30 @@ for iExp = 1:nExp
     for iT = 1:numel(tn)
         bn = sprintf('%sb', tn{iT});
         benefit = bc.(expName).(bn);
+        if normalizeWithinTarget
+            benefit = benefit./vi.(expName)(:,:,iT);
+        end
         nontargets = setdiff(alltargets,iT);
         for iNT = 1:numel(nontargets)
             nt = nontargets(iNT);
             cn = sprintf('%sc_cue%s',tn{nt},tn{iT});
             cost = bc.(expName).(cn);
+            if normalizeWithinTarget
+                if strcmp(expName,'e5')
+                    targets = setdiff(alltargets,nt);
+                    idx = find(targets==iT);
+                    cost = cost./vi12.(expName)(idx,:,nt);
+                else
+                    cost = cost./vi.(expName)(:,:,nt);
+                end
+            end
             pairedBC.(expName)(:,:,iT,iNT) = [benefit' cost'];
             pairNames.(expName){iT,iNT} = sprintf('%s_%s',bn,cn);
         end
     end
 end
 
-%% plot
+%% plot each expt
 colors = {'b','r','k'};
 % colors = {[97 47 255]/255,[255 4 0]/255,[255 177 6]/255};
 % colors = {[.1 .1 .1], [.4 .4 .4], [.7 .7 .7]};
@@ -62,11 +84,11 @@ shapes = {'o','s','^'};
 faceColors = {[1 1 1],[.5 .5 .5]};
 faceColors2 = colors;
 figure
-hold on
+% hold on
 allVals.all = [];
 for iExp = 1:nExp
-%     figure
-%     hold on
+    subplot(1,nExp,iExp)
+    hold on
     expName = expNames{iExp};
     allVals.(expName) = [];
     dataMax = max(pairedBC.(expName)(:));
@@ -84,14 +106,51 @@ for iExp = 1:nExp
             allVals.(expName) = [allVals.(expName); vals];
         end
     end
+    title(expName)
 end
-legend(expNames)
+% legend(expNames)
 
+% exclude extreme observations (eg. Inf)
+allVals0 = allVals;
+allVals.all = [];
+for iExp = 1:nExp
+    expName = expNames{iExp};
+    vals = allVals.(expName);
+    infRows = any(abs(vals)==Inf,2);
+    vals(infRows,:) = [];
+    m = mean(vals(:));
+    sd = std(vals(:));
+    extrmRows = any(abs(vals)>m+3*sd,2);
+    vals(extrmRows,:) = [];
+    allVals.(expName) = vals;
+    allVals.all = [allVals.all; vals];
+end
+
+    
+% correlation for each experiment
+for iExp = 1:nExp
+    expName = expNames{iExp};
+    [r p] = corr(allVals.(expName));
+    fprintf('%s: r=%.3f, p=%.3f\n', expName, r(2), p(2))
+end
+
+% normalize
 discrimPairedBC = [allVals.e0; allVals.e5]; 
 allPairedBCN = [discrimPairedBC/max(discrimPairedBC(:)); allVals.e3/max(allVals.e3(:))];
 
 [r p] = corr(allPairedBCN);
 
+% zscore
+allValsZ.all = [];
+for iExp = 1:nExp
+    expName = expNames{iExp};
+    allValsZ.(expName) = zscore(allVals.(expName));
+    allValsZ.all = [allValsZ.all; allValsZ.(expName)];
+end
+
+[r p] = corr(allValsZ.all);
+
+%% plot all expts combined
 figure
 hold on
 for iExp = [1 3]

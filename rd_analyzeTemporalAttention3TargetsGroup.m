@@ -21,7 +21,7 @@ nSubjects = numel(subjectInits);
 % dataDir = pathToExpt('data');
 % dataDir = [pathToExpt('data') '/pilot/rd'];
 
-doRandomizationTests = 0; % requries having generated empirical null distributions
+doRandomizationTests = 1; % requries having generated empirical null distributions
 
 %% Get data
 for iSubject = 1:nSubjects 
@@ -601,7 +601,8 @@ end
 %% Ranomization tests
 if doRandomizationTests
     % load empirical null distribution
-    R = load('data/E5_randomizationTest_workspace_run01_N10_20160804.mat');
+%     R = load('data/E5_randomizationTest_workspace_run01_N10_20160804.mat');
+    R = load('data/E5_randomizationTest_workspace_run01_IB_N10_20160822.mat');
     
     % calculate observed pairwise differences
     accDataCPairwise(1,:) = accMeanC(1,:) - accMeanC(2,:); % VI
@@ -667,6 +668,51 @@ if doRandomizationTests
     fprintf('valid vs. invalid, p = %1.3f\n', pCT(1))
     fprintf('valid vs. neutral, p = %1.3f\n', pCT(2))
     fprintf('neutral vs. invalid, p = %1.3f\n\n', pCT(3))
+    
+    % invalid breakdown
+    % calculate observed pairwise differences
+    accDataIBPairwise(1,:) = accMeanIB(1,:) - accMeanIB(3,:); % VI1
+    accDataIBPairwise(2,:) = accMeanIB(1,:) - accMeanIB(4,:); % VI2
+    accDataIBPairwise(3,:) = accMeanIB(1,:) - accMeanIB(2,:); % VN
+    accDataIBPairwise(4,:) = accMeanIB(2,:) - accMeanIB(3,:); % NI1
+    accDataIBPairwise(5,:) = accMeanIB(2,:) - accMeanIB(4,:); % NI2
+    
+    rtDataIBPairwise(1,:) = rtMeanIB(1,:) - rtMeanIB(3,:); % VI1
+    rtDataIBPairwise(2,:) = rtMeanIB(1,:) - rtMeanIB(4,:); % VI2
+    rtDataIBPairwise(3,:) = rtMeanIB(1,:) - rtMeanIB(2,:); % VN
+    rtDataIBPairwise(4,:) = rtMeanIB(2,:) - rtMeanIB(3,:); % NI1
+    rtDataIBPairwise(5,:) = rtMeanIB(2,:) - rtMeanIB(4,:); % NI2
+    
+    fprintf('RANDOMIZATION TESTS, invalid breakdown\n')
+    fprintf('Accuracy\n')
+    for iT = 1:nT
+        fprintf('T%d\n',iT)
+        for iVC = 1:5 % validity comparison
+            pIB(iVC,iT) = (nnz(R.accDataIBPairwise(iVC,iT,:) > accDataIBPairwise(iVC,iT)) + ...
+                nnz(R.accDataIBPairwise(iVC,iT,:) < -accDataIBPairwise(iVC,iT)))/R.nSamples;
+        end
+        
+        fprintf('valid vs. invalid1, p = %1.3f\n', pIB(1,iT))
+        fprintf('valid vs. invalid2, p = %1.3f\n', pIB(2,iT))
+        fprintf('valid vs. neutral, p = %1.3f\n', pIB(3,iT))
+        fprintf('neutral vs. invalid1, p = %1.3f\n', pIB(4,iT))
+        fprintf('neutral vs. invalid2, p = %1.3f\n\n', pIB(5,iT))
+    end
+    
+    fprintf('RT\n')
+    for iT = 1:nT
+        fprintf('T%d\n',iT)
+        for iVC = 1:5 % validity comparison
+            pIB(iVC,iT) = (nnz(R.rtDataIBPairwise(iVC,iT,:) < rtDataIBPairwise(iVC,iT)) + ...
+                nnz(R.rtDataIBPairwise(iVC,iT,:) > -rtDataIBPairwise(iVC,iT)))/R.nSamples;
+        end
+        
+        fprintf('valid vs. invalid1, p = %1.3f\n', pIB(1,iT))
+        fprintf('valid vs. invalid2, p = %1.3f\n', pIB(2,iT))
+        fprintf('valid vs. neutral, p = %1.3f\n', pIB(3,iT))
+        fprintf('neutral vs. invalid1, p = %1.3f\n', pIB(4,iT))
+        fprintf('neutral vs. invalid2, p = %1.3f\n\n', pIB(5,iT))
+    end
 end
 
 %% Effect size
