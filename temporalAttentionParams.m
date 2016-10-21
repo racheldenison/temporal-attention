@@ -62,7 +62,7 @@ p.imPos = [4 4];
 p.imSize = [4 4]; % this is the size of the image container that holds the stim
 p.targetSize = 0.5; % 0.5 sigma of gaussian / 1.5 side length of T/L / 1.5 width of triangle
 p.spatialFrequency = 4; % 4
-p.targetOrientation = [-2 2]; % eg. [-10 10]
+p.targetOrientation = [-1.5 1.5]; % eg. [-10 10]
 p.targetPhases = 0; % eg. 0, or [0 pi/2 pi 3*pi/2]
 p.TL = [0 0.5]; % [offset-for-T(=0) offset-for-L]
 p.TLLineWidth = 5; % (pixels)
@@ -106,7 +106,7 @@ switch p.rotateTarget
 end
 
 % Masks
-p.maskType = 'pseudotarget'; % none, whitenoise, verticalgrating, crossedgratings, filterednoise, bullseye, pseudotarget, h&vgratings
+p.maskType = 'none'; % none, whitenoise, verticalgrating, crossedgratings, filterednoise, bullseye, pseudotarget, h&vgratings
 p.maskContrast = 1;
 p.maskSFBand = [1/1.3 1.3]*p.spatialFrequency;
 p.forwardMask = [0 0]; % T1, T2     1 to use forward mask, 0 for no forward mask
