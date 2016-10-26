@@ -3,12 +3,28 @@
 %% setup
 e0 = load('data/E0_workspace_run09_N10_20160224.mat');
 e3 = load('data/E3_workspace_run09_N12_20160224.mat');
+e5 = load('data/E5_workspace_run01_N10_20160806.mat');
 
 pdata.e0 = e0.accDataCP;
 pdata.e3 = e3.pdData;
+% pdata.e5 = e5.accDataCP; 
+pdata.e5 = e5.accDataIBP([1 3 4],:,1:2); % VI1, VN, NI1 /// % VI1, VI2, VN, NI1, NI2
 
-expNames = fields(pdata);
+% expNames = fields(pdata);
+expNames = {'e0','e3','e5'};
+% expNames = {'e0','e3'};
 nExp = numel(expNames);
+
+%% correlation for each experiment
+for iE = 1:nExp
+    exp = expNames{iE};
+    fprintf('%s\n', exp)
+    vals = pdata.(exp);
+    [r p] = corr(vals(2,:,1)', vals(3,:,2)');
+    fprintf('T1b-T2c: r=%.3f, p=%.3f\n', r, p)
+    [r p] = corr(vals(3,:,1)', vals(2,:,2)');
+    fprintf('T1c-T2b: r=%.3f, p=%.3f\n', r, p)
+end
 
 %% normalize
 for iE = 1:nExp
@@ -16,10 +32,18 @@ for iE = 1:nExp
     pdatan.(exp) = zscore(pdata.(exp),0,2);
 end
 
-pdatanAll = cat(2, pdatan.e0, pdatan.e3);
+% if any(strcmp(expNames,'e5'))
+%     pdatan.e5 = pdatan.e5(:,:,1:2);
+% end
 
-[rT1bT2c pT1bT2c] = corr(pdatanAll(2,:,1)', pdatanAll(3,:,2)');
-[rT1cT2b pT1cT2b] = corr(pdatanAll(3,:,1)', pdatanAll(2,:,2)');
+pdatanAll = [];
+for iE = 1:nExp
+    exp = expNames{iE};
+    pdatanAll = cat(2, pdatanAll, pdatan.(exp));
+end
+
+[rT1bT2c pT1bT2c] = corr(pdatanAll(2,:,1)', pdatanAll(3,:,2)')
+[rT1cT2b pT1cT2b] = corr(pdatanAll(3,:,1)', pdatanAll(2,:,2)')
 
 %% benefit-cost index
 for iE = 1:nExp
@@ -29,17 +53,17 @@ for iE = 1:nExp
 end
 
 % normalize
+bcIndexNAll = [];
 for iE = 1:nExp
     exp = expNames{iE};
     bcIndexN.(exp) = zscore(bcIndex.(exp),0,2);
+    bcIndexNAll = cat(2, bcIndexNAll, bcIndexN.(exp));
 end
-
-bcIndexNAll = cat(2, bcIndexN.e0, bcIndexN.e3);
 
 [rBCIndex pBCIndex] = corr(bcIndexNAll(1,:)', bcIndexNAll(2,:)');
     
 %% plot
-colors = {'b','r'};
+colors = {'b','r','k'};
 
 %% T1 benefit vs. T2 cost
 figure
@@ -53,11 +77,11 @@ for iE = 1:nExp
     ylabel('T2 cost')
     title(exp)
     switch exp
-        case 'e0'
-            plot([-.2 .2],[0 0],'--k')
-            plot([0 0],[-.2 .2],'--k')
-            xlim([-.2 .2])
-            ylim([-.2 .2])
+        case {'e0','e5'}
+            plot([-.3 .3],[0 0],'--k')
+            plot([0 0],[-.3 .3],'--k')
+            xlim([-.3 .3])
+            ylim([-.3 .3])
         case 'e3'
             plot([-15 15],[0 0],'--k')
             plot([0 0],[-15 15],'--k')
@@ -93,11 +117,11 @@ for iE = 1:nExp
     ylabel('T2 benefit')
     title(exp)
     switch exp
-        case 'e0'
-            plot([-.2 .2],[0 0],'--k')
-            plot([0 0],[-.2 .2],'--k')
-            xlim([-.2 .2])
-            ylim([-.2 .2])
+        case {'e0','e5'}
+            plot([-.3 .3],[0 0],'--k')
+            plot([0 0],[-.3 .3],'--k')
+            xlim([-.3 .3])
+            ylim([-.3 .3])
         case 'e3'
             plot([-15 15],[0 0],'--k')
             plot([0 0],[-15 15],'--k')
