@@ -43,11 +43,14 @@ rtIdx = strcmp(trials_headers,'rt');
 correctIdx = strcmp(trials_headers,'correct');
 
 %% Clean RT if requested
+% ref: Whelan 2008 http://opensiuc.lib.siu.edu/cgi/viewcontent.cgi?article=1077&context=tpr
 if cleanRT
     rt0 = trials(:,rtIdx);
 %     cutoff = prctile(rt0,95);
-    q = prctile(rt0,[25 75]);
-    cutoff = q(2)+3*(q(2)-q(1));
+%     q = prctile(rt0,[25 75]); % interquartile range
+%     cutoff = q(2)+3*(q(2)-q(1));
+    sd = std(rt0);
+    cutoff = mean(rt0) + 3*sd;
     
     rt = rt0;
     rt(rt0 > cutoff) = NaN;

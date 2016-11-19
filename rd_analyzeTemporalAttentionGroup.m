@@ -11,7 +11,7 @@ soa2 = 1250;
 
 run = 9;
 
-normalizeData = 1;
+normalizeData = 0;
 
 saveFigs = 0;
 
@@ -62,6 +62,11 @@ for iSubject = 1:nSubjects
             rtDataC{iEL}(:,iSubject) = mean(results.rtMean{iEL},2);
         end
     end
+end
+
+% inverse efficiency
+for iEL = 1:2
+    invEffDataC{iEL} = rtDataC{iEL}./accDataC{iEL};
 end
 
 % summary across subjects

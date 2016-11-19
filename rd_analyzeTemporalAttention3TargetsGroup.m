@@ -43,7 +43,7 @@ for iSubject = 1:nSubjects
 %     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %     %%% if you want to reanalyze, do it here %%%
 %     T1T2Axis = 'same';
-%     [expt results] = rd_analyzeTemporalAttention(expt, 0, 0, 0, 0, T1T2Axis, 0);
+%     [expt results] = rd_analyzeTemporalAttention3Targets(expt, 0, 0, 0, 0, T1T2Axis, 0);
 %     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     nT = numel(expt.p.respInterval);
@@ -88,6 +88,11 @@ for iSubject = 1:nSubjects
         accDataIB{iT}(:,iSubject) = [ad([1 3]); invalid.accMean{iT,1}; invalid.accMean{iT,2}];
         rtDataIB{iT}(:,iSubject) = [rd([1 3]); invalid.rtMean{iT,1}; invalid.rtMean{iT,2}];
     end
+end
+
+% inverse efficiency
+for iT = 1:nT
+    invEffDataC{iT} = rtDataC{iT}./accDataC{iT};
 end
 
 %% Summary across subjects

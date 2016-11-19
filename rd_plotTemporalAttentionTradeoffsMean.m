@@ -7,7 +7,7 @@ e5 = load('data/E5_workspace_run01_N10_20160806.mat');
 
 % fractional benefits and costs?
 normalizeWithinTarget = 1;
-baselineOpt = 'condsum'; % 'vi','condsum'
+baselineOpt = 'vi'; % 'vi','condsum'
 
 % valid vs. invalid
 vi.e0 = squeeze(mean(e0.accDataCP(1,:,:),2));
@@ -19,7 +19,7 @@ vi12.e5 = squeeze(mean(e5.accDataIBP(1:2,:,:),2))'; % target x VI1/VI2
 % sum across conditions
 condsum.e0 = sum(e0.accMeanC)';
 condsum.e3 = sum(e3.paramsMean.sd)';
-condsum.e5 = sum(e3.accMeanC)';
+condsum.e5 = sum(e5.accMeanC)';
 
 condsum12.e5(:,1) = sum(e5.accMeanIB(1:3,:)); % I1
 condsum12.e5(:,2) = sum(e5.accMeanIB([1 2 4],:)); % I2
@@ -90,7 +90,7 @@ for iExp = 1:nExp
         bn = sprintf('%sb', tn{iT});
         benefit = bc.(expName).(bn);
         if normalizeWithinTarget
-            benefit = benefit/vi.(expName)(iT);
+            benefit = benefit/base.(expName)(iT);
         end
         nontargets = setdiff(alltargets,iT);
         for iNT = 1:numel(nontargets)
@@ -101,9 +101,9 @@ for iExp = 1:nExp
                 if strcmp(expName,'e5')
                     targets = setdiff(alltargets,nt);
                     idx = find(targets==iT);
-                    cost = cost/vi12.(expName)(nt,idx);
+                    cost = cost/base12.(expName)(nt,idx);
                 else
-                    cost = cost/vi.(expName)(nt);
+                    cost = cost/base.(expName)(nt);
                 end
             end
             pairedBC.(expName)(iT,:,iNT) = [benefit cost];
@@ -116,7 +116,8 @@ end
 colors = {'b','r','k'};
 % colors = {[97 47 255]/255,[255 4 0]/255,[255 177 6]/255};
 % colors = {[.1 .1 .1], [.4 .4 .4], [.7 .7 .7]};
-shapes = {'o','s','^'};
+% shapes = {'o','s','^'};
+shapes = {'o','^','s'};
 faceColors = {[1 1 1],[.5 .5 .5]};
 faceColors2 = colors;
 figure
@@ -162,6 +163,7 @@ plot(vals(:,1),vals(:,2),'.','color',colors{2})
 xlabel('benefit')
 ylabel('cost')
 
+% colors are experiments, benefit targets are shapes, cost targets are shading
 figure
 hold on
 for iExp = [1 3]
@@ -179,13 +181,58 @@ vals = pairedBC.e3;
 for iT = 1:size(pairedBC.e3,1)
     plot(vals(iT,1),vals(iT,2),shapes{iT},'color',colors{2})
 end
-xlabel('benefit')
-ylabel('cost')
+xlabel('benefit index')
+ylabel('cost index')
 xlim([-.4 1.2])
 ylim([-.4 1.2])
 set(gca,'XTick',[-.4 0 .4 .8 1.2])
 set(gca,'YTick',[-.4 0 .4 .8 1.2])
 axis square
+
+% colors are experiments, targets not differentiated
+figure
+hold on
+for iExp = [1 3]
+    expName = expNames{iExp};
+    for iT = 1:size(pairedBC.(expName),1)
+        for iNT = 1:size(pairedBC.(expName),3)
+            vals = pairedBC.(expName)(:,:,iNT);
+            plot(vals(iT,1),vals(iT,2),'.','color',colors{iExp})
+        end
+    end
+end
+vals = pairedBC.e3;
+for iT = 1:size(pairedBC.e3,1)
+    plot(vals(iT,1),vals(iT,2),'.','color',colors{2})
+end
+xlabel('benefit index')
+ylabel('cost index')
+xlim([-.4 1.2])
+ylim([-.4 1.2])
+set(gca,'XTick',[-.4 0 .4 .8 1.2])
+set(gca,'YTick',[-.4 0 .4 .8 1.2])
+axis square
+
+x = allPaired(:,1); y = allPaired(:,2);
+stats = regstats(y,x,'linear','beta');
+% same as predint simultaneous functional confidence bounds in later matlab versions
+[top, bot] = regression_line_ci(.05,stats.beta,x,y,100,-.4,1.2);
+
+figure 
+hold on
+plot(x,y,'.')
+xx = linspace(-.4,1.2,101);
+l = stats.beta(2)*xx + stats.beta(1);
+plot(xx,l)
+plot(xx,top)
+plot(xx,bot)
+plot(xx,xx,'k--')
+xlim([-.4 1.2])
+ylim([-.4 1.2])
+set(gca,'XTick',[-.4 0 .4 .8 1.2])
+set(gca,'YTick',[-.4 0 .4 .8 1.2])
+axis square
+
 
 figure
 hold on
@@ -199,7 +246,7 @@ for iExp = [1 3]
             nt = nontargets(iNT);
 %             vals = pairedBC.(expName)(:,:,iNT)/max(discrimPairedBC(:));
             vals = pairedBC.(expName)(:,:,iNT);
-            plot(vals(iT,1),vals(iT,2),shapes{iExp},'color',colors{iT},'MarkerFaceColor',faceColors2{nt},'LineWidth',1.5,'MarkerSize',10)
+            plot(vals(iT,1),vals(iT,2),shapes{iExp},'color',colors{nt},'MarkerFaceColor',faceColors2{iT},'LineWidth',1.5,'MarkerSize',10)
         end
     end
 end
@@ -208,10 +255,10 @@ vals = pairedBC.e3;
 for iT = 1:size(pairedBC.e3,1)
     nontargets = setdiff([1 2],iT);
     nt = nontargets;
-    plot(vals(iT,1),vals(iT,2),shapes{2},'color',colors{iT},'MarkerFaceColor',faceColors2{nt},'LineWidth',1.5,'MarkerSize',10)
+    plot(vals(iT,1),vals(iT,2),shapes{2},'color',colors{nt},'MarkerFaceColor',faceColors2{iT},'LineWidth',1.5,'MarkerSize',10)
 end
-xlabel('benefit')
-ylabel('cost')
+xlabel('benefit index')
+ylabel('cost index')
 xlim([-.4 1.2])
 ylim([-.4 1.2])
 set(gca,'XTick',[-.4 0 .4 .8 1.2])
