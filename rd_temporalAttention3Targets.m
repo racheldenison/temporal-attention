@@ -1077,7 +1077,8 @@ if p.eyeTracking
     
     % rename eye file
     eyeFileFull = sprintf('%s/%s_TemporalAttention3Targets_%s.edf', eyeDataDir, subjectID, datestr(now, 'yyyymmdd'));
-    movefile(sprintf('%s/%s.edf', eyeDataDir, eyeFile), eyeFileFull)
+%     movefile(sprintf('%s/%s.edf', eyeDataDir, eyeFile), eyeFileFull)
+    copyfile(sprintf('%s/%s.edf', eyeDataDir, eyeFile), eyeFileFull)
 end
 
 %% Clean up

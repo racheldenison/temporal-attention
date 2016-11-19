@@ -62,14 +62,14 @@ p.imPos = [4 4];
 p.imSize = [4 4]; % this is the size of the image container that holds the stim
 p.targetSize = 0.5; % 0.5 sigma of gaussian / 1.5 side length of T/L / 1.5 width of triangle
 p.spatialFrequency = 4; % 4
-p.targetOrientation = [-2 2]; % eg. [-10 10]
+p.targetOrientation = [-2.5 2.5]; % eg. [-10 10]
 p.targetPhases = 0; % eg. 0, or [0 pi/2 pi 3*pi/2]
 p.TL = [0 0.5]; % [offset-for-T(=0) offset-for-L]
 p.TLLineWidth = 5; % (pixels)
 p.triangleBlurProp = 0.3;
 p.triHWRatio = 1; % should be >= 1 so that targetSize corresponds to triangle width
 p.extraOblTilt = [-5 5];
-p.tiltJitter = 1;
+p.tiltJitter = 0;
 
 % Staircase (implemented only for targetOrientation for now)
 p.staircase = 0;
@@ -89,7 +89,7 @@ end
 % target rotation
 switch p.task
     case 'targetOrientation'
-        p.rotateTarget = 'cb'; % 'none','rotT2'= rotate T2 90 deg, 'rotT1' = rotate T1 90 deg, 'cb'= counterbalanced vert/horiz, 'cbvar'= cb with tilt variability, 'cbvark'= cb with +/-k tilt variability, 'cardobl'= cardinal + oblique orientations, 'card4'= 4 cardinal directions (triangle), 'card4wap'= like card4 but rotate the entire aperture ("card4 w/ aperture")
+        p.rotateTarget = 'cb'; % 'none','rotT2'= rotate T2 90 deg, 'rotT1' = rotate T1 90 deg, 'cb'= counterbalanced vert/horiz, 'cbvar'= cb with tilt variability, 'cbvark'= cb with +/-k tilt variability, 'cardobl'= cardinal + oblique orientations, 'card4'= 4 cardinal directions (triangle), 'card4wap'= like card4 but rotate the entire aperture ("card4 w/ aperture"), 'vh'
     case 'spatialFrequency'
         p.rotateTarget = 'random'; % random rotations
     case 'TL'
@@ -106,7 +106,7 @@ switch p.rotateTarget
 end
 
 % Masks
-p.maskType = 'pseudotarget'; % none, whitenoise, verticalgrating, crossedgratings, filterednoise, bullseye, pseudotarget, h&vgratings
+p.maskType = 'none'; % none, whitenoise, verticalgrating, crossedgratings, filterednoise, bullseye, pseudotarget, h&vgratings
 p.maskContrast = 1;
 p.maskSFBand = [1/1.3 1.3]*p.spatialFrequency;
 p.forwardMask = [0 0]; % T1, T2     1 to use forward mask, 0 for no forward mask

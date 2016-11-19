@@ -31,7 +31,7 @@ p.font = 'Verdana';
 p.fontSize = 24;
 p.showPlaceholders = 1;
 p.phLineWidth = 2; % (pixels)
-p.eyeRad = 1.5; % allowed fixation radius (degrees)    
+p.eyeRad = 1.5; %1.5; % allowed fixation radius (degrees)    
 
 % Condition
 p.targetContrasts = 1; % [.64 1] [.16 .64];
@@ -84,7 +84,7 @@ end
 % target rotation
 switch p.task
     case 'targetOrientation'
-        p.rotateTarget = 'vh'; % 'none','random','cb'= counterbalanced vert/horiz,'vh'= vert/horiz not fully counterbalanced
+        p.rotateTarget = 'cb'; % 'none','random','cb'= counterbalanced vert/horiz,'vh'= vert/horiz not fully counterbalanced
     case 'spatialFrequency'
         p.rotateTarget = 'random'; % random rotations
 end
