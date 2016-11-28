@@ -135,12 +135,12 @@ for iM = 1:numel(measures)
     
     fprintf('Wilcoxon sign-rank test\n')
     % distribution should be symmetric about median
-    [pvi hvi svi] = signrank(vals(1,:),vals(2,:)); % to return z-value, include 'method','approximate'
-    [pvn hvn svn] = signrank(vals(1,:),vals(3,:));
-    [pni hni sni] = signrank(vals(2,:),vals(3,:));
-    fprintf('valid vs. invalid, p = %1.4f\n', pvi)
-    fprintf('valid vs. neutral, p = %1.4f\n', pvn)
-    fprintf('neutral vs. invalid, p = %1.4f\n\n', pni)
+    [pvi hvi svi] = signrank(vals(1,:),vals(2,:),'method','approximate'); % to return z-value, include 'method','approximate'
+    [pvn hvn svn] = signrank(vals(1,:),vals(3,:),'method','approximate');
+    [pni hni sni] = signrank(vals(2,:),vals(3,:),'method','approximate');
+    fprintf('valid vs. invalid, Z = %1.3f, p = %1.4f\n', svi.zval, pvi)
+    fprintf('valid vs. neutral, Z = %1.3f, p = %1.4f\n', svn.zval, pvn)
+    fprintf('neutral vs. invalid, Z = %1.3f, p = %1.4f\n\n', sni.zval, pni)
     
     fprintf('Sign test\n')
     [pvi] = signtest(vals(1,:),vals(2,:)); % to return z-value, include 'method','approximate'

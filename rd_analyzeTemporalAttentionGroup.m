@@ -62,6 +62,13 @@ for iSubject = 1:nSubjects
             rtDataC{iEL}(:,iSubject) = mean(results.rtMean{iEL},2);
         end
     end
+    
+    % calculate dprime and criterion, ignoring contrast
+    [dprime, criterion] = rd_dprimeTemporalAttention(expt.trials, expt.trials_headers);
+    for iEL = 1:2
+        dprimeDataC{iEL}(:,iSubject) = dprime(:,iEL);
+        critDataC{iEL}(:,iSubject) = criterion(:,iEL);
+    end
 end
 
 % inverse efficiency
@@ -112,6 +119,11 @@ else
         accSteC(:,iEL) = std(accDataC{iEL},0,2)./sqrt(nSubjects);
         rtMeanC(:,iEL) = mean(rtDataC{iEL},2);
         rtSteC(:,iEL) = std(rtDataC{iEL},0,2)./sqrt(nSubjects);
+        
+        dprimeMeanC(:,iEL) = mean(dprimeDataC{iEL},2);
+        dprimeSteC(:,iEL) = std(dprimeDataC{iEL},0,2)./sqrt(nSubjects);
+        critMeanC(:,iEL) = mean(critDataC{iEL},2);
+        critSteC(:,iEL) = std(critDataC{iEL},0,2)./sqrt(nSubjects);
     end
 end
 
@@ -266,6 +278,45 @@ for iRI = 1:numel(p.respInterval)
     rd_raiseAxis(gca);
 end
 
+figure;
+for iRI = 1:numel(p.respInterval)
+    subplot(1,numel(p.respInterval),iRI);
+    
+    p1 = bar(repmat((1:nSubjects)',1,nCV),...
+        dprimeDataC{iRI}(idx,:)');
+    colormap(flag(nCV));
+
+    set(gca,'XTick',1:nSubjects)
+    xlabel('subject')
+    ylabel('dprime')
+    legend(p1, cueNames(idx),'location','best')
+    title(intervalNames{iRI})
+    xlim(xlims)
+    ylim([0 3])
+    rd_supertitle(sprintf('%s run %d, N=%d', exptStr, run, nSubjects));
+    rd_raiseAxis(gca);
+end
+
+figure;
+for iRI = 1:numel(p.respInterval)
+    subplot(1,numel(p.respInterval),iRI);
+    hold on
+    
+    b1 = bar(1:nCV, dprimeMeanC(idx,iRI),'FaceColor',[.5 .5 .5]);
+    p1 = errorbar(1:nCV, dprimeMeanC(idx,iRI)', dprimeSteC(idx,iRI)','k','LineStyle','none');
+    
+    set(gca,'XTick',1:nCV)
+    set(gca,'XTickLabel', cueNames(idx))
+    xlabel('cue validity')
+    ylabel('dprime')
+    title(intervalNames{iRI})
+    ylim([0 max(dprimeMeanC(:))*1.3])
+%     ylim([.3 .9])
+    box off
+    rd_supertitle(sprintf('%s run %d, ave across contrasts, N=%d', exptStr, run, nSubjects));
+    rd_raiseAxis(gca);
+end
+
 % all contrasts separately
 contrastLims = [p.targetContrasts(1)-0.05 p.targetContrasts(end)+0.05];
 fig(7) = figure;
@@ -351,6 +402,7 @@ rt_all = [rt1; rt2];
 %% Collapsing across T1/T2
 accDataCT = (accDataC{1} + accDataC{2})/2;
 rtDataCT = (rtDataC{1} + rtDataC{2})/2;
+dprimeDataCT = (dprimeDataC{1} + dprimeDataC{2})/2;
 
 accMeanCT = mean(accDataCT,2);
 rtMeanCT = mean(rtDataCT,2);
@@ -358,7 +410,8 @@ rtMeanCT = mean(rtDataCT,2);
 %% Quick stats
 for iEL = 1:2
     fprintf('T%d\n',iEL)
-    vals = accDataC{iEL};
+%     vals = accDataC{iEL};
+    vals = dprimeDataC{iEL};
     [hvi pvi cvi svi] = ttest(vals(1,:),vals(2,:));
     [hvn pvn cvn svn] = ttest(vals(1,:),vals(3,:));
     [hni pni cni sni] = ttest(vals(2,:),vals(3,:));

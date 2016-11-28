@@ -53,9 +53,9 @@ for iExp = 1:nExp
     for iT = 1:numel(tn)
         bn = sprintf('%sb', tn{iT});
         benefit = bc.(expName).(bn);
-        if normalizeWithinTarget
-            benefit = benefit./vi.(expName)(:,:,iT);
-        end
+%         if normalizeWithinTarget
+%             benefit = benefit./vi.(expName)(:,:,iT);
+%         end
         nontargets = setdiff(alltargets,iT);
         for iNT = 1:numel(nontargets)
             nt = nontargets(iNT);
@@ -66,8 +66,10 @@ for iExp = 1:nExp
                     targets = setdiff(alltargets,nt);
                     idx = find(targets==iT);
                     cost = cost./vi12.(expName)(idx,:,nt);
+                    benefit = benefit./vi12.(expName)(iNT,:,iT);
                 else
                     cost = cost./vi.(expName)(:,:,nt);
+                    benefit = benefit./vi.(expName)(:,:,iT);
                 end
             end
             pairedBC.(expName)(:,:,iT,iNT) = [benefit' cost'];

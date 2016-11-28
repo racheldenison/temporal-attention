@@ -1,4 +1,4 @@
-% rd_plotTemporalAttentionTradeoffsMean.m
+function [pairedBC, pairNames, stackedBC, stackedNames] = rd_plotTemporalAttentionTradeoffsMean2
 
 %% setup
 e0 = load('data/E0_workspace_run09_N10_20160224.mat');
@@ -9,6 +9,45 @@ e5 = load('data/E5_workspace_run01_N10_20160806.mat');
 normalizeWithinTarget = 1;
 baselineOpt = 'vi'; % 'vi','condsum'
 
+% bootstrap error bars?
+resample = 1;
+
+plotFigs = 0;
+
+%% resample if requested
+% currently does not include condsum
+if resample
+    e0.accDataCP0 = e0.accDataCP;
+    for iT = 1:size(e0.accDataCP,3)
+        for iP = 1:size(e0.accDataCP,1)
+            vals = e0.accDataCP(iP,:,iT);
+            e0.accDataCP(iP,:,iT) = RandSample(vals,size(vals));
+        end
+    end
+    e3.pdData0 = e3.pdData;
+    for iT = 1:size(e3.pdData,3) 
+        for iP = 1:size(e3.pdData,1)
+            vals = e3.pdData(iP,:,iT);
+            e3.pdData(iP,:,iT) = RandSample(vals,size(vals));
+        end
+    end
+    e5.accDataCP0 = e5.accDataCP;
+    for iT = 1:size(e5.accDataCP,3)
+        for iP = 1:size(e5.accDataCP,1)
+            vals = e5.accDataCP(iP,:,iT);
+            e5.accDataCP(iP,:,iT) = RandSample(vals,size(vals));
+        end
+    end
+    e5.accDataIBP0 = e5.accDataIBP;
+    for iT = 1:size(e5.accDataIBP,3)
+        for iP = 1:size(e5.accDataIBP,1)
+            vals = e5.accDataIBP(iP,:,iT);
+            e5.accDataIBP(iP,:,iT) = RandSample(vals,size(vals));
+        end
+    end
+end
+
+%% get data
 % valid vs. invalid
 vi.e0 = squeeze(mean(e0.accDataCP(1,:,:),2));
 vi.e3 = squeeze(mean(e3.pdData(1,:,:),2));
@@ -87,13 +126,10 @@ for iExp = 1:nExp
     tn = targetNames.(expName);
     alltargets = 1:numel(tn);
     for iT = 1:numel(tn)
-        bn = sprintf('%sb', tn{iT});
-        benefit = bc.(expName).(bn);
-        if normalizeWithinTarget
-            benefit = benefit/base.(expName)(iT);
-        end
         nontargets = setdiff(alltargets,iT);
         for iNT = 1:numel(nontargets)
+            bn = sprintf('%sb', tn{iT});
+            benefit = bc.(expName).(bn);
             nt = nontargets(iNT);
             cn = sprintf('%sc_cue%s',tn{nt},tn{iT});
             cost = bc.(expName).(cn);
@@ -101,8 +137,10 @@ for iExp = 1:nExp
                 if strcmp(expName,'e5')
                     targets = setdiff(alltargets,nt);
                     idx = find(targets==iT);
+                    benefit = benefit/base12.(expName)(iT,iNT);
                     cost = cost/base12.(expName)(nt,idx);
                 else
+                    benefit = benefit/base.(expName)(iT);
                     cost = cost/base.(expName)(nt);
                 end
             end
@@ -118,22 +156,19 @@ for iExp = 1:nExp
     tn = targetNames.(expName);
     alltargets = 1:numel(tn);
     for iT = 1:numel(tn)
-        bn = sprintf('%sb', tn{iT});
-        benefit = bc.(expName).(bn);
-        if normalizeWithinTarget
-            benefit = benefit/base.(expName)(iT);
-        end
         nontargets = setdiff(alltargets,iT);
         for iNT = 1:numel(nontargets)
+            bn = sprintf('%sb', tn{iT});
+            benefit = bc.(expName).(bn);
             nt = nontargets(iNT);
             cn = sprintf('%sc_cue%s',tn{iT},tn{nt});
             cost = bc.(expName).(cn);
             if normalizeWithinTarget
                 if strcmp(expName,'e5')
-%                     targets = setdiff(alltargets,nt);
-%                     idx = find(targets==iT);
+                    benefit = benefit/base12.(expName)(iT,iNT);
                     cost = cost/base12.(expName)(iT,iNT);
                 else
+                    benefit = benefit/base.(expName)(iT);
                     cost = cost/base.(expName)(iT);
                 end
             end
@@ -143,6 +178,8 @@ for iExp = 1:nExp
     end
 end
 
+%% plot figs
+if plotFigs
 %% plot scatterplots
 colors = {'b','r','k'};
 % colors = {[97 47 255]/255,[255 4 0]/255,[255 177 6]/255};
@@ -258,21 +295,24 @@ figure
 x = allPaired(:,1); y = allPaired(:,2);
 stats = regstats(y,x,'linear','beta');
 % same as predint simultaneous functional confidence bounds in later matlab versions
-[top, bot] = regression_line_ci(.05,stats.beta,x,y,100,-.4,1.2);
+[top, bot] = regression_line_ci(.05,stats.beta,x,y,100,min(x),max(x));
 
+lims = [-.4 1.6];
+% ticks = lims(1):.4:lims(end);
+ticks = [0 .5 1 1.5];
 figure 
 hold on
 plot(x,y,'.')
-xx = linspace(-.4,1.2,101);
+xx = linspace(min(x),max(x),101);
 l = stats.beta(2)*xx + stats.beta(1);
 plot(xx,l)
 plot(xx,top)
 plot(xx,bot)
-plot(xx,xx,'k--')
-xlim([-.4 1.2])
-ylim([-.4 1.2])
-set(gca,'XTick',[-.4 0 .4 .8 1.2])
-set(gca,'YTick',[-.4 0 .4 .8 1.2])
+plot(lims,lims,'k--')
+xlim(lims)
+ylim(lims)
+set(gca,'XTick',ticks)
+set(gca,'YTick',ticks)
 axis square
 
 % colors are experiments, targets not differentiated
@@ -291,13 +331,13 @@ end
 plot(xx,l)
 plot(xx,top)
 plot(xx,bot)
-plot(xx,xx,'k--')
+plot(lims,lims,'k--')
 xlabel('benefit index')
 ylabel('cost index')
-xlim([-.4 1.2])
-ylim([-.4 1.2])
-set(gca,'XTick',[-.4 0 .4 .8 1.2])
-set(gca,'YTick',[-.4 0 .4 .8 1.2])
+xlim(lims)
+ylim(lims)
+set(gca,'XTick',ticks)
+set(gca,'YTick',ticks)
 axis square
 
 %% plot benefit/cost bar graphs for each experiment
@@ -350,13 +390,13 @@ for iExp = 1:nExp
     
     vals = pairedBC.(expName);
     vals(:,2,:) = -1*vals(:,2,:); % make costs negative
-    bcave = mean(vals,3); % average costs across targets
+    bcave = mean(vals,3); % average benefits and costs across targets
     
     % order benefits and costs according to target number
     if size(vals,3)==1
         pp = vals(:,:,1);
     else
-        pp = [vals(:,1,1) bcave(:,2) vals(:,2,1) vals(:,2,2)];
+        pp = [bcave vals(:,2,1) vals(:,2,2)];
     end
 
     figure
@@ -365,18 +405,23 @@ for iExp = 1:nExp
 end
 
 % stacked bars
-vals = pairedBC.(expName);
-t1b_t1c_cuet2 = [vals(1,1,1) vals(2,2,1)];
-t2b_t2c_cuet1 = [vals(2,1,1) vals(1,2,1)];
-t1b_t1c_cuet3 = [vals(1,1,1) vals(3,2,1)];
-t3b_t3c_cuet1 = [vals(3,1,1) vals(1,2,2)];
-t2b_t2c_cuet3 = [vals(2,1,1) vals(3,2,2)];
-t3b_t3c_cuet2 = [vals(3,1,1) vals(2,2,2)];
-
-stackGroups(:,:,1) = [t1b_t1c_cuet2; t2b_t2c_cuet1];
-stackGroups(:,:,2) = [t1b_t1c_cuet3; t3b_t3c_cuet1];
-stackGroups(:,:,3) = [t2b_t2c_cuet3; t3b_t3c_cuet2];
-
-
-
-
+for iExp = 1:nExp
+    expName = expNames{iExp};
+    vals = stackedBC.(expName);
+    if strcmp(expName,'e5')
+        sets = {[1 2],[1 3],[2 3]};
+    else
+        sets = {[1 2]};
+    end
+    
+    figure
+    for ip = 1:numel(sets)
+        s = sets{ip};
+        v(1,:) = vals(s(1),:,s(2));
+        v(2,:) = vals(s(2),:,s(1));
+        subplot(1,numel(sets),ip)
+        bar(fliplr(v),'stacked')
+        ylim([-.3 1.3])
+    end
+end
+end

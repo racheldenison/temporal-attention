@@ -10,7 +10,7 @@ soa2 = 1250;
 
 run = 9;
 
-nSamples = 10000;
+nSamples = 1000;
 % shuffleLabels = {'targetContrast','respInterval','cueValidity'};
 shuffleLabels = {'cueValidity'};
 

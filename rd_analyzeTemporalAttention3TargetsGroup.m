@@ -21,7 +21,7 @@ nSubjects = numel(subjectInits);
 % dataDir = pathToExpt('data');
 % dataDir = [pathToExpt('data') '/pilot/rd'];
 
-doRandomizationTests = 1; % requries having generated empirical null distributions
+doRandomizationTests = 0; % requries having generated empirical null distributions
 
 %% Get data
 for iSubject = 1:nSubjects 
@@ -55,8 +55,10 @@ for iSubject = 1:nSubjects
         
         % replace accData with dprime if requested
         if doDprime
-            accData{iT}(:,iSubject) = ...
-                rd_dprime(accData{iT}(:,iSubject),[],'2afc','adjust');
+%             accData{iT}(:,iSubject) = ...
+%                 rd_dprime(accData{iT}(:,iSubject),[],'2afc','adjust');
+            [dprime, criterion] = rd_dprimeTemporalAttention(expt.trials, expt.trials_headers);
+            accData{iT}(:,iSubject) = dprime(:,iT);
         end
     end
     
@@ -72,8 +74,10 @@ for iSubject = 1:nSubjects
         
         % replace accData with dprime if requested
         if doDprime
-            accDataC{iT}(:,iSubject) = ...
-                rd_dprime(accDataC{iT}(:,iSubject),[],'2afc','adjust');
+%             accDataC{iT}(:,iSubject) = ...
+%                 rd_dprime(accDataC{iT}(:,iSubject),[],'2afc','adjust');
+            [dprime, criterion] = rd_dprimeTemporalAttention(expt.trials, expt.trials_headers);
+            accDataC{iT}(:,iSubject) = dprime(:,iT);
         end
     end
     %     end
@@ -191,7 +195,8 @@ tc = p.targetContrasts(contrastIdx)*100;
 %% Plot figs
 intervalNames = {'T1','T2','T3'};
 cueNames = {'valid','invalid','neutral'};
-accLims = [0.4 1];
+% accLims = [0.4 1];
+accLims = [0 3];
 rtLims = [0.3 1.4]; 
 xlims = [0 nSubjects+1];
 colors = get(0,'DefaultAxesColorOrder');
@@ -305,7 +310,7 @@ for iRI = 1:numel(p.respInterval)
     ylabel('acc')
     title(intervalNames{iRI})
     ylim([0.3 max(accMeanC(:))*1.1])
-    ylim([.3 .9])
+%     ylim([.3 .9])
     box off
     rd_supertitle(sprintf('%s run %d, ave across contrasts, N=%d', exptName, run, nSubjects));
     rd_raiseAxis(gca);
