@@ -1,4 +1,4 @@
-function [pairedBC, pairNames, stackedBC, stackedNames] = rd_plotTemporalAttentionTradeoffsMean2
+function [pairedBC, pairNames, stackedBC, stackedNames] = rd_plotTemporalAttentionTradeoffsMean2(sample)
 
 %% setup
 e0 = load('data/E0_workspace_run09_N10_20160224.mat');
@@ -7,16 +7,27 @@ e5 = load('data/E5_workspace_run01_N10_20160806.mat');
 
 % fractional benefits and costs?
 normalizeWithinTarget = 1;
-baselineOpt = 'vi'; % 'vi','condsum'
+baselineOpt = 'neut'; % 'vi','condsum','neut'
 
-% bootstrap error bars?
-resample = 1;
+% for generating pairedBC bootstrap error bars or null distributions with
+% rd_resampleTemporalAttentionTradeoffs
+% to plot real data, turn these OFF
+resampleSubjects = 0; % draws one resample from subject data
+resampleTrials = 0; % loads one resample from pre-saved data file
+resampleOption = 'bootstrap'; % 'bootstrap','permutation'
+
+% for plotting bootstrap error bars that have been generated previously
+% must load below
+bootstrapErrorBars = 0;
+
+% for randomization stats
+doRandomizationStats = 0;
 
 plotFigs = 0;
 
 %% resample if requested
 % currently does not include condsum
-if resample
+if resampleSubjects
     e0.accDataCP0 = e0.accDataCP;
     for iT = 1:size(e0.accDataCP,3)
         for iP = 1:size(e0.accDataCP,1)
@@ -47,6 +58,43 @@ if resample
     end
 end
 
+if resampleTrials
+    switch resampleOption
+        case 'bootstrap'
+            % load bootstrap workspace, overwrites previous e0, e3, e5
+            e0 = load('data/E0_resample_workspace_bootstrap_20161128.mat');
+            accDataCP = e0.accDataCPairwise(:,:,sample);
+            e0.accDataCP = reshape(accDataCP,[3,1,2]);
+            
+            e3 = load('data/E3_resample_workspace_bootstrap_20161128.mat');
+            pdData = e3.pd(:,:,2,sample);
+            e3.pdData = reshape(pdData,[3,1,2]);
+            
+            e5 = load('data/E5_resample_workspace_bootstrap_20161128.mat');
+            accDataCP = e5.accDataCPairwise(:,:,sample);
+            accDataIBP = e5.accDataIBPairwise(:,:,sample);
+            e5.accDataCP = reshape(accDataCP,[3,1,3]);
+            e5.accDataIBP = reshape(accDataIBP,[5,1,3]);
+        case 'permutation'
+            % load randomization workspace, overwrites previous e0, e3, e5
+            e0 = load('data/E0_randomizationTest_workspace_run09_N10_20160107b.mat');
+            accDataCP = e0.accDataCPairwise(:,:,sample);
+            e0.accDataCP = reshape(accDataCP,[3,1,2]);
+            
+            e3 = load('data/adjust_randomizationTest_workspace_run09_N12_20160108.mat');
+            pdData = e3.pd(:,:,2,sample);
+            e3.pdData = reshape(pdData,[3,1,2]);
+            
+            e5 = load('data/E5_randomizationTest_workspace_run01_IB_N10_20160822.mat');
+            accDataCP = e5.accDataCPairwise(:,:,sample);
+            accDataIBP = e5.accDataIBPairwise(:,:,sample);
+            e5.accDataCP = reshape(accDataCP,[3,1,3]);
+            e5.accDataIBP = reshape(accDataIBP,[5,1,3]);
+        otherwise
+            error('resampleOption not recognized')
+    end
+end
+
 %% get data
 % valid vs. invalid
 vi.e0 = squeeze(mean(e0.accDataCP(1,:,:),2));
@@ -55,13 +103,23 @@ vi.e5 = squeeze(mean(e5.accDataCP(1,:,:),2));
 
 vi12.e5 = squeeze(mean(e5.accDataIBP(1:2,:,:),2))'; % target x VI1/VI2
 
-% sum across conditions
-condsum.e0 = sum(e0.accMeanC)';
-condsum.e3 = sum(e3.paramsMean.sd)';
-condsum.e5 = sum(e5.accMeanC)';
-
-condsum12.e5(:,1) = sum(e5.accMeanIB(1:3,:)); % I1
-condsum12.e5(:,2) = sum(e5.accMeanIB([1 2 4],:)); % I2
+if ~resampleSubjects && ~resampleTrials
+    % sum across conditions
+    condsum.e0 = sum(e0.accMeanC)';
+    condsum.e3 = sum(e3.paramsMean.sd)';
+    condsum.e5 = sum(e5.accMeanC)';
+    
+    condsum12.e5(:,1) = sum(e5.accMeanIB(1:3,:)); % I1
+    condsum12.e5(:,2) = sum(e5.accMeanIB([1 2 4],:)); % I2
+    
+    % neutral
+    neut.e0 = e0.accMeanC(3,:)';
+    neut.e3 = e3.paramsMean.sd(3,:)';
+    neut.e5 = e5.accMeanC(3,:)';
+    
+    neut12.e5(:,1) = e5.accMeanIB(2,:)'; % I1, same as neut.e5
+    neut12.e5(:,2) = e5.accMeanIB(2,:)'; % I2, same as neut.e5    
+end
 
 % set baseline
 base = eval(baselineOpt);
@@ -364,7 +422,27 @@ for iExp = 1:nExp
     bar(pp)
 end
     
-% average costs across targets
+%% average costs across targets
+if bootstrapErrorBars
+    ciType = 68;
+    switch ciType
+        case 95
+            ci = load('data/E0_resample_workspace_bootstrapPairedBC_20161128.mat','pairedBCCI');
+            pairedBCCI.e0 = ci.pairedBCCI.e0;
+            
+            ci = load('data/E3_resample_workspace_bootstrapPairedBC_20161128.mat','pairedBCCI');
+            pairedBCCI.e3 = ci.pairedBCCI.e3;
+            
+            ci = load('data/E5_resample_workspace_bootstrapPairedBC_20161128.mat','pairedBCAveCI');
+            pairedBCCI.e5 = ci.pairedBCAveCI.e5;
+        case 68
+            ci = load('data/E0E3E5_resample_workspace_bootstrapPairedBC_CI68_20161128.mat','pairedBCCI','pairedBCAveCI');
+            pairedBCCI.e0 = ci.pairedBCCI.e0;
+            pairedBCCI.e3 = ci.pairedBCCI.e3;
+            pairedBCCI.e5 = ci.pairedBCAveCI.e5;
+    end
+end
+
 for iExp = 1:nExp
     expName = expNames{iExp};
     tn = targetNames.(expName);
@@ -377,11 +455,34 @@ for iExp = 1:nExp
     bcave = mean(vals,3); % average costs across targets
     
     figure
-    bar(bcave)
+    hold on
+    h = bar(bcave);
     ylim([-1.2 1.2])
+        
+    if bootstrapErrorBars
+        eb = pairedBCCI.(expName);
+        eb(:,2,:) = -1*eb(:,2,:); % make costs negative
+        
+        for iT = 1:nTargets
+            for iBC = 1:2
+                xdata=get(get(h(iBC),'Children'),'XData');
+                x=xdata(1,iT)+(xdata(3,iT)-xdata(1,iT))/2;
+                y = bcave(iT,iBC);
+                l = eb(iT,iBC,1)-y;
+                u = eb(iT,iBC,2)-y;
+                if iBC==2 % flip error bars for costs
+                    ltemp = l;
+                    l = u;
+                    u = ltemp;
+                end
+                
+                errorbar(x,y,l,u);
+            end
+        end
+    end
 end
 
-% average across targets plus costs for each target
+%% average across targets plus costs for each target
 for iExp = 1:nExp
     expName = expNames{iExp};
     tn = targetNames.(expName);
@@ -404,7 +505,7 @@ for iExp = 1:nExp
     ylim([-1 1])
 end
 
-% stacked bars
+%% stacked bars
 for iExp = 1:nExp
     expName = expNames{iExp};
     vals = stackedBC.(expName);
@@ -425,3 +526,27 @@ for iExp = 1:nExp
     end
 end
 end
+
+%% Randomization stats
+if doRandomizationStats
+    R = load('data/E0E3E5_resample_workspace_permutationPairedBC_20161128.mat');
+    
+    for iExp = 1:nExp
+        expName = expNames{iExp};
+        tn = targetNames.(expName);
+        nTargets = numel(tn);
+        for iT = 1:nTargets
+            for iBC = 1:2
+                if strcmp(expName,'e5')
+                    val = mean(pairedBC.(expName)(iT,iBC,:),3); % mean across non-targets
+                    nullDist = squeeze(R.pairedBCAveSamples.(expName)(iT,iBC,:));
+                else
+                    val = pairedBC.(expName)(iT,iBC);
+                    nullDist = squeeze(R.pairedBCSamples.(expName)(iT,iBC,:));
+                end
+                pval.(expName)(iT,iBC) = nnz(abs(nullDist)>abs(val))/numel(nullDist);
+            end
+        end
+    end
+end
+

@@ -10,10 +10,21 @@ nExp = numel(expNames);
 
 normalizeData = 1;
 
+measureOption = 'rt-g'; % 'acc-sd','rt-g'
+
 %% get data
-groupData.e0 = e0.accDataCT;
-groupData.e3 = squeeze(mean(e3.paramsData.sd,2));
-groupData.e5 = e5.accDataCT;
+switch measureOption
+    case 'acc-sd'
+        groupData.e0 = e0.accDataCT;
+        groupData.e3 = squeeze(mean(e3.paramsData.sd,2));
+        groupData.e5 = e5.accDataCT;
+    case 'rt-g'
+        groupData.e0 = e0.rtDataCT;
+        groupData.e3 = squeeze(mean(e3.paramsData.g,2));
+        groupData.e5 = e5.rtDataCT;
+    otherwise
+        error('measureOption not recognized')
+end
 
 %% summarize data, with normalization option
 for iExp = 1:nExp
@@ -37,9 +48,16 @@ for iExp = 1:nExp
 end
 
 %% plot
-ylims.e0 = [.5 .9];
-ylims.e3 = [6 20];
-ylims.e5 = [.5 .9];
+switch measureOption
+    case 'acc-sd'
+        ylims.e0 = [.5 .9];
+        ylims.e3 = [6 20];
+        ylims.e5 = [.5 .9];
+    case 'rt-g'
+        ylims.e0 = [.9 1.6];
+        ylims.e3 = [.02 .08];
+        ylims.e5 = [0 .7];
+end
 
 idx = [1 3 2];
 nCV = numel(idx);

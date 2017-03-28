@@ -3,7 +3,8 @@ function [fit, err] = rd_resampleTemporalAttentionAdjust(subjectID, run)
 % [fit, err] = rd_resampleTemporalAttentionAdjust(subjectID, run)
 
 %% setup
-shuffleLabels = {'cueValidity'};
+resampleOption = 'bootstrap'; % 'bootstrap','permutation'
+shuffleLabels = {'cueValidity'}; % applies to permutation
 
 % subjectID = 'rd';
 subject = sprintf('%s_a1_tc100_soa1000-1250', subjectID);
@@ -19,14 +20,36 @@ figDir = sprintf('%s/%s/%s', figDir, expName, subject(1:2));
 dataFile = dir(sprintf('%s/%s_run%02d*', dataDir, subject, run));
 load(sprintf('%s/%s', dataDir, dataFile(1).name))
 
-%% shuffle labels and reanalyze
-idx = zeros(size(shuffleLabels));
-for iLabel = 1:numel(shuffleLabels)
-    idx(iLabel) = find(strcmp(expt.trials_headers, shuffleLabels{iLabel}));
+%% resample and reanalyze
+switch resampleOption
+    case 'bootstrap'
+        % bootstrap from each condition (validity x target) and reanalyze
+        cvIdx = find(strcmp(expt.trials_headers, 'cueValidity'));
+        tIdx = find(strcmp(expt.trials_headers, 'respInterval'));
+        for iCV = 1:3
+            wcv = expt.trials(:,cvIdx)==iCV;
+            for iT = 1:2
+                wt = expt.trials(:,tIdx)==iT;
+                w = wcv & wt;
+                vals = expt.trials(w,:);
+                resamp = RandSample(1:nnz(w),[1 nnz(w)]);
+                expt.trials(w,:) = vals(resamp,:);
+            end
+        end
+        [expt results] = rd_analyzeTemporalAttentionAdjust(expt);
+        
+    case 'permutation'
+        % shuffle labels and reanalyze
+        idx = zeros(size(shuffleLabels));
+        for iLabel = 1:numel(shuffleLabels)
+            idx(iLabel) = find(strcmp(expt.trials_headers, shuffleLabels{iLabel}));
+        end
+        newOrder = randperm(size(expt.trials,1));
+        expt.trials(:,idx) = expt.trials(newOrder,idx);
+        [expt results] = rd_analyzeTemporalAttentionAdjust(expt);
+    otherwise
+        error('resampleOption not recognized')
 end
-newOrder = randperm(size(expt.trials,1));
-expt.trials(:,idx) = expt.trials(newOrder,idx);
-[expt results] = rd_analyzeTemporalAttentionAdjust(expt);
 
 %% specify model
 modelName = 'mixtureNoBias';

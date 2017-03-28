@@ -7,6 +7,7 @@ e5 = load('data/E5_workspace_run01_N10_20160806.mat');
 
 % fractional benefits and costs?
 normalizeWithinTarget = 1;
+baselineOpt = 'neut'; % 'vi','neut'
 
 % valid vs. invalid
 vi.e0 = e0.accDataCP(1,:,:); % 1 x subject x target
@@ -14,6 +15,21 @@ vi.e3 = e3.pdData(1,:,:);
 vi.e5 = e5.accDataCP(1,:,:);
 
 vi12.e5 = e5.accDataIBP(1:2,:,:); % VI1/VI2 x subject x target
+
+% neutral
+neut.e0(:,:,1) = e0.accDataC{1}(3,:);
+neut.e0(:,:,2) = e0.accDataC{2}(3,:);
+neut.e3(:,:,1) = squeeze(e3.paramsData.sd(3,1,:))';
+neut.e3(:,:,2) = squeeze(e3.paramsData.sd(3,2,:))';
+neut.e5(:,:,1) = e5.accDataC{1}(3,:);
+neut.e5(:,:,2) = e5.accDataC{2}(3,:);
+neut.e5(:,:,3) = e5.accDataC{3}(3,:);
+
+neut12.e5 = repmat(neut.e5,[2,1,1]);   
+
+% set baseline
+base = eval(baselineOpt);
+base12 = eval([baselineOpt '12']);
 
 % benefits and costs
 % VI, VN, NI
@@ -65,16 +81,36 @@ for iExp = 1:nExp
                 if strcmp(expName,'e5')
                     targets = setdiff(alltargets,nt);
                     idx = find(targets==iT);
-                    cost = cost./vi12.(expName)(idx,:,nt);
-                    benefit = benefit./vi12.(expName)(iNT,:,iT);
+                    cost = cost./base12.(expName)(idx,:,nt);
+                    benefit = benefit./base12.(expName)(iNT,:,iT);
                 else
-                    cost = cost./vi.(expName)(:,:,nt);
-                    benefit = benefit./vi.(expName)(:,:,iT);
+                    cost = cost./base.(expName)(:,:,nt);
+                    benefit = benefit./base.(expName)(:,:,iT);
                 end
             end
             pairedBC.(expName)(:,:,iT,iNT) = [benefit' cost'];
             pairNames.(expName){iT,iNT} = sprintf('%s_%s',bn,cn);
         end
+    end
+end
+
+%% mean and ste
+pairedBCMean = [];
+pairedBCSte = [];
+for iExp = 1:nExp
+    expName = expNames{iExp};
+    if strcmp(expName,'e5')
+        % target x bc x non-target
+        m = squeeze(mean(pairedBC.(expName),1));
+        s = squeeze(std(pairedBC.(expName),0,1))/sqrt(size(pairedBC.(expName),1));
+        for iNT = 1:2
+            pairedBCMean.(expName)(:,:,iNT) = m(:,:,iNT)';
+            pairedBCSte.(expName)(:,:,iNT) = s(:,:,iNT)';
+        end
+    else
+        % target x bc
+        pairedBCMean.(expName) = squeeze(mean(pairedBC.(expName),1))';
+        pairedBCSte.(expName) = squeeze(std(pairedBC.(expName),0,1))'/sqrt(size(pairedBC.(expName),1));
     end
 end
 

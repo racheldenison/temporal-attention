@@ -20,7 +20,7 @@ if nargin < 2 || isempty(saveData)
 end
 
 steOption = 'trial'; % 'trial','set'
-fprintf('\nStandard error by %s\n\n', steOption)
+% fprintf('\nStandard error by %s\n\n', steOption)
 
 plotFigs = 1;
 

@@ -9,6 +9,7 @@ nSamples = 1000;
 
 %% run resampling
 for iSample = 1:nSamples
+    tic
     fprintf('\n%d', iSample)
     
     for iSubject = 1:nSubjects
@@ -28,6 +29,7 @@ for iSample = 1:nSamples
     pd(1,:,:,iSample) = mean(p(2,:,:,:) - p(1,:,:,:),4); % VI
     pd(2,:,:,iSample) = mean(p(3,:,:,:) - p(1,:,:,:),4); % VN
     pd(3,:,:,iSample) = mean(p(2,:,:,:) - p(3,:,:,:),4); % NI
+    toc
 end
 
 %% plots

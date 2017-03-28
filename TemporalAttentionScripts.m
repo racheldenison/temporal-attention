@@ -40,6 +40,7 @@ rd_analyzeTemporalAttention3Targets
 % costs vs. benefits
 rd_plotTemporalAttentionTradeoffs
 rd_plotTemporalAttentionTradeoffsMean % mean for each experiment
+rd_plotTemporalAttentionTradeoffsMean2 % use this one
 rd_plotTemporalAttentionTradeoffsAll % each subject
 
     

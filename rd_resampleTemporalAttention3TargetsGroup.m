@@ -7,6 +7,7 @@ subjectInits = {'gb','xw','yz','jg','rd','ht','gb2','ds','ik','jp'};
 
 run = 1;
 
+resampleOption = 'bootstrap'; % 'bootstrap','permutation'
 nSamples = 1000;
 % shuffleLabels = {'targetContrast','respInterval','cueValidity'};
 shuffleLabels = {'cueValidity'};
@@ -17,6 +18,7 @@ nSubjects = numel(subjectInits);
 
 %% Resample
 for iSample = 1:nSamples
+    tic
     fprintf('%d\n', iSample)
     
     %% Get data
@@ -37,14 +39,34 @@ for iSample = 1:nSamples
         end
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        %%% shuffle labels and reanalyze %%%
-        idx = zeros(size(shuffleLabels));
-        for iLabel = 1:numel(shuffleLabels)
-            idx(iLabel) = find(strcmp(expt.trials_headers, shuffleLabels{iLabel}));
+        switch resampleOption
+            case 'bootstrap'
+                %%% resample from each condition (validity x target) and reanalyze %%%
+                cvIdx = find(strcmp(expt.trials_headers, 'cueValidity'));
+                tIdx = find(strcmp(expt.trials_headers, 'respInterval'));
+                for iCV = 1:3
+                    wcv = expt.trials(:,cvIdx)==iCV;
+                    for iT = 1:3
+                        wt = expt.trials(:,tIdx)==iT;
+                        w = wcv & wt;
+                        vals = expt.trials(w,:);
+                        resamp = RandSample(1:nnz(w),[1 nnz(w)]);
+                        expt.trials(w,:) = vals(resamp,:);
+                    end
+                end
+                [expt results] = rd_analyzeTemporalAttention3Targets(expt);
+            case 'permutation'
+                %%% shuffle labels and reanalyze %%%
+                idx = zeros(size(shuffleLabels));
+                for iLabel = 1:numel(shuffleLabels)
+                    idx(iLabel) = find(strcmp(expt.trials_headers, shuffleLabels{iLabel}));
+                end
+                newOrder = randperm(size(expt.trials,1));
+                expt.trials(:,idx) = expt.trials(newOrder,idx);
+                [expt results] = rd_analyzeTemporalAttention3Targets(expt);
+            otherwise
+                error('resampleOption not recognized')
         end
-        newOrder = randperm(size(expt.trials,1));
-        expt.trials(:,idx) = expt.trials(newOrder,idx);
-        [expt results] = rd_analyzeTemporalAttention3Targets(expt);
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
         nT = numel(expt.p.respInterval);
@@ -110,6 +132,7 @@ for iSample = 1:nSamples
         rtDataIBPairwise(4,iT,iSample) = mean(rtDataIB{iT}(2,:) - rtDataIB{iT}(3,:)); % NI1
         rtDataIBPairwise(5,iT,iSample) = mean(rtDataIB{iT}(2,:) - rtDataIB{iT}(4,:)); % NI2
     end
+    toc
 end
 
 %% figures
