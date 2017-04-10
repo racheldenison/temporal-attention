@@ -17,10 +17,10 @@ tilt = '*';
 
 % soa1 = [1000 1000 1000 1000 1000 1000 1000 1000 1000 1000];
 % soa2 = [1100 1150 1200 1250 1300 1350 1400 1450 1500 1800];
-soa1 = [1000 1000 1000 1000 1000 1000 1000 1000 1000 1000];
-soa2 = [1100 1150 1200 1250 1300 1350 1400 1450 1500 1800];
+soa1 = [1000 1000 1000 1000];
+soa2 = [1200 1350 1500 1800];
 t1t2soa = soa2 - soa1;
-run = 98; % 8 = runs 1-3; 9 = runs 2-3; 18 = runs 1-3 with first good block of each day excluded
+run = 8; % 8 = runs 1-3; 9 = runs 2-3; 18 = runs 1-3 with first good block of each day excluded
 
 plotFigs = 0;
 saveFigs = 0;
@@ -45,7 +45,7 @@ end
 
 %% Get data
 for iSOA = 1:numel(soa1)
-    subject = sprintf('%s*_soa%d-%d', ...
+    subject = sprintf('%s_soa%d-%d', ...
         subjectID, soa1(iSOA), soa2(iSOA));
     
     % load data from a given soa

@@ -1,7 +1,7 @@
 % rd_plotTemporalAttentionMultiSOAGroup.m
 
 %% Setup
-subjectInits = {'rd','hl','ho','vp'};
+% subjectInits = {'rd','hl','ho','vp'};
 % subjectInits = {'rd','hl','ho'};
 % subjectInits = {'dg','sl','mr','ly','pv','ek','gk','md','ax'}; % 'ek'
 % subjectInits = {'sl','pv','gk'}; % 100
@@ -9,7 +9,7 @@ subjectInits = {'rd','hl','ho','vp'};
 % subjectInits = {'dg','ly','ek'}; % 800
 % subjectInits = {'dg','sl','mr','ax'}; % rd ran (full or partial)
 % subjectInits = {'ly','pv','ek','gk','md'}; % wd ran
-% subjectInits = {'ax'};
+subjectInits = {'jp'};
 nSubjects = numel(subjectInits);
 groupStr = sprintf('N=%d', nSubjects);
 
