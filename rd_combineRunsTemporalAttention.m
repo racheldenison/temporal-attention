@@ -4,7 +4,7 @@ function rd_combineRunsTemporalAttention(subject)
 if nargin==0
     % subject = 'ecPilot_cb_tilt1pt5_tc64-100_soa1000-1250';
 %     subject = 'ax_cbD10_tilt2pt3_tc16-64_soa1000-1300';
-    subject = 'jp_cbD6_tilt1pt4_tc64_soa1000-1200';
+    subject = 'jp_cbD6_tilt1pt4_tc64_soa1000-1450';
 end
 runs = 1:3;
 combinedRun = 8; % 8 = runs 1-3; 28 = runs 4-6; 98 = runs 1-6; 88 = runs 1-6 ste by set 

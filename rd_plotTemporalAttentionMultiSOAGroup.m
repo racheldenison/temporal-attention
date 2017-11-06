@@ -1,25 +1,30 @@
 % rd_plotTemporalAttentionMultiSOAGroup.m
 
 %% Setup
+subjectInits = {'rd','hl','ho','vp','jp'};
 % subjectInits = {'rd','hl','ho','vp'};
-% subjectInits = {'rd','hl','ho'};
 % subjectInits = {'dg','sl','mr','ly','pv','ek','gk','md','ax'}; % 'ek'
 % subjectInits = {'sl','pv','gk'}; % 100
 % subjectInits = {'mr','md','ax'}; % 300
 % subjectInits = {'dg','ly','ek'}; % 800
 % subjectInits = {'dg','sl','mr','ax'}; % rd ran (full or partial)
 % subjectInits = {'ly','pv','ek','gk','md'}; % wd ran
-subjectInits = {'jp'};
 nSubjects = numel(subjectInits);
 groupStr = sprintf('N=%d', nSubjects);
 
 expName = 'E2'; % 'E2','E4'
 
 contrast = 64;
-T1T2Axis = ''; % 'same','diff'
-extraSelection = ''; % 'sameOrient','diffOrient','sameContrastOneBack','diffContrastOneBack'
+T1T2Axis = 'same'; % 'same','diff'
+extraSelection = 'sameOrient'; % 'sameOrient','diffOrient','sameContrastOneBack','diffContrastOneBack'
 cleanRT = 0;
-normalizeData = 0;
+normalizeData = 1;
+w = []; % subject weights
+if isempty(w)
+    w = ones(1,nSubjects);
+else
+    groupStr = sprintf('%sw',groupStr);
+end
 
 analStr1 = sprintf('contrast%d', contrast);
 switch extraSelection
@@ -113,15 +118,15 @@ end
 
 %% Group summary stats
 for iEL = 1:numel(accData)
-    accMean{iEL} = mean(accData{iEL},3);
-    rtMean{iEL} = mean(rtData{iEL},3);
-    dpMean{iEL} = mean(dpData{iEL},3);
-    effMean{iEL} = mean(effData{iEL},3);
+    accMean{iEL} = wmean(accData{iEL},w,3); 
+    rtMean{iEL} = wmean(rtData{iEL},w,3);
+    dpMean{iEL} = wmean(dpData{iEL},w,3);
+    effMean{iEL} = wmean(effData{iEL},w,3);
     
-    accSte{iEL} = std(accData{iEL},0,3)./sqrt(nSubjects);
-    rtSte{iEL} = std(rtData{iEL},0,3)./sqrt(nSubjects);
-    dpSte{iEL} = std(dpData{iEL},0,3)./sqrt(nSubjects);
-    effSte{iEL} = std(effData{iEL},0,3)./sqrt(nSubjects);
+    accSte{iEL} = wstd(accData{iEL},w,3)./sqrt(nSubjects); %%%%%% right way to do weighted ste?
+    rtSte{iEL} = wstd(rtData{iEL},w,3)./sqrt(nSubjects);
+    dpSte{iEL} = wstd(dpData{iEL},w,3)./sqrt(nSubjects);
+    effSte{iEL} = wstd(effData{iEL},w,3)./sqrt(nSubjects);
 end
 
 %% Plot figs
@@ -153,6 +158,9 @@ for iRI = 1:numel(p.respInterval)
     e1 = errorbar(repmat(t1t2soa',1,numel(p.cueValidity)),...
         accMean{iRI}', accSte{iRI}', '.', 'MarkerSize', 20, ...
         'LineWidth', 1);
+    for i=1:numel(e1)
+        set(e1(i),'Color',colors(i,:));
+    end
 
     xlabel('soa')
     ylabel('acc')
@@ -175,6 +183,9 @@ for iRI = 1:numel(p.respInterval)
     e1 = errorbar(repmat(t1t2soa',1,numel(p.cueValidity)),...
         rtMean{iRI}', rtSte{iRI}', '.', 'MarkerSize', 20, ...
         'LineWidth', 1);
+    for i=1:numel(e1)
+        set(e1(i),'Color',colors(i,:));
+    end
     
     xlabel('soa')
     ylabel('rt')
@@ -199,6 +210,9 @@ for iRI = 1:numel(p.respInterval)
     e1 = errorbar(repmat(t1t2soa',1,numel(p.cueValidity)),...
         dpMean{iRI}', dpSte{iRI}', '.', 'MarkerSize', 20, ...
         'LineWidth', 1);
+    for i=1:numel(e1)
+        set(e1(i),'Color',colors(i,:));
+    end
 
     xlabel('soa')
     ylabel('dprime')
@@ -221,7 +235,9 @@ for iRI = 1:numel(p.respInterval)
     e1 = errorbar(repmat(t1t2soa',1,numel(p.cueValidity)),...
         effMean{iRI}', effSte{iRI}', '.', 'MarkerSize', 20, ...
         'LineWidth', 1);
-    set(p1(2),'LineWidth',1.5)
+    for i=1:numel(e1)
+        set(e1(i),'Color',colors(i,:));
+    end
 
     xlabel('soa')
     ylabel('efficiency (dprime/rt)')
@@ -279,18 +295,19 @@ fig(7) = figure;
 hold on
 plot(soaLims, [0 0], '--k')
 p1 = [];
-p1(1) = plot(t1t2soa, mean(accDataCueEff{1},2),'-','LineWidth',2);
-p1(2) = plot(t1t2soa, mean(accDataCueEff{2},2),'r-','LineWidth',2);
+p1(1) = plot(t1t2soa, mean(accDataCueEff{1},2),'-','LineWidth',2, 'Color', colors(1,:));
+p1(2) = plot(t1t2soa, mean(accDataCueEff{2},2),'-','LineWidth',2, 'Color', colors(2,:));
 
 e1(1) = errorbar(t1t2soa, mean(accDataCueEff{1},2), ...
     std(accDataCueEff{1},0,2)./sqrt(nSubjects),...
-    '.','MarkerSize', 20,'LineWidth', 1);
+    'o','MarkerSize', 8,'LineWidth', 1, 'Color', colors(1,:),'MarkerFaceColor','w');
 e1(2) = errorbar(t1t2soa, mean(accDataCueEff{2},2), ...
     std(accDataCueEff{2},0,2)./sqrt(nSubjects),...
-    '.r','MarkerSize', 20,'LineWidth', 1);
+    's','MarkerSize', 8,'LineWidth', 1, 'Color', colors(2,:),'MarkerFaceColor','w');
 
-plot(t1t2soa, mean(accDataCueEff{1},2),'o','LineWidth',1,'MarkerSize',8,'MarkerFaceColor','w')
-plot(t1t2soa, mean(accDataCueEff{2},2),'rs','LineWidth',1,'MarkerSize',8,'MarkerFaceColor','w')
+% put markers on top
+plot(t1t2soa, mean(accDataCueEff{1},2),'o','LineWidth',1,'MarkerSize',8, 'Color', colors(1,:),'MarkerFaceColor','w')
+plot(t1t2soa, mean(accDataCueEff{2},2),'s','LineWidth',1,'MarkerSize',8, 'Color', colors(2,:),'MarkerFaceColor','w')
 
 legend(p1, intervalNames)
 xlabel('soa')
@@ -303,18 +320,18 @@ fig(8) = figure;
 hold on
 plot(soaLims, [0.5 0.5], '--k');
 p1 = [];
-p1(1) = plot(t1t2soa, mean(accDataCueAve{1},2),'-','LineWidth',2);
-p1(2) = plot(t1t2soa, mean(accDataCueAve{2},2),'r-','LineWidth',2);
+p1(1) = plot(t1t2soa, mean(accDataCueAve{1},2),'-','LineWidth',2, 'Color', colors(1,:));
+p1(2) = plot(t1t2soa, mean(accDataCueAve{2},2),'-','LineWidth',2, 'Color', colors(2,:));
 
 e1(1) = errorbar(t1t2soa, mean(accDataCueAve{1},2), ...
     std(accDataCueAve{1},0,2)./sqrt(nSubjects),...
-    '.','MarkerSize', 20,'LineWidth', 1);
+    'o','MarkerSize', 8,'LineWidth', 1, 'Color', colors(1,:),'MarkerFaceColor','w');
 e1(2) = errorbar(t1t2soa, mean(accDataCueAve{2},2), ...
     std(accDataCueAve{2},0,2)./sqrt(nSubjects),...
-    '.r','MarkerSize', 20,'LineWidth', 1);
+    's','MarkerSize', 8,'LineWidth', 1, 'Color', colors(2,:),'MarkerFaceColor','w');
 
-plot(t1t2soa, mean(accDataCueAve{1},2),'o','LineWidth',1,'MarkerSize',8,'MarkerFaceColor','w')
-plot(t1t2soa, mean(accDataCueAve{2},2),'rs','LineWidth',1,'MarkerSize',8,'MarkerFaceColor','w')
+plot(t1t2soa, mean(accDataCueAve{1},2),'o','LineWidth',1,'MarkerSize',8, 'Color', colors(1,:),'MarkerFaceColor','w')
+plot(t1t2soa, mean(accDataCueAve{2},2),'s','LineWidth',1,'MarkerSize',8, 'Color', colors(2,:),'MarkerFaceColor','w')
 
 legend(p1, intervalNames)
 xlabel('soa')
@@ -329,19 +346,19 @@ for iVI = 1:2
     hold on
     plot(soaLims, [0 0], '--k')
     p1 = [];
-    p1(1,:) = plot(t1t2soa, squeeze(mean(accDataCueEffN{1}(:,:,iVI),2)),'-','LineWidth',2);
-    p1(2,:) = plot(t1t2soa, squeeze(mean(accDataCueEffN{2}(:,:,iVI),2)),'-r','LineWidth',2);
+    p1(1,:) = plot(t1t2soa, squeeze(mean(accDataCueEffN{1}(:,:,iVI),2)),'-','LineWidth',2, 'Color', colors(1,:));
+    p1(2,:) = plot(t1t2soa, squeeze(mean(accDataCueEffN{2}(:,:,iVI),2)),'-','LineWidth',2, 'Color', colors(2,:));
     
     e1 = [];
     e1(1,:) = errorbar(t1t2soa, squeeze(mean(accDataCueEffN{1}(:,:,iVI),2)), ...
         squeeze(std(accDataCueEffN{1}(:,:,iVI),0,2))./sqrt(nSubjects),...
-        '.','MarkerSize', 20,'LineWidth', 1);
+        '.','MarkerSize', 20,'LineWidth', 1, 'Color', colors(1,:));
     e1(2,:) = errorbar(t1t2soa, squeeze(mean(accDataCueEffN{2}(:,:,iVI),2)), ...
         squeeze(std(accDataCueEffN{2}(:,:,iVI),0,2))./sqrt(nSubjects),...
-        '.r','MarkerSize', 20,'LineWidth', 1);
+        '.','MarkerSize', 20,'LineWidth', 1, 'Color', colors(2,:));
     
-    plot(t1t2soa, squeeze(mean(accDataCueEffN{1}(:,:,iVI),2)),'o','LineWidth',1,'MarkerSize',8,'MarkerFaceColor','w')
-    plot(t1t2soa, squeeze(mean(accDataCueEffN{2}(:,:,iVI),2)),'rs','LineWidth',1,'MarkerSize',8,'MarkerFaceColor','w')
+    plot(t1t2soa, squeeze(mean(accDataCueEffN{1}(:,:,iVI),2)),'o','LineWidth',1,'MarkerSize',8, 'Color', colors(1,:),'MarkerFaceColor','w')
+    plot(t1t2soa, squeeze(mean(accDataCueEffN{2}(:,:,iVI),2)),'s','LineWidth',1,'MarkerSize',8, 'Color', colors(2,:),'MarkerFaceColor','w')
     
     legend(p1(:,1), intervalNames)
     xlabel('soa')

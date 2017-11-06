@@ -15,7 +15,7 @@ normalizeData = 0;
 saveFigs = 0;
 
 nSubjects = numel(subjectInits);
-exptStr = sprintf('%s_*%s_soa%d-%d*', ...
+exptStr = sprintf('%s_%s_soa%d-%d*', ...
     exptName, contrast, soa1, soa2);
 
 % dataDir = pathToExpt('data');
