@@ -1,7 +1,7 @@
 % rd_plotTemporalAttentionMultiSOABootstrapErrorBars.m
 
 %% Setup
-subjectInit = 'ho';
+subjectInit = 'jp';
 exptName = 'cbD6'; % 'cbD6', 'cbD10'
 
 run = 98;

@@ -3,7 +3,7 @@
 % modified from rd_resampleTemporalAttentionGroup.m
 
 exptName = 'cbD6';
-subjectInits = {'rd','hl','ho','vp'};
+subjectInits = {'rd','hl','ho','vp','jp'};
 contrast = '*'; 
 soa1 = [1000 1000 1000 1000 1000 1000 1000 1000 1000 1000];
 soa2 = [1100 1150 1200 1250 1300 1350 1400 1450 1500 1800];
@@ -77,3 +77,4 @@ rtGroupPairwise = mean(rtDataPairwise,5);
 
 %% save
 % save data/E2_SOA_cbD6_randomizationTest_workspace_run98_N4_20160125.mat
+% save data/E2_SOA_cbD6_randomizationTest_workspace_run98_N5_20160816.mat

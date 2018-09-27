@@ -1,7 +1,7 @@
 % rd_plotTemporalAttentionMultiSOAResampledNull.m
 
 %% Setup
-subjectInits = {'rd','hl','ho','vp'};
+subjectInits = {'rd','hl','ho','vp','jp'};
 nSubjects = numel(subjectInits);
 groupStr = sprintf('N=%d', nSubjects);
 nSubjects = numel(subjectInits);
@@ -14,7 +14,8 @@ figPrefix = sprintf('g%s_N%d', expName, nSubjects);
 
 saveFigs = 0;
 
-R = load(sprintf('data/E2_SOA_cbD6_randomizationTest_workspace_run98_N%d_20160125.mat',nSubjects));
+% R = load(sprintf('data/E2_SOA_cbD6_randomizationTest_workspace_run98_N%d_20160125.mat',nSubjects));
+R = load(sprintf('data/E2_SOA_cbD6_randomizationTest_workspace_run98_N%d_20160816.mat',nSubjects));
 if ~isequal(subjectInits,R.subjectInits)
     error('different subjects in randomized data')
 end

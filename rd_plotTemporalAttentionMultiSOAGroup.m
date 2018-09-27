@@ -15,15 +15,18 @@ groupStr = sprintf('N=%d', nSubjects);
 expName = 'E2'; % 'E2','E4'
 
 contrast = 64;
-T1T2Axis = 'same'; % 'same','diff'
-extraSelection = 'sameOrient'; % 'sameOrient','diffOrient','sameContrastOneBack','diffContrastOneBack'
+T1T2Axis = ''; % 'same','diff'
+extraSelection = ''; % 'sameOrient','diffOrient','sameContrastOneBack','diffContrastOneBack'
 cleanRT = 0;
 normalizeData = 1;
-w = []; % subject weights
-if isempty(w)
+% w = [1 1 1 .5 1]; % subject weights
+w = [];
+if isempty(w) || all(diff(w)==0)
     w = ones(1,nSubjects);
+    wStr = '';
 else
     groupStr = sprintf('%sw',groupStr);
+    wStr = 'w';
 end
 
 analStr1 = sprintf('contrast%d', contrast);
@@ -64,7 +67,7 @@ else
     normStr = '';
 end
 
-figPrefix = sprintf('g%s_N%d_%s%s%s', expName, nSubjects, analStr, rtStr, normStr);
+figPrefix = sprintf('g%s_N%d%s_%s%s%s', expName, nSubjects, wStr, analStr, rtStr, normStr);
 
 saveFigs = 0;
 
@@ -118,15 +121,25 @@ end
 
 %% Group summary stats
 for iEL = 1:numel(accData)
-    accMean{iEL} = wmean(accData{iEL},w,3); 
-    rtMean{iEL} = wmean(rtData{iEL},w,3);
-    dpMean{iEL} = wmean(dpData{iEL},w,3);
-    effMean{iEL} = wmean(effData{iEL},w,3);
+    accMean{iEL} = mean(accData{iEL},3);
+    rtMean{iEL} = mean(rtData{iEL},3);
+    dpMean{iEL} = mean(dpData{iEL},3);
+    effMean{iEL} = mean(effData{iEL},3);
     
-    accSte{iEL} = wstd(accData{iEL},w,3)./sqrt(nSubjects); %%%%%% right way to do weighted ste?
-    rtSte{iEL} = wstd(rtData{iEL},w,3)./sqrt(nSubjects);
-    dpSte{iEL} = wstd(dpData{iEL},w,3)./sqrt(nSubjects);
-    effSte{iEL} = wstd(effData{iEL},w,3)./sqrt(nSubjects);
+    accSte{iEL} = std(accData{iEL},0,3)./sqrt(nSubjects);
+    rtSte{iEL} = std(rtData{iEL},0,3)./sqrt(nSubjects);
+    dpSte{iEL} = std(dpData{iEL},0,3)./sqrt(nSubjects);
+    effSte{iEL} = std(effData{iEL},0,3)./sqrt(nSubjects);
+    
+%     accMean{iEL} = wmean(accData{iEL},w,3); 
+%     rtMean{iEL} = wmean(rtData{iEL},w,3);
+%     dpMean{iEL} = wmean(dpData{iEL},w,3);
+%     effMean{iEL} = wmean(effData{iEL},w,3);
+%     
+%     accSte{iEL} = wstd(accData{iEL},w,3)./sqrt(nSubjects); %%%%%% right way to do weighted ste?
+%     rtSte{iEL} = wstd(rtData{iEL},w,3)./sqrt(nSubjects);
+%     dpSte{iEL} = wstd(dpData{iEL},w,3)./sqrt(nSubjects);
+%     effSte{iEL} = wstd(effData{iEL},w,3)./sqrt(nSubjects);
 end
 
 %% Plot figs
@@ -134,10 +147,11 @@ intervalNames = {'T1','T2'};
 cueNames = {'valid','invalid','neutral'};
 accLims = [0.5 1];
 rtLims = [0.6 1];
-dpLims = [0 2];
-effLims = [0 2.5];
+dpLims = [0 2.5];
+effLims = [0 3];
 accDiffLims = [-0.1 0.2];
 accCueEffLims = [-0.15 0.2];
+dpCueEffLims = [-0.3 0.7];
 soaLims = [t1t2soa(1)-100 t1t2soa(end)+100];
 colors = get(0,'DefaultAxesColorOrder');
 axTitle = '';
@@ -368,6 +382,30 @@ for iVI = 1:2
     title(viNames{iVI})
 end
 
+fig(9) = figure;
+hold on
+plot(soaLims, [0 0], '--k')
+p1 = [];
+p1(1) = plot(t1t2soa, mean(dpDataCueEff{1},2),'-','LineWidth',2, 'Color', colors(1,:));
+p1(2) = plot(t1t2soa, mean(dpDataCueEff{2},2),'-','LineWidth',2, 'Color', colors(2,:));
+
+e1(1) = errorbar(t1t2soa, mean(dpDataCueEff{1},2), ...
+    std(dpDataCueEff{1},0,2)./sqrt(nSubjects),...
+    'o','MarkerSize', 8,'LineWidth', 1, 'Color', colors(1,:),'MarkerFaceColor','w');
+e1(2) = errorbar(t1t2soa, mean(dpDataCueEff{2},2), ...
+    std(dpDataCueEff{2},0,2)./sqrt(nSubjects),...
+    's','MarkerSize', 8,'LineWidth', 1, 'Color', colors(2,:),'MarkerFaceColor','w');
+
+% put markers on top
+plot(t1t2soa, mean(dpDataCueEff{1},2),'o','LineWidth',1,'MarkerSize',8, 'Color', colors(1,:),'MarkerFaceColor','w')
+plot(t1t2soa, mean(dpDataCueEff{2},2),'s','LineWidth',1,'MarkerSize',8, 'Color', colors(2,:),'MarkerFaceColor','w')
+
+legend(p1, intervalNames)
+xlabel('soa')
+ylabel('cuing effect (dprime valid-invalid)')
+xlim(soaLims)
+ylim(dpCueEffLims)
+
 %% set figure properties
 for iF = 1:numel(fig)
     % set font size of titles, axis labels, and legends
@@ -378,6 +416,6 @@ end
 %% Save figs
 % figPrefix = [figPrefix '_sameAxDiffOrient'];
 if saveFigs
-    figNames = {'acc','rt','dprime','eff','accCueEffect','accCueAve','accCueEffectOverlay','accCueAveOverlay','accCueEffectNOverlay'};
+    figNames = {'acc','rt','dprime','eff','accCueEffect','accCueAve','accCueEffectOverlay','accCueAveOverlay','accCueEffectNOverlay','dpCueEffect'};
     rd_saveAllFigs(fig, figNames, figPrefix, [])
 end

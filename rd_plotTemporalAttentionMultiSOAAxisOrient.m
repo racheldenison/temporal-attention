@@ -1,23 +1,28 @@
 % rd_plotTemporalAttentionMultiSOAAxisOrient.m
 
 %% load data
-sosa = load('data/E2_SOA_cbD6_run98_N4_SOSA_workspace_20160128.mat');
-soda = load('data/E2_SOA_cbD6_run98_N4_SODA_workspace_20160128.mat');
-dosa = load('data/E2_SOA_cbD6_run98_N4_DOSA_workspace_20160128.mat');
-doda = load('data/E2_SOA_cbD6_run98_N4_DODA_workspace_20160128.mat');
+% sosa = load('data/E2_SOA_cbD6_run98_N4_SOSA_workspace_20160128.mat');
+% soda = load('data/E2_SOA_cbD6_run98_N4_SODA_workspace_20160128.mat');
+% dosa = load('data/E2_SOA_cbD6_run98_N4_DOSA_workspace_20160128.mat');
+% doda = load('data/E2_SOA_cbD6_run98_N4_DODA_workspace_20160128.mat');
+
+sosa = load('data/E2_SOA_cbD6_run98_N5_SOSA_workspace_20180731.mat');
+soda = load('data/E2_SOA_cbD6_run98_N5_SODA_workspace_20180731.mat');
+dosa = load('data/E2_SOA_cbD6_run98_N5_DOSA_workspace_20180731.mat');
+doda = load('data/E2_SOA_cbD6_run98_N5_DODA_workspace_20180731.mat');
 
 %% get data
-m = 'accDataCueAve';
+m = 'dpDataCueEff'; % dpData
 % data for each subject - subject is 3rd dimension
 for iT = 1:2
-    valsData{iT}(:,1,:) = sosa.(m){iT};
-    valsData{iT}(:,2,:) = soda.(m){iT};
-    valsData{iT}(:,3,:) = dosa.(m){iT};
-    valsData{iT}(:,4,:) = doda.(m){iT};
+    valsData{iT}(:,1,:) = sosa.(m){iT}; %(3,:,:);
+    valsData{iT}(:,2,:) = soda.(m){iT}; %(3,:,:);
+    valsData{iT}(:,3,:) = dosa.(m){iT}; %(3,:,:);
+    valsData{iT}(:,4,:) = doda.(m){iT}; %(3,:,:);
 end
 % mean across subjects
 for iT = 1:2
-    valsMean{iT} = mean(valsData{1},3);
+    valsMean{iT} = mean(valsData{iT},3);
 end
 
 %% plot
@@ -26,7 +31,7 @@ t1t2soa = sosa.t1t2soa;
 soaLims = sosa.soaLims;
 nSubjects = sosa.nSubjects;
 subjectInits = sosa.subjectInits;
-accLims = [.4 1];
+valLims = [-0.5 2.5]; %[.4 1];
 colors = [0 0 0; 2 132 130; 0 0 0; 2 132 130]/255;
 
 for iSubject = 1:nSubjects
@@ -34,17 +39,18 @@ for iSubject = 1:nSubjects
     for iT = 1:2
         subplot(1,2,iT)
         hold on
-        plot(soaLims, [0.5 0.5], '--k');
+        plot(soaLims, [0 0], '--k');
         set(gca, 'ColorOrder', colors);
         p1 = plot(t1t2soa, valsData{iT}(:,:,iSubject),'-','LineWidth',2);
         
         h = plot(t1t2soa, valsData{iT}(:,1:2,iSubject),'o','LineWidth',1,'MarkerSize',8);
-        for iH = 1:numel(h);
+        for iH = 1:numel(h)
             set(h(iH), 'MarkerFaceColor', get(h(iH), 'Color'));
         end
-        h = plot(t1t2soa, valsData{iT}(:,3:4,iSubject),'s','LineWidth',1,'MarkerSize',8);
-        for iH = 1:numel(h);
-            set(h(iH), 'MarkerFaceColor', get(h(iH), 'Color'));
+        h = plot(t1t2soa, valsData{iT}(:,3:4,iSubject),'o','LineWidth',1,'MarkerSize',8);
+        for iH = 1:numel(h)
+%             set(h(iH), 'MarkerFaceColor', get(h(iH), 'Color'));
+            set(h(iH), 'MarkerFaceColor', 'w');
         end
         
         if iT==2
@@ -53,7 +59,7 @@ for iSubject = 1:nSubjects
         xlabel('soa')
         ylabel(m)
         xlim(soaLims)
-        ylim(accLims)
+        ylim(valLims)
     end
     rd_supertitle(sprintf('%s',subjectInits{iSubject}))
 end
@@ -62,28 +68,29 @@ figure
 for iT = 1:2
     subplot(1,2,iT)
     hold on
-    plot(soaLims, [0.5 0.5], '--k');
+    plot(soaLims, [0 0], '--k');
     set(gca, 'ColorOrder', colors);
     p1 = plot(t1t2soa, valsMean{iT},'-','LineWidth',2);
     
     h = plot(t1t2soa, valsMean{iT}(:,1:2),'o','LineWidth',1,'MarkerSize',8);
-    for iH = 1:numel(h);
+    for iH = 1:numel(h)
         set(h(iH), 'MarkerFaceColor', get(h(iH), 'Color'));
     end
-%     set(h(2), 'MarkerFaceColor', 'w');
-    h = plot(t1t2soa, valsMean{iT}(:,3:4),'s','LineWidth',1,'MarkerSize',8);
-    for iH = 1:numel(h);
-        set(h(iH), 'MarkerFaceColor', get(h(iH), 'Color'));
+    allh = h;
+    h = plot(t1t2soa, valsMean{iT}(:,3:4),'o','LineWidth',1,'MarkerSize',8);
+    for iH = 1:numel(h)
+%         set(h(iH), 'MarkerFaceColor', get(h(iH), 'Color'));
+        set(h(iH), 'MarkerFaceColor', 'w');
     end
-%     set(h(2), 'MarkerFaceColor', 'w');
+	allh = [allh; h];
     
     
     if iT==2
-        legend(p1, aoNames)
+        legend(allh, aoNames)
     end
     xlabel('soa')
     ylabel(m)
     xlim(soaLims)
-    ylim(accLims)
+    ylim(valLims)
 end
 rd_supertitle(sprintf('N=%d',nSubjects))
