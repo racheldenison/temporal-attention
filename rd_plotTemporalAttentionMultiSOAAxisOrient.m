@@ -6,19 +6,24 @@
 % dosa = load('data/E2_SOA_cbD6_run98_N4_DOSA_workspace_20160128.mat');
 % doda = load('data/E2_SOA_cbD6_run98_N4_DODA_workspace_20160128.mat');
 
-sosa = load('data/E2_SOA_cbD6_run98_N5_SOSA_workspace_20180731.mat');
-soda = load('data/E2_SOA_cbD6_run98_N5_SODA_workspace_20180731.mat');
-dosa = load('data/E2_SOA_cbD6_run98_N5_DOSA_workspace_20180731.mat');
-doda = load('data/E2_SOA_cbD6_run98_N5_DODA_workspace_20180731.mat');
+% sosa = load('data/E2_SOA_cbD6_run98_N5_SOSA_workspace_20180731.mat');
+% soda = load('data/E2_SOA_cbD6_run98_N5_SODA_workspace_20180731.mat');
+% dosa = load('data/E2_SOA_cbD6_run98_N5_DOSA_workspace_20180731.mat');
+% doda = load('data/E2_SOA_cbD6_run98_N5_DODA_workspace_20180731.mat');
+
+sosa = load('data/E2_SOA_cbD6_run98_N5_SOSA_workspace_20191009.mat');
+soda = load('data/E2_SOA_cbD6_run98_N5_SODA_workspace_20191009.mat');
+dosa = load('data/E2_SOA_cbD6_run98_N5_DOSA_workspace_20191009.mat');
+doda = load('data/E2_SOA_cbD6_run98_N5_DODA_workspace_20191009.mat');
 
 %% get data
-m = 'dpDataCueEff'; % dpData
+m = 'dpData'; % dpData, dpDataCueEff
 % data for each subject - subject is 3rd dimension
 for iT = 1:2
-    valsData{iT}(:,1,:) = sosa.(m){iT}; %(3,:,:);
-    valsData{iT}(:,2,:) = soda.(m){iT}; %(3,:,:);
-    valsData{iT}(:,3,:) = dosa.(m){iT}; %(3,:,:);
-    valsData{iT}(:,4,:) = doda.(m){iT}; %(3,:,:);
+    valsData{iT}(:,1,:) = sosa.(m){iT}(2,:,:); %(1,:,:) for dpData, or none for dpDataCueEff;
+    valsData{iT}(:,2,:) = soda.(m){iT}(2,:,:); %(1,:,:);
+    valsData{iT}(:,3,:) = dosa.(m){iT}(2,:,:); %(1,:,:);
+    valsData{iT}(:,4,:) = doda.(m){iT}(2,:,:); %(1,:,:);
 end
 % mean across subjects
 for iT = 1:2
@@ -31,7 +36,7 @@ t1t2soa = sosa.t1t2soa;
 soaLims = sosa.soaLims;
 nSubjects = sosa.nSubjects;
 subjectInits = sosa.subjectInits;
-valLims = [-0.5 2.5]; %[.4 1];
+valLims = [-0.5 3.5]; %[.4 1];
 colors = [0 0 0; 2 132 130; 0 0 0; 2 132 130]/255;
 
 for iSubject = 1:nSubjects

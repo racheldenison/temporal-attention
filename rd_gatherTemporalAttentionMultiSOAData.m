@@ -1,7 +1,7 @@
 % rd_gatherTemporalAttentionMultiSOAData.m
 
 %% Setup
-subjectInit = 'ho';
+subjectInit = 'jp';
 exptName = 'cbD6'; % 'cbD6', 'cbD10'
 
 run = 98;
@@ -16,7 +16,8 @@ dataDir = pathToExpt('data');
 dataDir = sprintf('%s/%s/%s', dataDir, expName, subjectInit(1:2));
 figDir = sprintf('%s/%s/%s', pathToExpt('figures'), expName, subjectInit(1:2));
 
-subjectID = sprintf('%s_%s*', subjectInit, exptName);
+% subjectID = sprintf('%s_%s*', subjectInit, exptName);
+subjectID = sprintf('%s_%s', subjectInit, exptName);
 
 %% Get data
 for iSOA = 1:numel(soa1)

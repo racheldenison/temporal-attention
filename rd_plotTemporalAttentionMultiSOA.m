@@ -1,4 +1,4 @@
-function [accMean rtMean t1t2soa p dprime eff] = rd_plotTemporalAttentionMultiSOA(subjectInit, contrast, T1T2Axis, extraSelection, cleanRT)
+function [accMean rtMean t1t2soa p dprime eff crit] = rd_plotTemporalAttentionMultiSOA(subjectInit, contrast, T1T2Axis, extraSelection, cleanRT)
 
 if nargin < 3
     T1T2Axis = []; % 'same','diff'
@@ -85,8 +85,12 @@ for iSOA = 1:numel(soa1)
         rtSte{iEL}(:,iSOA) = results.rtSte{iEL}(:,tcIdx);
         
         if doDprime
-            dprime{iEL}(:,iSOA) = ...
-                rd_dprime(results.accMean{iEL}(:,tcIdx),[],'2afc','adjust');
+%             dprime{iEL}(:,iSOA) = ...
+            %     rd_dprime(results.accMean{iEL}(:,tcIdx),[],'2afc','adjust');
+            for iCV = 1:3
+                [dprime{iEL}(iCV,iSOA), crit{iEL}(iCV,iSOA)] = ...
+                    getDprimeFromTrials(results.totals.all{iCV,iEL}, expt.trials_headers);
+            end
         else
             dprime{iEL}(:,iSOA) = zeros(size(rtSte{iEL}(:,iSOA)));
         end
@@ -114,8 +118,8 @@ if plotFigs
         otherwise
             rtLims = [0.2 1.6];
     end
-    dpLims = [-0.5 2.7];
-    effLims = [-0.5 4];
+    dpLims = [-0.5 3.5];
+    effLims = [-0.5 6];
     soaLims = [t1t2soa(1)-100 t1t2soa(end)+100];
     colors = get(0,'DefaultAxesColorOrder');
     axTitle = '';

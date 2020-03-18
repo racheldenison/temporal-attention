@@ -18,7 +18,7 @@ contrast = 64;
 T1T2Axis = ''; % 'same','diff'
 extraSelection = ''; % 'sameOrient','diffOrient','sameContrastOneBack','diffContrastOneBack'
 cleanRT = 0;
-normalizeData = 1;
+normalizeData = 0;
 % w = [1 1 1 .5 1]; % subject weights
 w = [];
 if isempty(w) || all(diff(w)==0)
@@ -74,13 +74,14 @@ saveFigs = 0;
 %% Get indiv subject data
 for iSubject = 1:nSubjects
     subjectInit = subjectInits{iSubject};
-    [acc rt t1t2soa p dp eff] = ...
+    [acc rt t1t2soa p dp eff crit] = ...
         rd_plotTemporalAttentionMultiSOA(subjectInit, contrast, T1T2Axis, extraSelection, cleanRT);
     for iEL = 1:numel(acc)
         accData{iEL}(:,:,iSubject) = acc{iEL};
         rtData{iEL}(:,:,iSubject) = rt{iEL};
         dpData{iEL}(:,:,iSubject) = dp{iEL};
         effData{iEL}(:,:,iSubject) = eff{iEL};
+        critData{iEL}(:,:,iSubject) = crit{iEL};
     end
 end
 
@@ -91,6 +92,7 @@ if normalizeData
         rtData{iEL} = normalizeDC(rtData{iEL});
         dpData{iEL} = normalizeDC(dpData{iEL});
         effData{iEL} = normalizeDC(effData{iEL});
+        critData{iEL} = normalizeDC(critData{iEL});
     end
 end
 
@@ -147,11 +149,11 @@ intervalNames = {'T1','T2'};
 cueNames = {'valid','invalid','neutral'};
 accLims = [0.5 1];
 rtLims = [0.6 1];
-dpLims = [0 2.5];
-effLims = [0 3];
+dpLims = [0 3];
+effLims = [0 3.5];
 accDiffLims = [-0.1 0.2];
 accCueEffLims = [-0.15 0.2];
-dpCueEffLims = [-0.3 0.7];
+dpCueEffLims = [-0.5 1];
 soaLims = [t1t2soa(1)-100 t1t2soa(end)+100];
 colors = get(0,'DefaultAxesColorOrder');
 axTitle = '';
@@ -382,7 +384,7 @@ for iVI = 1:2
     title(viNames{iVI})
 end
 
-fig(9) = figure;
+fig(10) = figure;
 hold on
 plot(soaLims, [0 0], '--k')
 p1 = [];
@@ -405,6 +407,45 @@ xlabel('soa')
 ylabel('cuing effect (dprime valid-invalid)')
 xlim(soaLims)
 ylim(dpCueEffLims)
+
+%% Plot individual subject figs
+figure('Position',[1000 25 400 1300])
+for iS = 1:nSubjects
+    subplot(nSubjects,2,iS*2-1)
+    plot(t1t2soa, dpData{1}(:,:,iS))
+    title(intervalNames{1})
+    xlim([0 900])
+    ylim([-.2 3.5])
+    if iS==nSubjects
+        xlabel('SOA (ms)')
+        ylabel('Performance d''')
+        legend(cueNames)
+    end
+    subplot(nSubjects,2,iS*2)
+    plot(t1t2soa, dpData{2}(:,:,iS))
+    title(intervalNames{2})
+    xlim([0 900])
+    ylim([-.2 3.5])
+end
+
+figure('Position',[1000 25 400 1300])
+for iS = 1:nSubjects
+    subplot(nSubjects,2,iS*2-1)
+    plot(t1t2soa, rtData{1}(:,:,iS))
+    title(intervalNames{1})
+    xlim([0 900])
+    ylim([.5 1.2])
+    if iS==nSubjects
+        xlabel('SOA (ms)')
+        ylabel('Reaction time (ms)')
+        legend(cueNames)
+    end
+    subplot(nSubjects,2,iS*2)
+    plot(t1t2soa, rtData{2}(:,:,iS))
+    title(intervalNames{2})
+    xlim([0 900])
+    ylim([.5 1.2])
+end
 
 %% set figure properties
 for iF = 1:numel(fig)

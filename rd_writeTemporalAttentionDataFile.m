@@ -1,18 +1,20 @@
 % rd_writeTemporalAttentionDataFile.m
 
 %% multi SOA
-D = load('data/E2_SOA_cbD6_run98_N5_workspace_20180731.mat');
-data = D.rtData; % dpData, rtData
+% D = load('data/E2_SOA_cbD6_run98_N5_workspace_20180731.mat');
+D = load('data/E2_SOA_cbD6_run98_N5_workspace_20191003.mat');
+data = D.dpData; % dpData, rtData
 subjects = D.subjectInits;
 soas = D.t1t2soa;
 ts = D.intervalNames;
 vs = D.cueNames;
 
-fileID = fopen('data/E2_SOA_cbD6_run98_N5_rt.txt','w');
-fprintf(fileID,'%s %s %s %s %s\n','subject','target','soa','validity','rt');
+fileID = fopen('data/E2_SOA_cbD6_run98_N5_dprime.txt','w');
+fprintf(fileID,'%s %s %s %s %s\n','subject','target','soa','validity','dprime');
 
 for iS = 1:numel(subjects)
-    subject = subjects{iS};
+    subject = subjects{iS}; % initials
+%     subject = sprintf('s%d', iS); % anonymized subject number
     for iT = 1:numel(ts)
         t = ts{iT};
         for iSOA = 1:numel(soas)
